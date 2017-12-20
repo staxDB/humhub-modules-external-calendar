@@ -1,0 +1,14 @@
+{
+    "id": "external_calendar",
+    "name": "External Calendar",
+    "description": "Extends the Calendar-Module to show external Calendars with iCal",
+    "keywords": [
+        "calendar",
+        "external calendar"
+    ],
+    "version": "0.1.1",
+    "humhub": {
+        "minVersion": "1.2.3"
+    },
+    "screenshots": ["assets/screen1.jpg", "assets/screen2.jpg", "assets/screen3.jpg"]
+}
