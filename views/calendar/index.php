@@ -10,7 +10,6 @@ use humhub\modules\user\models\User;
 
 $this->title = Yii::t('ExternalCalendarModule.views_calendar', 'External Calendars');
 ?>
-
 <div class="panel panel-default">
     <div class="panel-heading">
         <h1><?= Html::encode($this->title) ?></h1>

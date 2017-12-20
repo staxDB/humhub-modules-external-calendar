@@ -14,8 +14,8 @@ use humhub\modules\external_calendar\models\ExternalCalendar;
 use humhub\modules\external_calendar\models\ExternalCalendarEntry;
 use humhub\widgets\ModalClose;
 
-require_once(Yii::$app->basePath . '/modules/external_calendar/vendors/johngrogg/ics-parser/src/ICal/Event.php');
-require_once(Yii::$app->basePath . '/modules/external_calendar/vendors/johngrogg/ics-parser/src/ICal/ICal.php');
+require_once(Yii::$app->getModule('external_calendar')->basePath . '/vendors/johngrogg/ics-parser/src/ICal/Event.php');
+require_once(Yii::$app->getModule('external_calendar')->basePath . '/vendors/johngrogg/ics-parser/src/ICal/ICal.php');
 
 use ICal\ICal;
 
