@@ -29,22 +29,22 @@ Right: https://calendar.google.com/calendar/ical/...
 ```
 ## Informations
 This is the first module I've written and I hope it works for you. I have oriented myself on the original calendar module code.
-I also hope that I can find a solution for the ["upcoming-events"-issue](https://github.com/staxDB/calendar_extenstion/issues/1), but I haven't found it yet. Maybe one of you can do that.
+I also hope that I can find a solution for the ["upcoming-events"-issue](https://github.com/staxDB/external_calendar/issues/1), but I haven't found it yet. Maybe one of you can do that.
 
 ## Tested Calendars
 - Google Calendar ([private adress](https://support.google.com/calendar/answer/37648?hl=en) only)
 - [MEP24 Calendar](https://www.mep24software.de/kalender-freigeben/)
 
-__Module website:__ <https://github.com/staxDB/calendar_extension.git>    
+__Module website:__ <https://github.com/staxDB/external_calendar.git>    
 __Author:__ David Born    
 
 ## Changelog
 
-<https://github.com/staxDB/calendar_extension/commits/master>
+<https://github.com/staxDB/external_calendar/commits/master>
 
 ## Bugtracker
 
-<https://github.com/staxDB/calendar_extension/issues>
+<https://github.com/staxDB/external_calendar/issues>
 
 ## ToDos
 - fix bug with calendar-widget "upcoming events"
