@@ -19,5 +19,6 @@ return array(
     'Yes' => 'Ja',
     'Manage external calendar here.' => 'Verwalte hier deine externen Kalender.',
     'Manage external calendar for your profile.' => 'Verwalte hier externe Kalender für dein Profil.',
-    'External Calendar' => 'Externer Kalender'
+    'External Calendar' => 'Externer Kalender',
+    'Extends the Calendar-Module to show external calendars with iCal' => 'Erweitert das Kalender-Modul, um externe Kalender im iCal-Format zu integrieren.'
 );
