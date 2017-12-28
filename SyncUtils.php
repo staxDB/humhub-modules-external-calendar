@@ -96,6 +96,7 @@ class SyncUtils
                 if (($dbModel->uid == $entryModel->uid) && ($dbModel->start_datetime == $entryModel->start_datetime)) {
                     // found & update $dbModel
                     $dbModel->setByEvent($event);
+//                    $dbModel->content->refresh(); // refresh updated_at
                     $dbModel->save();
                     unset($recurringEvents[$eventKey]);
                     unset($dbModels[$dbModelKey]);    // can't do this here, because of recurring events
