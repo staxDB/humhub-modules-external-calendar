@@ -4,8 +4,11 @@ namespace humhub\modules\external_calendar\models;
 
 use Yii;
 
-
-
+/**
+ * ConfigForm uses for AdminController to set the configs for all external calendars
+ *
+ * @author davidborn
+ */
 class ConfigForm extends \yii\base\Model
 {
 

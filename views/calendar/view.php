@@ -17,7 +17,7 @@ $this->title = $model->title;
     <div class="panel-body">
 
         <div class="btn-group-sm">
-            <?= Html::a('<i class="fa fa-pencil-square-o edit"></i>&nbsp;'. Yii::t('ExternalCalendarModule.base', 'Update'), $contentContainer->createUrl('update', ['id' => $model->id]), ['class' => 'btn btn-primary']) ?>
+            <?= Html::a('<i class="fa fa-pencil-square-o edit"></i>&nbsp;' . Yii::t('ExternalCalendarModule.base', 'Update'), $contentContainer->createUrl('update', ['id' => $model->id]), ['class' => 'btn btn-primary']) ?>
             <?= humhub\widgets\ModalConfirm::widget([
                 'uniqueID' => 'modal_delete_task_' . $model->id,
                 'linkOutput' => 'a',
@@ -45,18 +45,18 @@ $this->title = $model->title;
 //                    'sync_mode',
 //                    'event_mode',
                     [
-                        'label'=>Yii::t('ExternalCalendarModule.model_calendar', 'Sync Mode'),
-                        'value'=>$model->getSyncMode(),
+                        'label' => Yii::t('ExternalCalendarModule.model_calendar', 'Sync Mode'),
+                        'value' => $model->getSyncMode(),
                     ],
                     [
-                        'label'=>Yii::t('ExternalCalendarModule.model_calendar', 'Event Mode'),
-                        'value'=>$model->getEventMode(),
+                        'label' => Yii::t('ExternalCalendarModule.model_calendar', 'Event Mode'),
+                        'value' => $model->getEventMode(),
                     ],
                     'time_zone',
                     [
-                        'attribute'=>'color',
-                        'format'=>'raw',
-                        'value'=>"<code style='background-color: {$model->color}; color: transparent'>{$model->color}</code>",
+                        'attribute' => 'color',
+                        'format' => 'raw',
+                        'value' => "<code style='background-color: {$model->color}; color: transparent'>{$model->color}</code>",
 //                        'type'=>DetailView::INPUT_COLOR,
 //                        'inputWidth'=>'40%'
                     ],
@@ -67,7 +67,7 @@ $this->title = $model->title;
             ]) ?>
         </div>
         </br>
-        <div >
+        <div>
             <?= Html::a('<i class="fa fa-arrow-left"></i>&nbsp;' . Yii::t('ExternalCalendarModule.base', 'Back to overview'), $contentContainer->createUrl('index'), ['class' => 'btn-sm btn-default']) ?>
         </div>
 

@@ -2,7 +2,6 @@
 
 namespace humhub\modules\external_calendar;
 
-use function GuzzleHttp\Promise\all;
 use ICal\Event;
 use Yii;
 use humhub\modules\content\models\Content;
@@ -11,6 +10,7 @@ use humhub\modules\external_calendar\models\ExternalCalendar;
 
 require_once(Yii::$app->getModule('external_calendar')->basePath . '/vendors/johngrogg/ics-parser/src/ICal/Event.php');
 require_once(Yii::$app->getModule('external_calendar')->basePath . '/vendors/johngrogg/ics-parser/src/ICal/ICal.php');
+
 use ICal\ICal;
 use yii\helpers\ArrayHelper;
 
@@ -18,7 +18,7 @@ use yii\helpers\ArrayHelper;
 /**
  * Description of SyncUtils
  *
- * @author luke
+ * @author davidborn
  */
 class SyncUtils
 {
@@ -49,8 +49,7 @@ class SyncUtils
      */
     public static function checkAndSubmitModels(array &$events, ExternalCalendar &$calendar)
     {
-        if (!isset($events) && !isset($calendar))
-        {
+        if (!isset($events) && !isset($calendar)) {
             return false;
         }
         $dbModels = $calendar->externalCalendarEntries;
@@ -59,13 +58,11 @@ class SyncUtils
         $recurringEvents = self::filterRecurringEvents($events);
 
         // models is an array of ExternalCalendarEntry-Models
-        foreach ($events as $eventKey => $event)
-        {
+        foreach ($events as $eventKey => $event) {
             // first: check if last_modified is set. If not - set it to DateTime('now')
             $last_modified = self::getLastModified($event);
 
-            foreach ($dbModels as $dbModelKey => $dbModel)
-            {
+            foreach ($dbModels as $dbModelKey => $dbModel) {
                 if (($dbModel->uid == $event->uid) && ($dbModel->last_modified >= $last_modified)) {
                     // found, but nothing to change
                     unset($events[$eventKey]);
@@ -76,22 +73,19 @@ class SyncUtils
                     $dbModel->save();
                     unset($events[$eventKey]);
                     unset($dbModels[$dbModelKey]);    // can't do this here, because of recurring events
-                }
-                else {
+                } else {
                     continue;
                 }
             }
         }
 
         // handle recurring events
-        foreach ($recurringEvents as $eventKey => $event)
-        {
+        foreach ($recurringEvents as $eventKey => $event) {
             // first create entryModel out of event
             $entryModel = self::getModel($event, $calendar);
 
             // then check list of remaining dbModels for this event
-            foreach ($dbModels as $dbModelKey => $dbModel)
-            {
+            foreach ($dbModels as $dbModelKey => $dbModel) {
                 // compare uid & start_datetime
                 if (($dbModel->uid == $entryModel->uid) && ($dbModel->start_datetime == $entryModel->start_datetime)) {
                     // found & update $dbModel
@@ -101,16 +95,14 @@ class SyncUtils
                     unset($recurringEvents[$eventKey]);
                     unset($dbModels[$dbModelKey]);    // can't do this here, because of recurring events
                     continue;
-                }
-                else {
+                } else {
                     continue;
                 }
             }
             unset($entryModel);
         }
 
-        foreach ($recurringEvents as $newModelKey => $newModel)
-        {
+        foreach ($recurringEvents as $newModelKey => $newModel) {
             $model = self::getModel($newModel, $calendar);
             // recurring event not in db found --> create new
             $calendar->link('externalCalendarEntries', $model);
@@ -118,8 +110,7 @@ class SyncUtils
         }
 
         // link new values
-        foreach ($events as $eventKey => $event)
-        {
+        foreach ($events as $eventKey => $event) {
             $model = self::getModel($event, $calendar);
             if ($model != false) {
                 $calendar->link('externalCalendarEntries', $model);
@@ -131,8 +122,7 @@ class SyncUtils
         }
 
         // finally delete items from db
-        foreach ($dbModels as $modelKey => $model)
-        {
+        foreach ($dbModels as $modelKey => $model) {
             $calendar->unlink('externalCalendarEntries', $model, true);
             unset($dbModels[$modelKey]);
         }
@@ -143,8 +133,7 @@ class SyncUtils
     public static function getModel($event, ExternalCalendar $calendar)
     {
         // create ExternalCalendarEntry-model without safe
-        if (!isset($events) && !isset($calendar))
-        {
+        if (!isset($events) && !isset($calendar)) {
             return false;
         }
 
@@ -155,7 +144,7 @@ class SyncUtils
         $model->content->setContainer($calendar->content->container);
         $model->content->created_by = $calendar->content->created_by;
 //        $model->content->created_at = $model->dtstamp;  // set created_at to original created timestamp
-        $model->content->visibility = ($calendar->public) ?  Content::VISIBILITY_PUBLIC : Content::VISIBILITY_PRIVATE;
+        $model->content->visibility = ($calendar->public) ? Content::VISIBILITY_PUBLIC : Content::VISIBILITY_PRIVATE;
 
         return $model;
     }
@@ -181,17 +170,15 @@ class SyncUtils
     {
         $last_modified = null;
         // first check if lastmodified is set or emtpy... for comparison...
-        if(!isset($event->lastmodified) || $event->lastmodified == null) {
+        if (!isset($event->lastmodified) || $event->lastmodified == null) {
             if (isset($event->last_modified) && $event->last_modified != null) {
                 $last_modified = CalendarUtils::formatDateTimeToString($event->last_modified);
-            }
-            else {
+            } else {
                 $now = new \DateTime('now');
                 $last_modified = $now->format('Y-m-d H:i:s');
                 unset($now);
             }
-        }
-        else {
+        } else {
             $last_modified = CalendarUtils::formatDateTimeToString($event->lastmodified);
         }
         return $last_modified;
@@ -205,8 +192,7 @@ class SyncUtils
     {
         $recurringEvents = [];
         $id_array = [];
-        foreach ($events as $eventKey => $event)
-        {
+        foreach ($events as $eventKey => $event) {
             if (!in_array($event->uid, $id_array)) {
                 array_push($id_array, $event->uid);
             } else {
@@ -217,10 +203,8 @@ class SyncUtils
 
         // now we have filtered the double events
         // but we also need the original ones
-        foreach ($events as $eventKey => $event)
-        {
-            foreach ($recurringEvents as $key => $val)
-            {
+        foreach ($events as $eventKey => $event) {
+            foreach ($recurringEvents as $key => $val) {
                 if ($event->uid == $val->uid) {
                     array_push($recurringEvents, $event);
                     unset($events[$eventKey]);

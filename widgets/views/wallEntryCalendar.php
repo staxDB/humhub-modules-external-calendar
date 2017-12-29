@@ -1,4 +1,5 @@
 <?php
+
 use humhub\widgets\MarkdownView;
 use yii\helpers\Html;
 
@@ -21,11 +22,13 @@ $color = $calendar->color ? $calendar->color : $this->theme->variable('info');
                 </a>
             </h4>
             <h5>
-                <?= Yii::t('ExternalCalendarModule.widgets', 'A new Calendar has been added.');?>
+                <?= Yii::t('ExternalCalendarModule.widgets', 'A new Calendar has been added.'); ?>
             </h5>
         </div>
         <?php if (!empty($calendar->description)) : ?>
-            <div <?= ($collapse) ? 'data-ui-show-more' : '' ?> data-read-more-text="<?= Yii::t('ExternalCalendarModule.widgets', "Read full description...") ?>" style="overflow:hidden">
+            <div <?= ($collapse) ? 'data-ui-show-more' : '' ?>
+                    data-read-more-text="<?= Yii::t('ExternalCalendarModule.widgets', "Read full description...") ?>"
+                    style="overflow:hidden">
                 <?= MarkdownView::widget(['markdown' => $calendar->description]); ?>
             </div>
         <?php endif; ?>

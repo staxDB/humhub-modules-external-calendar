@@ -8,9 +8,10 @@ use yii\helpers\Url;
 use humhub\modules\admin\components\Controller;
 use humhub\modules\external_calendar\models\ConfigForm;
 
-
 /**
- * AdminController implements the CRUD actions for ExternalCalendarEntry model.
+ * AdminController implements the config actions for all external calendars
+ *
+ * @author davidborn
  */
 class AdminController extends Controller
 {

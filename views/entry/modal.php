@@ -1,26 +1,21 @@
 <?php
-/**
- * @link https://www.humhub.org/
- * @copyright Copyright (c) 2017 HumHub GmbH & Co. KG
- * @license https://www.humhub.com/licences
- *
- */
+
 use humhub\widgets\ModalButton;
 use humhub\widgets\ModalDialog;
 
 /* @var $this \humhub\components\View */
-/* @var $model \humhub\modules\external_calendar\models\ExternalCalendarEntry  */
-/* @var $canManageEntries boolean  */
-/* @var $editUrl string  */
+/* @var $model \humhub\modules\external_calendar\models\ExternalCalendarEntry */
+/* @var $canManageEntries boolean */
+/* @var $editUrl string */
 
 ?>
 
 <?php ModalDialog::begin(['size' => 'large', 'closable' => true]); ?>
     <div class="modal-body" style="padding-bottom:0px">
-        <?= $this->renderAjax('view', ['model' => $model, 'stream' => false])?>
+        <?= $this->renderAjax('view', ['model' => $model, 'stream' => false]) ?>
     </div>
     <div class="modal-footer">
-        <?php if($canManageEntries): ?>
+        <?php if ($canManageEntries): ?>
             <?= ModalButton::primary(Yii::t('ExternalCalendarModule.base', 'Edit'))->load($editUrl)->loader(true); ?>
         <?php endif; ?>
         <?= ModalButton::cancel(Yii::t('ExternalCalendarModule.base', 'Close')) ?>

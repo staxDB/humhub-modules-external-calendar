@@ -1,25 +1,17 @@
 <?php
-/**
- * @link https://www.humhub.org/
- * @copyright Copyright (c) 2017 HumHub GmbH & Co. KG
- * @license https://www.humhub.com/licences
- *
- */
 
 namespace humhub\modules\external_calendar\integration\calendar;
 
-use humhub\modules\external_calendar\models\ExternalCalendar;
+use humhub\modules\external_calendar\models\ExternalCalendarEntry;
 use Yii;
 use yii\base\Object;
 use humhub\modules\external_calendar\models\ExternalCalendarEntryQuery;
 
 /**
- * Created by PhpStorm.
- * User: David Born
- * Date: 18.11.2017
- * Time: 15:19
+ * CalendarExtension implements functions for the Events.php file
+ *
+ * @author davidborn
  */
-
 class CalendarExtension extends Object
 {
     /**
@@ -48,7 +40,7 @@ class CalendarExtension extends Object
      */
     public static function addItems($event)
     {
-        /* @var $meetings Meeting[] */
+        /* @var $entries ExternalCalendarEntry[] */
         $entries = ExternalCalendarEntryQuery::findForEvent($event);
 
         $items = [];

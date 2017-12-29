@@ -9,7 +9,7 @@ use humhub\widgets\ColorPickerField;
 /* @var $contentContainer \humhub\modules\content\models\ContentContainer */
 /* @var $form yii\widgets\ActiveForm */
 
-if($model->color == null && isset($contentContainer->color)) {
+if ($model->color == null && isset($contentContainer->color)) {
     $model->color = $contentContainer->color;
 } elseif ($model->color == null) {
     $model->color = '#d1d1d1';

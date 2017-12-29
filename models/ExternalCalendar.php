@@ -10,7 +10,6 @@ use humhub\modules\content\models\Content;
 
 require_once(Yii::$app->getModule('external_calendar')->basePath . '/vendors/johngrogg/ics-parser/src/ICal/Event.php');
 require_once(Yii::$app->getModule('external_calendar')->basePath . '/vendors/johngrogg/ics-parser/src/ICal/ICal.php');
-
 use ICal\ICal;
 
 
@@ -29,9 +28,9 @@ use ICal\ICal;
  * @property string $cal_scale    The original calendar scale format, e.g. Gregorian
  * @property integer $sync_mode    Set if the Content should be autosynced
  * @property integer $event_mode    Set how old and new Events should be handled
+ * @property ExternalCalendarEntry $ExternalCalendarEntries[]
  *
- * property ExternalCalendarEvent[] $ExternalCalendarEvents
- * @property ExternalCalendarEntry[] $ExternalCalendarEntries
+ * @author davidborn
  */
 class ExternalCalendar extends ContentActiveRecord implements Searchable
 {

@@ -1,17 +1,4 @@
 <?php
-/**
- * @link https://www.humhub.org/
- * @copyright Copyright (c) 2017 HumHub GmbH & Co. KG
- * @license https://www.humhub.com/licences
- *
- */
-
-/**
- * Created by PhpStorm.
- * User: buddha
- * Date: 17.09.2017
- * Time: 21:21
- */
 
 namespace humhub\modules\external_calendar\models;
 
@@ -22,6 +9,11 @@ use humhub\libs\TimezoneHelper;
 use humhub\modules\calendar\interfaces\CalendarItem;
 use yii\base\Object;
 
+/**
+ * CalendarDateFormatter offers some useful Date-Formatter functions
+ *
+ * @author davidborn
+ */
 class CalendarDateFormatter extends Object
 {
 

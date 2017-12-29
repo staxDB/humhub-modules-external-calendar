@@ -1,4 +1,5 @@
 <?php
+
 use humhub\modules\content\widgets\PinLink;
 use humhub\modules\stream\assets\StreamAsset;
 use humhub\modules\stream\actions\Stream;
@@ -14,5 +15,5 @@ use humhub\modules\stream\actions\Stream;
         'controlsOptions' => [
             'prevent' => [PinLink::class]
         ],
-    ])?>
+    ]) ?>
 </div>

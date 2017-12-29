@@ -1,4 +1,5 @@
 <?php
+
 use humhub\libs\Helpers;
 use humhub\widgets\MarkdownView;
 use humhub\widgets\Button;
@@ -26,8 +27,10 @@ $color = $calendarEntry->calendar->color ? $calendarEntry->calendar->color : $th
                 <?= $calendarEntry->getFormattedTime() ?>
             </h5>
         </div>
-        <?php if (!empty($calendarEntry->description) || !empty($calendarEntry->location) || !empty($calendarEntry->calendar->title) ) : ?>
-            <div <?= ($collapse) ? 'data-ui-show-more' : '' ?> data-read-more-text="<?= Yii::t('ExternalCalendarModule.widgets', "Read full description...") ?>" style="overflow:hidden">
+        <?php if (!empty($calendarEntry->description) || !empty($calendarEntry->location) || !empty($calendarEntry->calendar->title)) : ?>
+            <div <?= ($collapse) ? 'data-ui-show-more' : '' ?>
+                    data-read-more-text="<?= Yii::t('ExternalCalendarModule.widgets', "Read full description...") ?>"
+                    style="overflow:hidden">
                 <?= MarkdownView::widget(['markdown' => $calendarEntry->description]); ?>
                 <?php if (!empty($calendarEntry->location)) : ?>
                     <i class="fa fa-map-marker colorDefault pull-left" style="font-size: 20px; margin-right: 8px"></i>

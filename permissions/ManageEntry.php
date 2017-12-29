@@ -1,12 +1,5 @@
 <?php
 
-/**
- * @link https://www.humhub.org/
- * @copyright Copyright (c) 2017 HumHub GmbH & Co. KG
- * @license https://www.humhub.com/licences
- *
- */
-
 namespace humhub\modules\external_calendar\permissions;
 
 use humhub\modules\space\models\Space;
@@ -14,7 +7,9 @@ use humhub\modules\user\models\User;
 use Yii;
 
 /**
- * CreateEntry Permission
+ * ManageEntry Permission
+ *
+ * @author davidborn
  */
 class ManageEntry extends \humhub\libs\BasePermission
 {

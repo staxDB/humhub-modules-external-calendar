@@ -6,20 +6,17 @@ use Yii;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use humhub\modules\space\models\Space;
-use humhub\modules\content\models\Content;
 use humhub\modules\external_calendar\SyncUtils;
 use humhub\modules\external_calendar\permissions\ManageCalendar;
 use humhub\modules\content\components\ContentContainerController;
 use humhub\modules\external_calendar\models\ExternalCalendar;
-use humhub\modules\external_calendar\models\ExternalCalendarEntry;
 use humhub\widgets\ModalClose;
 
-require_once(Yii::$app->getModule('external_calendar')->basePath . '/vendors/johngrogg/ics-parser/src/ICal/Event.php');
-require_once(Yii::$app->getModule('external_calendar')->basePath . '/vendors/johngrogg/ics-parser/src/ICal/ICal.php');
-
-use ICal\ICal;
-
-
+/**
+ * CalendarController implements the CRUD actions for all external calendars
+ *
+ * @author davidborn
+ */
 class CalendarController extends ContentContainerController
 {
 
@@ -97,7 +94,6 @@ class CalendarController extends ContentContainerController
     public function actionSync($id)
     {
         set_time_limit(180); // Set max execution time 3 minutes.
-        $message = '';
         $calendarModel = ExternalCalendar::find()->contentContainer($this->contentContainer)->where(['external_calendar.id' => $id])->one();
 
         if ($calendarModel) {
@@ -186,18 +182,18 @@ class CalendarController extends ContentContainerController
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-                $ical = SyncUtils::createICal($model->url);
-                if ($ical) {
-                    // add info to CalendarModel
-                    $model->addAttributes($ical);
-                    $model->save();
-                } else {
-                    $this->view->error(Yii::t('ExternalCalendarModule.results', 'Error while creating iCal File. Please check, if Url is correct and Internet connection of server is enabled.'));
-                    return $this->render('update', [
-                        'model' => $model,
-                        'contentContainer' => $this->contentContainer
-                    ]);
-                }
+            $ical = SyncUtils::createICal($model->url);
+            if ($ical) {
+                // add info to CalendarModel
+                $model->addAttributes($ical);
+                $model->save();
+            } else {
+                $this->view->error(Yii::t('ExternalCalendarModule.results', 'Error while creating iCal File. Please check, if Url is correct and Internet connection of server is enabled.'));
+                return $this->render('update', [
+                    'model' => $model,
+                    'contentContainer' => $this->contentContainer
+                ]);
+            }
             $this->view->success(Yii::t('ExternalCalendarModule.results', 'Calendar successfully updated!'));
             return $this->redirect($this->contentContainer->createUrl('view', array('id' => $model->id)));
         } else {
@@ -251,7 +247,7 @@ class CalendarController extends ContentContainerController
     }
 
     /**
-     * Checks the ManageEntry permission for the given user on the given contentContainer.
+     * Checks the ManageCalendar permission for the given user on the given contentContainer.
      *
      * Todo: After 1.2.1 use $model->content->canEdit();
      *

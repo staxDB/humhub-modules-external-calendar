@@ -13,7 +13,6 @@ use humhub\widgets\Label;
 use humhub\modules\content\components\ContentActiveRecord;
 use humhub\modules\external_calendar\permissions\ManageEntry;
 use humhub\modules\external_calendar\widgets\WallEntry;
-use humhub\modules\content\models\Content;
 use humhub\modules\external_calendar\CalendarUtils;
 
 /**
@@ -32,6 +31,8 @@ use humhub\modules\external_calendar\CalendarUtils;
  * @property string $end_datetime It is the moment immediately after the event has ended. For example, if the last full day of an event is Thursday, the exclusive end of the event will be 00:00:00 on Friday!
  * @property string $time_zone
  * @property integer $all_day
+ *
+ * @author davidborn
  */
 class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
 {
@@ -271,7 +272,6 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
 
 
     /**
-     * Access url of the source content or other view
      *
      * @return string the timezone this item was originally saved, note this is
      */

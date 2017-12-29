@@ -5,7 +5,7 @@ use humhub\modules\space\models\Space;
 use humhub\modules\user\models\User;
 
 /* @var $this yii\web\View */
-/* @var $models[] \humhub\modules\external_calendar\models\ExternalCalendar */
+/* @var $models [] \humhub\modules\external_calendar\models\ExternalCalendar */
 /* @var $model \humhub\modules\external_calendar\models\ExternalCalendar */
 
 $this->title = Yii::t('ExternalCalendarModule.views_calendar', 'External Calendars');
@@ -35,8 +35,8 @@ $this->title = Yii::t('ExternalCalendarModule.views_calendar', 'External Calenda
                         <td><?= $model->title ?></td>
                         <td><?= ($model->public) ? Yii::t('ExternalCalendarModule.views_calendar', 'Public') : Yii::t('ExternalCalendarModule.views_calendar', 'Private') ?></td>
                         <td>
-                            <?= Html::a('<i class="fa fa-eye view"></i> ', $contentContainer->createUrl('view', ['id' => $model->id]), ['class' => 'tt', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'data-original-title'=>Yii::t('ExternalCalendarModule.base', 'View')]) ?>
-                            <?= Html::a('<i class="fa fa-pencil-square-o edit"></i> ', $contentContainer->createUrl('update', ['id' => $model->id]), ['class' => 'tt', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'data-original-title'=>Yii::t('ExternalCalendarModule.base', 'Update')]) ?>
+                            <?= Html::a('<i class="fa fa-eye view"></i> ', $contentContainer->createUrl('view', ['id' => $model->id]), ['class' => 'tt', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'data-original-title' => Yii::t('ExternalCalendarModule.base', 'View')]) ?>
+                            <?= Html::a('<i class="fa fa-pencil-square-o edit"></i> ', $contentContainer->createUrl('update', ['id' => $model->id]), ['class' => 'tt', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 'data-original-title' => Yii::t('ExternalCalendarModule.base', 'Update')]) ?>
                             <?= humhub\widgets\ModalConfirm::widget([
                                 'uniqueID' => 'modal_delete_task_' . $model->id,
                                 'linkOutput' => 'a',

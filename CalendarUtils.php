@@ -9,7 +9,7 @@ use DateTimeZone;
 /**
  * Description of CalendarUtils
  *
- * @author luke
+ * @author davidborn
  */
 class CalendarUtils
 {

@@ -4,16 +4,15 @@ namespace humhub\modules\external_calendar\controllers;
 
 use Yii;
 use yii\web\HttpException;
-use yii\web\NotFoundHttpException;
 use humhub\widgets\ModalClose;
 use humhub\modules\content\components\ContentContainerController;
 use humhub\modules\external_calendar\permissions\ManageEntry;
 use humhub\modules\external_calendar\models\ExternalCalendarEntry;
 
-
-
 /**
- * EntryController implements the CRUD actions for ExternalCalendarEntry model.
+ * EntryController implements the CRUD actions for all external calendar entries
+ *
+ * @author davidborn
  */
 class EntryController extends ContentContainerController
 {
@@ -66,12 +65,13 @@ class EntryController extends ContentContainerController
      * @param null $cal
      * @return mixed
      * @throws HttpException
+     * @throws \Exception
      */
     public function actionUpdate($id, $cal = null)
     {
         $model = $this->getCalendarEntry($id);
 
-        if(!$model->content->canEdit()) {
+        if (!$model->content->canEdit()) {
             throw new HttpException(403);
         }
 
@@ -80,7 +80,7 @@ class EntryController extends ContentContainerController
         }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            if(empty($cal)) {
+            if (empty($cal)) {
                 return ModalClose::widget(['saved' => true]);
             } else {
                 return $this->renderModal($model, 1);
@@ -97,66 +97,6 @@ class EntryController extends ContentContainerController
 //        if ($cal) {
 //            return $this->renderModal($model, $cal);
 //        }
-
-
-
-//        $model = $this->findModel($id);
-//
-//        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-//            return $this->redirect(['view', 'id' => $model->id]);
-//        } else {
-//            return $this->render('update', [
-//                'model' => $model,
-//            ]);
-//        }
-    }
-
-    /**
-     * Deletes an existing ExternalCalendarEntry model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     * @throws HttpException
-     */
-    public function actionDelete($id)
-    {
-        $calendarEntry = $this->getCalendarEntry(Yii::$app->request->get('id'));
-
-        if ($calendarEntry == null) {
-            throw new HttpException('404', Yii::t('ExternalCalendarModule.base', "Event not found!"));
-        }
-
-        if (!($this->canManageEntries() ||  $calendarEntry->content->canEdit())) {
-            throw new HttpException('403', Yii::t('ExternalCalendarModule.base', "You don't have permission to delete this event!"));
-        }
-
-        if (Yii::$app->request->isAjax) {
-            $this->asJson(['success' => true]);
-        } else {
-            return $this->redirect($this->contentContainer->createUrl('/external_calendar/view/index'));
-        }
-//
-//        $calendarEntry->delete();
-//
-//        $this->findModel($id)->delete();
-//
-//        return $this->redirect(['index']);
-    }
-
-    /**
-     * Finds the ExternalCalendarEntry model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return ExternalCalendarEntry the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = ExternalCalendarEntry::findOne($id)) !== null) {
-            return $model;
-        } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
-        }
     }
 
     /**
@@ -176,6 +116,7 @@ class EntryController extends ContentContainerController
      *
      * @param int $id
      * @return ExternalCalendarEntry
+     * @throws \yii\base\Exception
      */
     protected function getCalendarEntry($id)
     {
