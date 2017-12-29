@@ -18,8 +18,7 @@ class m171126_184908_initial extends Migration
             'cal_name' => 'varchar(255)',
             'cal_scale' => 'varchar(60)',
             'sync_mode' => 'tinyint(4) NOT NULL',
-            'past_events_mode' => 'tinyint(4) NOT NULL',
-            'upcoming_events_mode' => 'tinyint(4) NOT NULL',
+            'event_mode' => 'tinyint(4) NOT NULL',
         ), '');
 
         $this->createTable('external_calendar_entry', array(

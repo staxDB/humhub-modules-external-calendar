@@ -15,6 +15,7 @@ if($model->color == null && isset($contentContainer->color)) {
     $model->color = '#d1d1d1';
 }
 
+\humhub\modules\external_calendar\assets\Assets::register($this);
 ?>
 <div class="calendar-extension-calendar-form">
 
@@ -41,8 +42,7 @@ if($model->color == null && isset($contentContainer->color)) {
 
     <?= $form->field($model, 'public')->checkbox() ?>
     <?= $form->field($model, 'sync_mode')->dropDownList($model->getSyncModeItems()) ?>
-    <?= $form->field($model, 'past_events_mode')->dropDownList($model->getPastEventsModeItems()) ?>
-    <?= $form->field($model, 'upcoming_events_mode')->dropDownList($model->getUpcomingEventsModeItems()) ?>
+    <?= $form->field($model, 'event_mode')->dropDownList($model->getEventModeItems()) ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? Yii::t('ExternalCalendarModule.base', 'Save') : Yii::t('ExternalCalendarModule.base', 'Save'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

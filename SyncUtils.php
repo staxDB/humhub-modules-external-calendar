@@ -162,79 +162,12 @@ class SyncUtils
 
     public static function getEvents(ExternalCalendar $calendarModel, ICal $ical)
     {
-        $start = false;
-        switch ($calendarModel->past_events_mode) {
-            case ExternalCalendar::PAST_EVENTS_ALL:
-                $start = false;
-                break;
-            case ExternalCalendar::PAST_EVENTS_NONE:
-                $start = new \DateTime('today');
-                $start = $start->format('Y-m-d H:i:s');
-                break;
-            case ExternalCalendar::PAST_EVENTS_ONE_WEEK:
-                $start = new \DateTime('today - 1 week');
-                $start = $start->format('Y-m-d H:i:s');
-                break;
-            case ExternalCalendar::PAST_EVENTS_ONE_MONTH:
-                $start = new \DateTime('today - 1 month');
-                $start = $start->format('Y-m-d H:i:s');
-                break;
-            default:
-                $start = new \DateTime('today - 5 years');
-                $start = $start->format('Y-m-d H:i:s');
-                break;
-        }
-
-        $end = false;
-        switch ($calendarModel->upcoming_events_mode) {
-            case ExternalCalendar::UPCOMING_EVENTS_ALL:
-                $end = false;
-                break;
-            case ExternalCalendar::UPCOMING_EVENTS_ONE_DAY:
-                $end = new \DateTime('today + 1 day');
-                $end = $end->format('Y-m-d H:i:s');
-                break;
-            case ExternalCalendar::UPCOMING_EVENTS_ONE_WEEK:
-                $end = new \DateTime('today + 1 day + 1 week');
-                $end = $end->format('Y-m-d H:i:s');
-                break;
-            case ExternalCalendar::UPCOMING_EVENTS_ONE_MONTH:
-                $end = new \DateTime('today + 1 day + 1 month');
-                $end = $end->format('Y-m-d H:i:s');
-                break;
-            case ExternalCalendar::UPCOMING_EVENTS_TWO_MONTH:
-                $end = new \DateTime('today + 1 day + 2 months');
-                $end = $end->format('Y-m-d H:i:s');
-                break;
-            case ExternalCalendar::UPCOMING_EVENTS_THREE_MONTH:
-                $end = new \DateTime('today + 1 day + 3 months');
-                $end = $end->format('Y-m-d H:i:s');
-                break;
-            case ExternalCalendar::UPCOMING_EVENTS_ONE_YEAR:
-                $end = new \DateTime('today + 1 day + 1 year');
-                $end = $end->format('Y-m-d H:i:s');
-                break;
-            default:
-                $end = new \DateTime('today + 5 years');
-                $end = $end->format('Y-m-d H:i:s');
-                break;
-        }
-
         $events = [];
-        if (!$start && !$end) {
-            // if start & end set to false, all events should be synced
-            $events = $ical->events();
-        } else if ($start || $end) {
-
-            // either start or end is restricted
-            if ($start === false) {
-                $now = new \DateTime('today - 5 years');
-                $start = $now->format('Y-m-d H:i:s');
-            }
-            if ($end === false){
-                $now = new \DateTime('today + 5 years');
-                $end = $now->format('Y-m-d H:i:s');
-            }
+        if ($calendarModel->event_mode === ExternalCalendar::EVENT_MODE_CURRENT_MONTH) {
+            $start = new \DateTime('first day of this month');
+            $start = $start->format('Y-m-d 00:00:00');
+            $end = new \DateTime('last day of this month');
+            $end = $end->format('Y-m-d 23:59:59');
 
             $events = $ical->eventsFromRange($start, $end);
         } else {

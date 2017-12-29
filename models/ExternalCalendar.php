@@ -28,8 +28,7 @@ use ICal\ICal;
  * @property string $cal_name    The original calendar-name
  * @property string $cal_scale    The original calendar scale format, e.g. Gregorian
  * @property integer $sync_mode    Set if the Content should be autosynced
- * @property integer $past_events_mode    Set if old Events should be deleted
- * @property integer $upcoming_events_mode    Set if old Events should be deleted
+ * @property integer $event_mode    Set how old and new Events should be handled
  *
  * property ExternalCalendarEvent[] $ExternalCalendarEvents
  * @property ExternalCalendarEntry[] $ExternalCalendarEntries
@@ -61,23 +60,10 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
     const SYNC_MODE_DAILY = 2;
 
     /**
-     * Delete Past Events Modes
+     * Event Modes
      */
-    const PAST_EVENTS_ALL = 0;
-    const PAST_EVENTS_NONE = 1;
-    const PAST_EVENTS_ONE_WEEK = 2;
-    const PAST_EVENTS_ONE_MONTH = 3;
-
-    /**
-     * Sync Upcoming Events Modes
-     */
-    const UPCOMING_EVENTS_ALL = 0;
-    const UPCOMING_EVENTS_ONE_DAY = 1;
-    const UPCOMING_EVENTS_ONE_WEEK = 2;
-    const UPCOMING_EVENTS_ONE_MONTH = 3;
-    const UPCOMING_EVENTS_TWO_MONTH = 4;
-    const UPCOMING_EVENTS_THREE_MONTH = 5;
-    const UPCOMING_EVENTS_ONE_YEAR = 6;
+    const EVENT_MODE_CURRENT_MONTH = 0;
+    const EVENT_MODE_ALL = 1;
 
     /**
      * @var array all given sync modes as array
@@ -89,26 +75,11 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
     ];
 
     /**
-     * @var array all given past events modes as array
+     * @var array all given sync modes as array
      */
-    public static $pastEventsModes = [
-        self::PAST_EVENTS_ALL,
-        self::PAST_EVENTS_NONE,
-        self::PAST_EVENTS_ONE_WEEK,
-        self::PAST_EVENTS_ONE_MONTH,
-];
-
-    /**
-     * @var array all given upcoming events modes as array
-     */
-    public static $upcomingEventsMode = [
-       self::UPCOMING_EVENTS_ALL,
-       self::UPCOMING_EVENTS_ONE_DAY,
-       self::UPCOMING_EVENTS_ONE_WEEK,
-       self::UPCOMING_EVENTS_ONE_MONTH,
-       self::UPCOMING_EVENTS_TWO_MONTH,
-       self::UPCOMING_EVENTS_THREE_MONTH,
-       self::UPCOMING_EVENTS_ONE_YEAR
+    public static $eventModes = [
+        self::EVENT_MODE_CURRENT_MONTH,
+        self::EVENT_MODE_ALL
     ];
 
     /**
@@ -180,8 +151,7 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
             [['url'], 'validateURL'],
             [['public'], 'integer'],
             [['sync_mode'], 'in', 'range' => self::$syncModes],
-            [['past_events_mode'], 'in', 'range' => self::$pastEventsModes],
-            [['upcoming_events_mode'], 'in', 'range' => self::$upcomingEventsMode],
+            [['event_mode'], 'in', 'range' => self::$eventModes],
         ];
     }
 
@@ -205,8 +175,8 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios['create'] = ['title', 'url', 'public', 'sync_mode', 'past_events_mode', 'upcoming_events_mode'];
-        $scenarios['admin'] = ['title', 'url', 'public', 'sync_mode', 'past_events_mode', 'upcoming_events_mode'];
+        $scenarios['create'] = ['title', 'url', 'public', 'sync_mode', 'event_mode'];
+        $scenarios['admin'] = ['title', 'url', 'public', 'sync_mode', 'event_mode'];
         return $scenarios;
     }
 
@@ -226,8 +196,7 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
             'cal_name' => Yii::t('ExternalCalendarModule.model_calendar', 'Original Calendar Name'),
             'cal_scale' => Yii::t('ExternalCalendarModule.model_calendar', 'Original Calendar Scale'),
             'sync_mode' => Yii::t('ExternalCalendarModule.model_calendar', 'Sync Mode'),
-            'past_events_mode' => Yii::t('ExternalCalendarModule.model_calendar', 'Past Events'),
-            'upcoming_events_mode' => Yii::t('ExternalCalendarModule.model_calendar', 'Upcoming Events'),
+            'event_mode' => Yii::t('ExternalCalendarModule.model_calendar', 'Event Selection'),
         ];
     }
 
@@ -310,72 +279,22 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
         }
     }
 
-    public static function getPastEventsModeItems()
+    public static function getEventModeItems()
     {
         return [
-            self::PAST_EVENTS_ALL => Yii::t('ExternalCalendarModule.model_calendar', 'Keep all past events'),
-            self::PAST_EVENTS_NONE => Yii::t('ExternalCalendarModule.model_calendar', 'Delete all past events'),
-            self::PAST_EVENTS_ONE_WEEK => Yii::t('ExternalCalendarModule.model_calendar', 'Keep all one week old events'),
-            self::PAST_EVENTS_ONE_MONTH => Yii::t('ExternalCalendarModule.model_calendar', 'Keep all one month old events'),
+            self::EVENT_MODE_CURRENT_MONTH => Yii::t('ExternalCalendarModule.model_calendar', 'Only sync events from current month'),
+            self::EVENT_MODE_ALL => Yii::t('ExternalCalendarModule.model_calendar', 'Sync all events'),
         ];
     }
 
-    public function getPastEventsMode()
+    public function getEventMode()
     {
-        switch ($this->past_events_mode){
-            case (self::PAST_EVENTS_ALL):
-                return Yii::t('ExternalCalendarModule.model_calendar', 'Keep all past events');
+        switch ($this->event_mode){
+            case (self::EVENT_MODE_CURRENT_MONTH):
+                return Yii::t('ExternalCalendarModule.model_calendar', 'Only sync events from current month');
                 break;
-            case (self::PAST_EVENTS_NONE):
-                return Yii::t('ExternalCalendarModule.model_calendar', 'Delete all past events');
-                break;
-            case (self::PAST_EVENTS_ONE_WEEK):
-                return Yii::t('ExternalCalendarModule.model_calendar', 'Keep all one week old events');
-                break;
-            case (self::PAST_EVENTS_ONE_MONTH):
-                return Yii::t('ExternalCalendarModule.model_calendar', 'Keep all one month old events');
-                break;
-            default:
-                return;
-        }
-    }
-
-    public static function getUpcomingEventsModeItems()
-    {
-        return [
-            self::UPCOMING_EVENTS_ALL => Yii::t('ExternalCalendarModule.model_calendar', 'Sync all upcoming events'),
-            self::UPCOMING_EVENTS_ONE_DAY => Yii::t('ExternalCalendarModule.model_calendar', 'Sync only upcoming events for today'),
-            self::UPCOMING_EVENTS_ONE_WEEK => Yii::t('ExternalCalendarModule.model_calendar', 'Sync only upcoming events for one week'),
-            self::UPCOMING_EVENTS_ONE_MONTH => Yii::t('ExternalCalendarModule.model_calendar', 'Sync only upcoming events for one month'),
-            self::UPCOMING_EVENTS_TWO_MONTH => Yii::t('ExternalCalendarModule.model_calendar', 'Sync only upcoming events for two months'),
-            self::UPCOMING_EVENTS_THREE_MONTH => Yii::t('ExternalCalendarModule.model_calendar', 'Sync only upcoming events for three months'),
-            self::UPCOMING_EVENTS_ONE_YEAR => Yii::t('ExternalCalendarModule.model_calendar', 'Sync only upcoming events for one year'),
-        ];
-    }
-
-    public function getUpcomingEventsMode()
-    {
-        switch ($this->upcoming_events_mode){
-            case (self::UPCOMING_EVENTS_ALL):
-                return Yii::t('ExternalCalendarModule.model_calendar', 'Sync all upcoming events');
-                break;
-            case (self::UPCOMING_EVENTS_ONE_DAY):
-                return Yii::t('ExternalCalendarModule.model_calendar', 'Sync only upcoming events for today');
-                break;
-            case (self::UPCOMING_EVENTS_ONE_WEEK):
-                return Yii::t('ExternalCalendarModule.model_calendar', 'Sync only upcoming events for one week');
-                break;
-            case (self::UPCOMING_EVENTS_ONE_MONTH):
-                return Yii::t('ExternalCalendarModule.model_calendar', 'Sync only upcoming events for one month');
-                break;
-            case (self::UPCOMING_EVENTS_TWO_MONTH):
-                return Yii::t('ExternalCalendarModule.model_calendar', 'Sync only upcoming events for two months');
-                break;
-            case (self::UPCOMING_EVENTS_THREE_MONTH):
-                return Yii::t('ExternalCalendarModule.model_calendar', 'Sync only upcoming events for three months');
-                break;
-            case (self::UPCOMING_EVENTS_ONE_YEAR):
-                return Yii::t('ExternalCalendarModule.model_calendar', 'Sync only upcoming events for one year');
+            case (self::EVENT_MODE_ALL):
+                return Yii::t('ExternalCalendarModule.model_calendar', 'Sync all events');
                 break;
             default:
                 return;

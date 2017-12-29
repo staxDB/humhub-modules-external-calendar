@@ -43,17 +43,14 @@ $this->title = $model->title;
                     'url:ntext',
                     'public:boolean',
 //                    'sync_mode',
+//                    'event_mode',
                     [
                         'label'=>Yii::t('ExternalCalendarModule.model_calendar', 'Sync Mode'),
                         'value'=>$model->getSyncMode(),
                     ],
                     [
-                        'label'=>Yii::t('ExternalCalendarModule.model_calendar', 'Past Events'),
-                        'value'=>$model->getPastEventsMode(),
-                    ],
-                    [
-                        'label'=>Yii::t('ExternalCalendarModule.model_calendar', 'Upcoming Events'),
-                        'value'=>$model->getUpcomingEventsMode(),
+                        'label'=>Yii::t('ExternalCalendarModule.model_calendar', 'Event Mode'),
+                        'value'=>$model->getEventMode(),
                     ],
                     'time_zone',
                     [
