@@ -2,6 +2,7 @@
 
 use humhub\modules\dashboard\widgets\Sidebar;
 use humhub\commands\CronController;
+use humhub\commands\IntegrityController;
 
 return [
     'id' => 'external_calendar',
@@ -12,7 +13,8 @@ return [
         ['class' => 'humhub\modules\calendar\interfaces\CalendarService', 'event' => 'getItemTypes', 'callback' => ['humhub\modules\external_calendar\Events', 'onGetCalendarItemTypes']],
         ['class' => 'humhub\modules\calendar\interfaces\CalendarService', 'event' => 'findItems', 'callback' => ['humhub\modules\external_calendar\Events', 'onFindCalendarItems']],
         ['class' => CronController::className(), 'event' => CronController::EVENT_ON_HOURLY_RUN, 'callback' => ['humhub\modules\external_calendar\Events', 'onCronHourly']],
-        ['class' => CronController::className(), 'event' => CronController::EVENT_ON_DAILY_RUN, 'callback' => ['humhub\modules\external_calendar\Events', 'onCronDaily']]
+        ['class' => CronController::className(), 'event' => CronController::EVENT_ON_DAILY_RUN, 'callback' => ['humhub\modules\external_calendar\Events', 'onCronDaily']],
+        ['class' => IntegrityController::className(), 'event' => IntegrityController::EVENT_ON_RUN, 'callback' => ['humhub\modules\external_calendar\Events', 'onIntegrityCheck']]
     ],
 ];
 ?>

@@ -2,6 +2,7 @@
 
 namespace humhub\modules\external_calendar;
 
+use humhub\modules\external_calendar\models\ExternalCalendarEntry;
 use Yii;
 use yii\helpers\Url;
 use yii\base\Object;
@@ -138,6 +139,25 @@ class Events extends Object
             }
         }
         return;
+    }
+
+    /**
+     * Callback to validate module database records.
+     *
+     * @param Event $event
+     * @throws \Exception
+     */
+    public static function onIntegrityCheck($event)
+    {
+        $integrityController = $event->sender;
+        $integrityController->showTestHeadline("External Calendar Module - Entries (" . ExternalCalendarEntry::find()->count() . " entries)");
+        foreach (ExternalCalendarEntry::find()->joinWith('calendar')->all() as $entry) {
+            if ($entry->calendar === null) {
+                if ($integrityController->showFix("Deleting external calendar entry id " . $entry->id . " without existing calendar!")) {
+                    $entry->delete();
+                }
+            }
+        }
     }
 
 }
