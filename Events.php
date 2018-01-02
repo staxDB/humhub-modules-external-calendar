@@ -57,87 +57,47 @@ class Events extends Object
     }
 
     /**
-     * Defines what to do if hourly cron is initialized.
+     * Defines what to do if cron runs.
      *
-     * @return bool|void
+     * @param $event
+     * @return void
      */
-    public static function onCronHourly()
+    public static function onCronRun($event)
     {
         $calendarModels = ExternalCalendar::find()->all();
 
-        foreach ($calendarModels as $calendarModel) {
-            if (!isset($calendarModel)) {
-                continue;
-            }
-            if ($calendarModel->sync_mode == ExternalCalendar::SYNC_MODE_NONE || $calendarModel->sync_mode == ExternalCalendar::SYNC_MODE_DAILY) {
-                continue;
-            }
-            $ical = SyncUtils::createICal($calendarModel->url);
-            if (!$ical) {
-                continue;
-            }
-
-            // add info to CalendarModel
-            $calendarModel->addAttributes($ical);
-            $calendarModel->save();
-
-            // check events
-            if ($ical->hasEvents()) {
-                // get formatted array
-                $events = SyncUtils::getEvents($calendarModel, $ical);
-
-                // create Entry-models without safe
-//                $models = SyncUtils::getModels($events, $calendarModel);
-//                $result = SyncUtils::checkAndSubmitModels($models, $calendarModel);
-                $result = SyncUtils::checkAndSubmitModels($events, $calendarModel);
-                if (!$result) {
+            foreach ($calendarModels as $calendarModel) {
+                if (!isset($calendarModel)) {
                     continue;
                 }
-            }
-        }
-
-        return;
-    }
-
-    /**
-     * Defines what to do if daily cron is initialized.
-     *
-     * @return bool|void
-     */
-    public static function onCronDaily()
-    {
-        $calendarModels = ExternalCalendar::find()->all();
-
-        foreach ($calendarModels as $calendarModel) {
-            if (!isset($calendarModel)) {
-                continue;
-            }
-            if ($calendarModel->sync_mode == ExternalCalendar::SYNC_MODE_NONE || $calendarModel->sync_mode == ExternalCalendar::SYNC_MODE_HOURLY) {
-                continue;
-            }
-            $ical = SyncUtils::createICal($calendarModel->url);
-            if (!$ical) {
-                continue;
-            }
-
-            // add info to CalendarModel
-            $calendarModel->addAttributes($ical);
-            $calendarModel->save();
-
-            // check events
-            if ($ical->hasEvents()) {
-                // get formatted array
-                $events = SyncUtils::getEvents($calendarModel, $ical);
-
-                // create Entry-models without safe
-//                $models = SyncUtils::getModels($events, $calendarModel);
-//                $result = SyncUtils::checkAndSubmitModels($models, $calendarModel);
-                $result = SyncUtils::checkAndSubmitModels($events, $calendarModel);
-                if (!$result) {
+                if (Yii::$app->controller->action->id == 'hourly') {
+                    if ($calendarModel->sync_mode == ExternalCalendar::SYNC_MODE_NONE || $calendarModel->sync_mode == ExternalCalendar::SYNC_MODE_DAILY) {
+                        continue;
+                    }
+                } elseif (Yii::$app->controller->action->id == 'daily') {
+                    if ($calendarModel->sync_mode == ExternalCalendar::SYNC_MODE_NONE || $calendarModel->sync_mode == ExternalCalendar::SYNC_MODE_HOURLY) {
+                        continue;
+                    }
+                }
+                $ical = SyncUtils::createICal($calendarModel->url);
+                if (!$ical) {
                     continue;
                 }
+
+                // add info to CalendarModel
+                $calendarModel->addAttributes($ical);
+                $calendarModel->save();
+
+                // check events
+                if ($ical->hasEvents()) {
+                    // get formatted array
+                    $events = SyncUtils::getEvents($calendarModel, $ical);
+                    $result = SyncUtils::checkAndSubmitModels($events, $calendarModel);
+                    if (!$result) {
+                        continue;
+                    }
+                }
             }
-        }
         return;
     }
 
