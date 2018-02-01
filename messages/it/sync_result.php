@@ -17,10 +17,10 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    'Calendar not found!' => '',
-    'Error while check and submit models...' => '',
-    'Error while creating ical... Check if link is reachable.' => '',
-    'No valid ical url! Try an url with http / https.' => '',
-    'Sync successfull!' => '',
-    'Warning! Something strange happened. Please try again.' => '',
+    'Calendar not found!' => 'Calendario non trovato!',
+    'Error while check and submit models...' => 'Errore durante il controllo e invio dei modelli ...',
+    'Error while creating ical... Check if link is reachable.' => 'Errore durante la creazione di ical ... Controllare se il collegamento è raggiungibile.',
+    'No valid ical url! Try an url with http / https.' => 'Nessun url ical valido! Prova un URL con http / https.',
+    'Sync successfull!' => 'Sincronizzato con successo!',
+    'Warning! Something strange happened. Please try again.' => 'Avvertimento! È successo qualcosa di strano. Per favore riprova.',
 ];

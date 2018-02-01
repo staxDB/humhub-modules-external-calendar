@@ -17,7 +17,7 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    'A new Calendar has been added.' => '',
-    'External Calendar: ' => '',
-    'Read full description...' => '',
+    'A new Calendar has been added.' => 'Un nuovo calendario è stato aggiunto.',
+    'External Calendar: ' => 'Calendario esterno',
+    'Read full description...' => 'Leggi la descrizione completa...',
 ];

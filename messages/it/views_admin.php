@@ -17,6 +17,6 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    'Calendar Extension Configuration' => '',
-    'Save' => '',
+    'Calendar Extension Configuration' => 'Configurazione estensione del calendario',
+    'Save' => 'Salva',
 ];

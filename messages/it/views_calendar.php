@@ -17,15 +17,15 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    'Actions' => '',
-    'Add Calendar' => '',
-    'Add external Calendar' => '',
-    'Calendar' => '',
-    'Calendar: {modelClass}' => '',
-    'External Calendars' => '',
-    'Private' => '',
-    'Public' => '',
-    'Sync Calendar' => '',
-    'Title and Color' => '',
-    'Update {modelClass}: ' => '',
+    'Actions' => 'Azioni',
+    'Add Calendar' => 'Aggiungere calendario',
+    'Add external Calendar' => 'Aggiungere calendario esterno',
+    'Calendar' => 'Calendario',
+    'Calendar: {modelClass}' => 'Calendario: {modelClass}',
+    'External Calendars' => 'Calendari esterni',
+    'Private' => 'Privato',
+    'Public' => 'Pubblico',
+    'Sync Calendar' => 'Sincronizza calendario',
+    'Title and Color' => 'Titolo e colore',
+    'Update {modelClass}: ' => 'Aggiorna {modelClass}: ',
 ];

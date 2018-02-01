@@ -17,6 +17,6 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    'Auto post Calendar' => '',
-    'Auto post Entries' => '',
+    'Auto post Calendar' => 'Annuncio automatico calendario',
+    'Auto post Entries' => 'Annuncio automatico registri',
 ];
