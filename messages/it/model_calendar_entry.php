@@ -17,16 +17,16 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    '(No Title)' => '',
-    'All Day' => '',
-    'Calendar' => '',
-    'DT Stamp' => '',
-    'Description' => '',
-    'End Datetime' => '',
-    'ID' => '',
-    'Last Modified' => '',
-    'Location' => '',
-    'Start Datetime' => '',
-    'Title' => '',
-    'UID' => '',
+    '(No Title)' => '(Nessun titolo)',
+    'All Day' => 'Tutto il giorno',
+    'Calendar' => 'Calendario',
+    'DT Stamp' => 'Timbro DT',
+    'Description' => 'Descrizione',
+    'End Datetime' => 'Termine date e ora',
+    'ID' => 'ID',
+    'Last Modified' => 'Ultima modifica',
+    'Location' => 'Posizione',
+    'Start Datetime' => 'Data e ora d'inizo',
+    'Title' => 'Titolo',
+    'UID' => 'UID',
 ];

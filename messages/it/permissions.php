@@ -17,10 +17,10 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    'Allows the user to edit/delete existing external calendar' => '',
-    'Allows the user to edit/delete existing external calendar entries' => '',
-    'Manage external Calendar' => '',
-    'Manage external entries' => '',
-    'You are not allowed to manage External Calendar!' => '',
-    'You need to be member of the space "%space_name%" to access this calendar!' => '',
+    'Allows the user to edit/delete existing external calendar' => 'Consente all'utente di modificare/eliminare il calendario esterno esistente',
+    'Allows the user to edit/delete existing external calendar entries' => 'Consente all'utente di modificare/eliminare registri su calendario esterne esistenti',
+    'Manage external Calendar' => 'Gestire calendario esterno',
+    'Manage external entries' => 'Gestire registri esterni',
+    'You are not allowed to manage External Calendar!' => 'Non sei autorizzato a gestire il calendario esterno!',
+    'You need to be member of the space "%space_name%" to access this calendar!' => 'Devi essere membro dello spazio "%space_name%" per accedere a questo calendario!',
 ];
