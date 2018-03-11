@@ -1,6 +1,10 @@
 Changelog
 =========
-06.03.2018
+v0.1.3
 ----------------------
-- Release: First release version 0.1
+- Changed sync-method to async task using [asynchronous tasks](http://docs.humhub.org/admin-asynchronous-tasks.html) 
+
+v0.1.2
+----------------------
+- First stable release
 
