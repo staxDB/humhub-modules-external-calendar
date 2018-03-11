@@ -2,12 +2,13 @@
 
 namespace humhub\modules\external_calendar;
 
-use humhub\modules\external_calendar\models\ExternalCalendarEntry;
 use Yii;
 use yii\helpers\Url;
 use yii\base\Object;
-use humhub\modules\external_calendar\models\ExternalCalendar;
+use humhub\modules\external_calendar\models\ExternalCalendarEntry;
 use humhub\modules\external_calendar\integration\calendar\CalendarExtension;
+use humhub\modules\external_calendar\jobs\SyncHourly;
+use humhub\modules\external_calendar\jobs\SyncDaily;
 
 class Events extends Object
 {
@@ -64,40 +65,13 @@ class Events extends Object
      */
     public static function onCronRun($event)
     {
-        $calendarModels = ExternalCalendar::find()->all();
+        if (Yii::$app->controller->action->id == 'hourly') {
+            Yii::$app->queue->push( new SyncHourly());
+        }
+        elseif (Yii::$app->controller->action->id == 'daily') {
+            Yii::$app->queue->push( new SyncDaily());
+        }
 
-            foreach ($calendarModels as $calendarModel) {
-                if (!isset($calendarModel)) {
-                    continue;
-                }
-                if (Yii::$app->controller->action->id == 'hourly') {
-                    if ($calendarModel->sync_mode == ExternalCalendar::SYNC_MODE_NONE || $calendarModel->sync_mode == ExternalCalendar::SYNC_MODE_DAILY) {
-                        continue;
-                    }
-                } elseif (Yii::$app->controller->action->id == 'daily') {
-                    if ($calendarModel->sync_mode == ExternalCalendar::SYNC_MODE_NONE || $calendarModel->sync_mode == ExternalCalendar::SYNC_MODE_HOURLY) {
-                        continue;
-                    }
-                }
-                $ical = SyncUtils::createICal($calendarModel->url);
-                if (!$ical) {
-                    continue;
-                }
-
-                // add info to CalendarModel
-                $calendarModel->addAttributes($ical);
-                $calendarModel->save();
-
-                // check events
-                if ($ical->hasEvents()) {
-                    // get formatted array
-                    $events = SyncUtils::getEvents($calendarModel, $ical);
-                    $result = SyncUtils::checkAndSubmitModels($events, $calendarModel);
-                    if (!$result) {
-                        continue;
-                    }
-                }
-            }
         return;
     }
 
