@@ -6,7 +6,7 @@
     "calendar",
     "external calendar"
   ],
-  "version": "0.1.4",
+  "version": "0.1.5",
   "humhub": {
     "minVersion": "1.2.3"
   },
