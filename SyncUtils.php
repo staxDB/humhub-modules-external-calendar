@@ -2,17 +2,12 @@
 
 namespace humhub\modules\external_calendar;
 
-use ICal\Event;
 use Yii;
 use humhub\modules\content\models\Content;
 use humhub\modules\external_calendar\models\ExternalCalendarEntry;
 use humhub\modules\external_calendar\models\ExternalCalendar;
-
-require_once(Yii::$app->getModule('external_calendar')->basePath . '/vendors/johngrogg/ics-parser/src/ICal/Event.php');
-require_once(Yii::$app->getModule('external_calendar')->basePath . '/vendors/johngrogg/ics-parser/src/ICal/ICal.php');
-
-use ICal\ICal;
-use yii\helpers\ArrayHelper;
+use humhub\modules\external_calendar\vendors\ICal\ICal;
+use humhub\modules\external_calendar\vendors\ICal\Event;
 
 
 /**

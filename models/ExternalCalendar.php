@@ -7,11 +7,7 @@ use humhub\modules\content\components\ContentActiveRecord;
 use humhub\modules\external_calendar\permissions\ManageCalendar;
 use humhub\modules\search\interfaces\Searchable;
 use humhub\modules\content\models\Content;
-
-require_once(Yii::$app->getModule('external_calendar')->basePath . '/vendors/johngrogg/ics-parser/src/ICal/Event.php');
-require_once(Yii::$app->getModule('external_calendar')->basePath . '/vendors/johngrogg/ics-parser/src/ICal/ICal.php');
-use ICal\ICal;
-
+use humhub\modules\external_calendar\vendors\ICal\ICal;
 
 
 /**

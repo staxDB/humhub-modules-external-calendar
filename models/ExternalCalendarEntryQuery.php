@@ -65,6 +65,4 @@ class ExternalCalendarEntryQuery extends AbstractCalendarQuery
 //    public $startField = 'start_datetime';
 //    public $endField = 'end_datetime';
 //    public $dateFormat = 'Y-m-d H:i:s';
-
-
 }

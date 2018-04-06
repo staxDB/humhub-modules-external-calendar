@@ -2,10 +2,7 @@
 
 namespace humhub\modules\external_calendar\models;
 
-use DateTimeZone;
-use humhub\libs\Html;
-use humhub\modules\search\interfaces\Searchable;
-use ICal\Event;
+
 use Yii;
 use DateTime;
 use humhub\libs\DbDateValidator;
@@ -14,6 +11,10 @@ use humhub\modules\content\components\ContentActiveRecord;
 use humhub\modules\external_calendar\permissions\ManageEntry;
 use humhub\modules\external_calendar\widgets\WallEntry;
 use humhub\modules\external_calendar\CalendarUtils;
+use DateTimeZone;
+use humhub\libs\Html;
+use humhub\modules\search\interfaces\Searchable;
+use humhub\modules\external_calendar\vendors\ICal\Event;
 
 /**
  * This is the model class for table "external_calendar_entry".
