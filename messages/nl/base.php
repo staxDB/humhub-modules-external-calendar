@@ -20,7 +20,6 @@ return [
     '<strong>Confirm</strong> deleting' => '',
     'Are you sure you want to delete this item?' => '',
     'Back to overview' => '',
-    'Calendar Extension' => '',
     'Cancel' => '',
     'Close' => '',
     'Create' => '',

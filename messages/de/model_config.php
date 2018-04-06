@@ -17,6 +17,7 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return array (
-    'Auto post Calendar' => 'Neu hinzugefügte Kalender automatisch im Stream posten',
-    'Auto post Entries' => 'Neu hinzugefügte Kalendereinträge automatisch im Stream posten',
+    'Auto post calendar' => 'Neu hinzugefügte Kalender automatisch im Stream posten',
+    'Auto post entries' => 'Neu hinzugefügte Kalendereinträge automatisch im Stream posten',
+    'Use calendar title for badge-title in widget' => 'Kalender-Bezeichnung für den Badge-Titel im Widget verwenden',
 );

@@ -16,7 +16,9 @@
  *
  * NOTE: this file must be saved in UTF-8 encoding.
  */
-return array (
+return [
+    'Back to modules' => 'Zurück zu den Modulen',
     'Calendar Extension Configuration' => 'Konfiguration der Kalender-Erweiterung',
+    'If this option is not checked, "Event" will be set as badge-title.' => 'Wenn diese Option nicht gesetzt ist, wird "Termin" als Badge-Titel verwendet.',
     'Save' => 'Speichern',
-);
+];
