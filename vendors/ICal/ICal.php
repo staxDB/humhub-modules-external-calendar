@@ -1,5 +1,4 @@
 <?php
-
 /*
  *  ####  THIS FILE IS MODIFIED FOR INTEGRATION IN HUMHUB  ####
  *  Original source can be found in subfolder
@@ -83,6 +82,13 @@ class ICal
      * @var boolean
      */
     public $useTimeZoneWithRRules = false;
+
+    /**
+     * Toggles whether to disable all character replacement.
+     *
+     * @var boolean
+     */
+    public $disableCharacterReplacement = false;
 
     /**
      * The parsed calendar
@@ -200,6 +206,7 @@ class ICal
         'defaultSpan',
         'defaultTimeZone',
         'defaultWeekStart',
+        'disableCharacterReplacement',
         'skipRecurrence',
         'useTimeZoneWithRRules',
     );
@@ -309,8 +316,10 @@ class ICal
             foreach ($lines as $line) {
                 $line = rtrim($line); // Trim trailing whitespace
                 $line = $this->removeUnprintableChars($line);
-                $line = $this->cleanData($line);
-                $add  = $this->keyValueFromString($line);
+                if (!$this->disableCharacterReplacement) {
+                    $line = $this->cleanData($line);
+                }
+                $add = $this->keyValueFromString($line);
 
                 $keyword = $add[0];
                 $values  = $add[1]; // May be an array containing multiple values
@@ -633,6 +642,7 @@ class ICal
      * @param  boolean $forceTimeZone Whether to force the time zone; the event's or the default
      * @param  boolean $forceUtc      Whether to force the time zone as UTC
      * @return DateTime
+     * @throws Exception
      */
     public function iCalDateToDateTime($icalDate, $forceTimeZone = false, $forceUtc = false)
     {
@@ -659,54 +669,53 @@ class ICal
         preg_match($pattern, $icalDate, $date);
 
         if (empty($date)) {
-            // Default to the initial
-            $dateTime = $icalDate;
+            throw new \Exception('Invalid iCal date format.');
+        }
+
+        // A Unix timestamp cannot represent a date prior to 1 Jan 1970
+        $year  = $date[2];
+        $isUtc = false;
+
+        if ($year <= self::UNIX_MIN_YEAR) {
+            $eventTimeZone = ltrim(strstr($icalDate, ':', true), 'TZID=');
+
+            if (empty($eventTimeZone)) {
+                $dateTime = new \DateTime($icalDate, new \DateTimeZone($this->defaultTimeZone));
+            } else {
+                $icalDate = ltrim(strstr($icalDate, ':'), ':');
+                $dateTime = new \DateTime($icalDate, new \DateTimeZone($eventTimeZone));
+            }
         } else {
-            // A Unix timestamp cannot represent a date prior to 1 Jan 1970
-            $year  = $date[2];
-            $isUtc = false;
+            if ($forceTimeZone) {
+                // TZID={Time Zone}:
+                if (isset($date[1])) {
+                    $eventTimeZone = rtrim($date[1], ':');
+                }
 
-            if ($year <= self::UNIX_MIN_YEAR) {
-                $eventTimeZone = ltrim(strstr($icalDate, ':', true), 'TZID=');
-
-                if (empty($eventTimeZone)) {
-                    $dateTime = new \DateTime($icalDate, new \DateTimeZone($this->defaultTimeZone));
+                if ($date[8] === 'Z') {
+                    $isUtc    = true;
+                    $dateTime = new \DateTime('now', new \DateTimeZone(self::TIME_ZONE_UTC));
+                } elseif (isset($eventTimeZone) && $this->isValidTimeZoneId($eventTimeZone)) {
+                    $dateTime = new \DateTime('now', new \DateTimeZone($eventTimeZone));
                 } else {
-                    $icalDate = ltrim(strstr($icalDate, ':'), ':');
-                    $dateTime = new \DateTime($icalDate, new \DateTimeZone($eventTimeZone));
+                    $dateTime = new \DateTime('now', new \DateTimeZone($this->defaultTimeZone));
                 }
             } else {
-                if ($forceTimeZone) {
-                    // TZID={Time Zone}:
-                    if (isset($date[1])) {
-                        $eventTimeZone = rtrim($date[1], ':');
-                    }
-
-                    if ($date[8] === 'Z') {
-                        $isUtc    = true;
-                        $dateTime = new \DateTime('now', new \DateTimeZone(self::TIME_ZONE_UTC));
-                    } elseif (isset($eventTimeZone) && $this->isValidTimeZoneId($eventTimeZone)) {
-                        $dateTime = new \DateTime('now', new \DateTimeZone($eventTimeZone));
-                    } else {
-                        $dateTime = new \DateTime('now', new \DateTimeZone($this->defaultTimeZone));
-                    }
+                if ($forceUtc) {
+                    $dateTime = new \DateTime('now', new \DateTimeZone(self::TIME_ZONE_UTC));
                 } else {
-                    if ($forceUtc) {
-                        $dateTime = new \DateTime('now', new \DateTimeZone(self::TIME_ZONE_UTC));
-                    } else {
-                        $dateTime = new \DateTime('now');
-                    }
+                    $dateTime = new \DateTime('now');
                 }
-
-                $dateTime->setDate((int) $date[2], (int) $date[3], (int) $date[4]);
-                $dateTime->setTime((int) $date[5], (int) $date[6], (int) $date[7]);
             }
 
-            if ($forceTimeZone && $isUtc) {
-                $dateTime->setTimezone(new \DateTimeZone($this->defaultTimeZone));
-            } elseif ($forceUtc) {
-                $dateTime->setTimezone(new \DateTimeZone(self::TIME_ZONE_UTC));
-            }
+            $dateTime->setDate((int) $date[2], (int) $date[3], (int) $date[4]);
+            $dateTime->setTime((int) $date[5], (int) $date[6], (int) $date[7]);
+        }
+
+        if ($forceTimeZone && $isUtc) {
+            $dateTime->setTimezone(new \DateTimeZone($this->defaultTimeZone));
+        } elseif ($forceUtc) {
+            $dateTime->setTimezone(new \DateTimeZone(self::TIME_ZONE_UTC));
         }
 
         return $dateTime;

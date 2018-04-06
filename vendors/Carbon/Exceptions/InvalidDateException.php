@@ -12,7 +12,6 @@
 //namespace Carbon\Exceptions;
 namespace humhub\modules\external_calendar\vendors\Carbon\Exceptions;
 
-
 use Exception;
 use InvalidArgumentException;
 

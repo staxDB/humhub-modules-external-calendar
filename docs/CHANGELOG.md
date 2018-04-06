@@ -1,5 +1,11 @@
 Changelog
 =========
+v0.1.5
+----------------------
+- Added: Option for choosing calendar title as `badge-title`
+- Changed: Behaviour of integrating calendar - Now each external calendar will be added separately, so you're able to disable an external calendar via `calendar-settings`.
+- Updated: Third-party code to latest version (2.1.1 to 2.1.2)
+
 
 v0.1.4
 ----------------------
