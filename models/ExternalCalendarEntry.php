@@ -3,6 +3,7 @@
 namespace humhub\modules\external_calendar\models;
 
 
+use humhub\modules\external_calendar\models\forms\ConfigForm;
 use Yii;
 use DateTime;
 use humhub\libs\DbDateValidator;
@@ -69,11 +70,9 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
 
     public function setSettings()
     {
-        // Set autopost settings for entries
-        $module = Yii::$app->getModule('external_calendar');
-        $autopost_entries = $module->settings->get('autopost_entries');
+        $settings = ConfigForm::instantiate();
 
-        if ($autopost_entries) {
+        if ($settings->autopost_entries) {
             // set back to autopost true
             $this->streamChannel = 'default';
             $this->silentContentCreation = false;
@@ -214,20 +213,26 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
 //            $end->setTime('00','00', '00');
         }
 
+        $settings = ConfigForm::instantiate();
+        if ($settings->useBadgeTitle) {
+            $badgeTitle = Label::asColor($this->calendar->color, Html::encode($this->calendar->title))->icon('fa-calendar-o')->right();
+        }
+        else {
+            $badgeTitle = Label::asColor($this->calendar->color, Yii::t('ExternalCalendarModule.base', "Event"))->icon('fa-calendar-o')->right();
+        }
+
+
         return [
 //            'id' => $this->id,
             'start' => $start,
             'end' => $end,
             'title' => Html::encode($this->getTitle()),
             'editable' => false,
-            'icon' => 'fa-calendar-o',
             'allDay' => $this->isAllDay(),
             'viewUrl' => $this->content->container->createUrl('/external_calendar/entry/view', ['id' => $this->id, 'cal' => '1']),
 //            'updateUrl' => $this->content->container->createUrl('/external_calendar/entry/update-ajax', ['id' => $this->id]),
             'openUrl' => $this->content->container->createUrl('/external_calendar/entry/view', ['id' => $this->id]),
-            'color' => $this->calendar->color, // overwrite color of Item_Type
-//            'badge' => Label::asColor($this->calendar->color, $this->calendar->title)->icon('fa-calendar-o')->right(),    // change badge to name of external calendar
-            'badge' => Label::asColor($this->calendar->color, Yii::t('ExternalCalendarModule.base', "Event"))->icon('fa-calendar-o')->right(),    // change badge
+            'badge' => $badgeTitle
         ];
     }
 

@@ -2,6 +2,9 @@
 
 namespace humhub\modules\external_calendar\models;
 
+use humhub\libs\Html;
+use humhub\modules\external_calendar\models\forms\ConfigForm;
+use humhub\widgets\Label;
 use Yii;
 use humhub\modules\content\components\ContentActiveRecord;
 use humhub\modules\external_calendar\permissions\ManageCalendar;
@@ -30,6 +33,8 @@ use humhub\modules\external_calendar\vendors\ICal\ICal;
  */
 class ExternalCalendar extends ContentActiveRecord implements Searchable
 {
+    const ITEM_TYPE_KEY = 'external_calendar';
+
     /**
      * @inheritdoc
      */
@@ -89,11 +94,9 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
 
     public function setSettings()
     {
-        // Set autopost settings for calendar
-        $module = Yii::$app->getModule('external_calendar');
-        $autopost_calendar = $module->settings->get('autopost_calendar');
+        $settings = ConfigForm::instantiate();
 
-        if ($autopost_calendar) {
+        if ($settings->autopost_calendar) {
             // set back to autopost true
             $this->streamChannel = 'default';
             $this->silentContentCreation = false;
@@ -138,7 +141,8 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
     public function rules()
     {
         return [
-            [['title', 'url'], 'string', 'max' => 255],
+            [['title'], 'string', 'max' => 15],
+            [['url'], 'string', 'max' => 255],
             [['title', 'url'], 'required'],
             [['time_zone'], 'string', 'max' => 60],
             [['color'], 'string', 'max' => 7],
@@ -353,5 +357,20 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
                 }
                 break;
         }
+    }
+
+    public function getItemTypeKey()
+    {
+        return (static::ITEM_TYPE_KEY . '_' . $this->id);
+    }
+
+    public function getFullCalendarArray()
+    {
+        return [
+            'title' => Html::encode($this->title),
+            'color' => Html::encode($this->color),
+            'icon' => 'fa-calendar-o',
+            'format' => 'Y-m-d H:i:s',
+        ];
     }
 }

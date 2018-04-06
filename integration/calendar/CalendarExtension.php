@@ -2,6 +2,7 @@
 
 namespace humhub\modules\external_calendar\integration\calendar;
 
+use humhub\modules\external_calendar\models\ExternalCalendar;
 use humhub\modules\external_calendar\models\ExternalCalendarEntry;
 use Yii;
 use yii\base\Object;
@@ -27,12 +28,11 @@ class CalendarExtension extends Object
      */
     public static function addItemTypes($event)
     {
-        $event->addType(static::ITEM_TYPE_KEY, [
-            'title' => Yii::t('ExternalCalendarModule.base', 'Calendar Extension'),
-            'color' => static::DEFAULT_COLOR,
-            'icon' => 'fa-calendar-o',
-            'format' => 'Y-m-d H:i:s',
-        ]);
+        $calendars = self::getCalendarsForEvent($event);
+
+        foreach ($calendars as $calendar) {
+            $event->addType($calendar->getItemTypeKey(), $calendar->getFullCalendarArray());
+        }
     }
 
     /**
@@ -42,13 +42,36 @@ class CalendarExtension extends Object
     {
         /* @var $entries ExternalCalendarEntry[] */
         $entries = ExternalCalendarEntryQuery::findForEvent($event);
+        $calendars = self::getCalendarsForEvent($event);
 
-        $items = [];
-        foreach ($entries as $entry) {
-            $items[] = $entry->getFullCalendarArray();
+        foreach ($calendars as $calendar) {
+            $items = [];
+            foreach ($entries as $entry) {
+                if ($entry->calendar->id !== $calendar->id) {
+                    continue;
+                }
+                $items[] = $entry->getFullCalendarArray();
+            }
+            if (!empty($items)) {
+                $event->addItems($calendar->getItemTypeKey(), $items);
+            }
+
         }
 
-        $event->addItems(static::ITEM_TYPE_KEY, $items);
+
+        // old
+//        $event->addItems(static::ITEM_TYPE_KEY, $items);
+    }
+
+    private static function getCalendarsForEvent($event)
+    {
+        if (isset($event->contentContainer) && !empty($event->contentContainer)) {
+            $calendars = ExternalCalendar::find()->contentContainer($event->contentContainer)->all();
+        }
+        else {
+            $calendars = ExternalCalendar::find()->all();
+        }
+        return $calendars;
     }
 
 }

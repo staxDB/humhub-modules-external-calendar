@@ -128,7 +128,7 @@ class Module extends ContentContainerModule
 
     public function getConfigUrl()
     {
-        return Url::to(['/external_calendar/admin/index']);
+        return Url::to(['/external_calendar/config/index']);
     }
 
     public function getContentContainerConfigUrl(ContentContainerActiveRecord $container)

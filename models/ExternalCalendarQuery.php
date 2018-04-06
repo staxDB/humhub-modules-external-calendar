@@ -55,14 +55,10 @@ use humhub\modules\calendar\interfaces\AbstractCalendarQuery;
  *
  * @author davidborn
  */
-class ExternalCalendarEntryQuery extends AbstractCalendarQuery
+class ExternalCalendarQuery extends AbstractCalendarQuery
 {
     /**
      * @inheritdocs
      */
-    protected static $recordClass = ExternalCalendarEntry::class;
-//
-//    public $startField = 'start_datetime';
-//    public $endField = 'end_datetime';
-//    public $dateFormat = 'Y-m-d H:i:s';
+    protected static $recordClass = ExternalCalendar::class;
 }

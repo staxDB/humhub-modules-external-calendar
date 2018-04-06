@@ -1,6 +1,6 @@
 <?php
 
-namespace humhub\modules\external_calendar\models;
+namespace humhub\modules\external_calendar\models\forms;
 
 use Yii;
 
@@ -11,9 +11,15 @@ use Yii;
  */
 class ConfigForm extends \yii\base\Model
 {
+    /**
+     * @var boolean determines whether external calendars should be posted to stream
+     */
+    public $autopost_calendar = false;
 
-    public $autopost_calendar;
-    public $autopost_entries;
+    /**
+     * @var boolean determines whether external calendar entries should be posted to stream
+     */
+    public $autopost_entries = false;
 
     /**
      * @var boolean determines if the title of the calendar should be used as badge-title for the upcoming-events widget
@@ -26,8 +32,8 @@ class ConfigForm extends \yii\base\Model
     public function init()
     {
         $settings = Yii::$app->getModule('external_calendar')->settings;
-        $this->autopost_calendar = $settings->get('autopost_calendar');
-        $this->autopost_entries = $settings->get('autopost_entries');
+        $this->autopost_calendar = $settings->get('autopost_calendar', $this->autopost_calendar);
+        $this->autopost_entries = $settings->get('autopost_entries', $this->autopost_entries);
         $this->useBadgeTitle = $settings->get('useBadgeTitle', $this->useBadgeTitle);
     }
 
