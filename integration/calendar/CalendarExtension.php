@@ -4,8 +4,6 @@ namespace humhub\modules\external_calendar\integration\calendar;
 
 use humhub\modules\external_calendar\models\ExternalCalendar;
 use humhub\modules\external_calendar\models\ExternalCalendarEntry;
-use Yii;
-use yii\base\Object;
 use humhub\modules\external_calendar\models\ExternalCalendarEntryQuery;
 
 /**
@@ -13,7 +11,7 @@ use humhub\modules\external_calendar\models\ExternalCalendarEntryQuery;
  *
  * @author davidborn
  */
-class CalendarExtension extends Object
+class CalendarExtension
 {
     /**
      * Default color of external calendar type items.
