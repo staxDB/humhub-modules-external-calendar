@@ -3,7 +3,6 @@
 namespace humhub\modules\external_calendar\models;
 
 
-use humhub\modules\external_calendar\models\forms\ConfigForm;
 use Yii;
 use DateTime;
 use humhub\libs\DbDateValidator;
@@ -16,6 +15,8 @@ use DateTimeZone;
 use humhub\libs\Html;
 use humhub\modules\search\interfaces\Searchable;
 use humhub\modules\external_calendar\vendors\ICal\Event;
+use humhub\modules\external_calendar\models\forms\ConfigForm;
+use humhub\modules\external_calendar\models\ICS;
 
 /**
  * This is the model class for table "external_calendar_entry".
@@ -361,5 +362,13 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
     public function getCalendar()
     {
         return $this->hasOne(ExternalCalendar::className(), ['id' => 'calendar_id']);
+    }
+
+    public function generateIcs()
+    {
+        $module = Yii::$app;
+        $timezone = $module->settings->get('timeZone');
+        $ics = new ICS($this->title, $this->description,$this->start_datetime, $this->end_datetime, $this->location, null, $timezone, $this->all_day);
+        return $ics;
     }
 }

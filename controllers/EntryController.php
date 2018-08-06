@@ -122,4 +122,11 @@ class EntryController extends ContentContainerController
     {
         return ExternalCalendarEntry::find()->contentContainer($this->contentContainer)->readable()->where(['external_calendar_entry.id' => $id])->one();
     }
+
+    public function actionGenerateics()
+    {
+        $calendarEntry = $this->getCalendarEntry(Yii::$app->request->get('id'));
+        $ics = $calendarEntry->generateIcs();
+        return Yii::$app->response->sendContentAsFile($ics, uniqid() . '.ics', ['mimeType' => 'text/calendar']);
+    }
 }

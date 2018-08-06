@@ -14,7 +14,8 @@ return [
         ['class' => 'humhub\modules\calendar\interfaces\CalendarService', 'event' => 'findItems', 'callback' => ['humhub\modules\external_calendar\Events', 'onFindCalendarItems']],
         ['class' => CronController::className(), 'event' => CronController::EVENT_ON_HOURLY_RUN, 'callback' => ['humhub\modules\external_calendar\Events', 'onCronRun']],
         ['class' => CronController::className(), 'event' => CronController::EVENT_ON_DAILY_RUN, 'callback' => ['humhub\modules\external_calendar\Events', 'onCronRun']],
-        ['class' => IntegrityController::className(), 'event' => IntegrityController::EVENT_ON_RUN, 'callback' => ['humhub\modules\external_calendar\Events', 'onIntegrityCheck']]
+        ['class' => IntegrityController::className(), 'event' => IntegrityController::EVENT_ON_RUN, 'callback' => ['humhub\modules\external_calendar\Events', 'onIntegrityCheck']],
+        ['class' => '\humhub\modules\content\widgets\WallEntryLinks', 'event' => 'init', 'callback' => ['humhub\modules\external_calendar\Events', 'onWallEntryLinks']],
     ],
 ];
 ?>

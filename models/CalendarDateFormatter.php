@@ -7,13 +7,14 @@ use Yii;
 use DateTime;
 use humhub\libs\TimezoneHelper;
 use humhub\modules\calendar\interfaces\CalendarItem;
+use yii\base\Component;
 
 /**
  * CalendarDateFormatter offers some useful Date-Formatter functions
  *
  * @author davidborn
  */
-class CalendarDateFormatter
+class CalendarDateFormatter extends Component
 {
 
     /**

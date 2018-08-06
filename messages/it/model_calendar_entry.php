@@ -26,7 +26,7 @@ return [
     'ID' => 'ID',
     'Last Modified' => 'Ultima modifica',
     'Location' => 'Posizione',
-    'Start Datetime' => 'Data e ora d'inizo',
+    'Start Datetime' => 'Data e ora d\'inizo',
     'Title' => 'Titolo',
     'UID' => 'UID',
 ];

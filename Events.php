@@ -8,6 +8,7 @@ use humhub\modules\external_calendar\models\ExternalCalendarEntry;
 use humhub\modules\external_calendar\integration\calendar\CalendarExtension;
 use humhub\modules\external_calendar\jobs\SyncHourly;
 use humhub\modules\external_calendar\jobs\SyncDaily;
+use humhub\modules\external_calendar\widgets\DownloadIcsLink;
 
 class Events
 {
@@ -90,6 +91,13 @@ class Events
                     $entry->delete();
                 }
             }
+        }
+    }
+
+    public static function onWallEntryLinks($event)
+    {
+        if ($event->sender->object instanceof ExternalCalendarEntry) {
+            $event->sender->addWidget(DownloadIcsLink::class, ['calendarEntry' => $event->sender->object]);
         }
     }
 
