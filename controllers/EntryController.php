@@ -12,7 +12,7 @@ use humhub\modules\external_calendar\models\ExternalCalendarEntry;
 /**
  * EntryController implements the CRUD actions for all external calendar entries
  *
- * @author davidborn
+ * @author David Born ([staxDB](https://github.com/staxDB))
  */
 class EntryController extends ContentContainerController
 {

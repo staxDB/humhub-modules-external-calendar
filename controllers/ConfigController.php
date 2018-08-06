@@ -4,14 +4,13 @@ namespace humhub\modules\external_calendar\controllers;
 
 
 use Yii;
-use yii\helpers\Url;
 use humhub\modules\admin\components\Controller;
 use humhub\modules\external_calendar\models\forms\ConfigForm;
 
 /**
  * ConfigController implements the config actions for all external calendars
  *
- * @author davidborn
+ * @author David Born ([staxDB](https://github.com/staxDB))
  */
 class ConfigController extends Controller
 {

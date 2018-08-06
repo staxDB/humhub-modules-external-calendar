@@ -8,11 +8,11 @@
 /* @var $this yii\web\View */
 /* @var $model \humhub\modules\external_calendar\models\forms\ConfigForm */
 
-use yii\widgets\ActiveForm;
+use humhub\modules\ui\form\widgets\ActiveForm;
 use \yii\helpers\Html;
 use yii\helpers\Url;
 use humhub\widgets\Button;
-use humhub\modules\bookmark\widgets\GlobalConfigMenu;
+
 $this->title = Yii::t('ExternalCalendarModule.views_admin', 'Calendar Extension Configuration');
 ?>
 

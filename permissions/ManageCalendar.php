@@ -5,13 +5,14 @@ namespace humhub\modules\external_calendar\permissions;
 use humhub\modules\space\models\Space;
 use humhub\modules\user\models\User;
 use Yii;
+use humhub\libs\BasePermission;
 
 /**
  * ManageCalendar Permission
  *
- * @author davidborn
+ * @author David Born ([staxDB](https://github.com/staxDB))
  */
-class ManageCalendar extends \humhub\libs\BasePermission
+class ManageCalendar extends BasePermission
 {
     /**
      * @inheritdoc

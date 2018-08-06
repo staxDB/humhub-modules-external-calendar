@@ -9,7 +9,7 @@ use DateTimeZone;
 /**
  * Description of CalendarUtils
  *
- * @author davidborn
+ * @author David Born ([staxDB](https://github.com/staxDB))
  */
 class CalendarUtils
 {

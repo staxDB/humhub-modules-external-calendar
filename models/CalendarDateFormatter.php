@@ -12,7 +12,7 @@ use yii\base\Component;
 /**
  * CalendarDateFormatter offers some useful Date-Formatter functions
  *
- * @author davidborn
+ * @author David Born ([staxDB](https://github.com/staxDB))
  */
 class CalendarDateFormatter extends Component
 {

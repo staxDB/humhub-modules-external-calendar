@@ -9,7 +9,7 @@ use humhub\modules\external_calendar\models\ExternalCalendarEntryQuery;
 /**
  * CalendarExtension implements functions for the Events.php file
  *
- * @author davidborn
+ * @author David Born ([staxDB](https://github.com/staxDB))
  */
 class CalendarExtension
 {

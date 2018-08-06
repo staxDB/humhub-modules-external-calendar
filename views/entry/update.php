@@ -1,9 +1,7 @@
 <?php
 
-use yii\helpers\Html;
 use humhub\widgets\ModalDialog;
-use humhub\widgets\ActiveForm;
-use kartik\widgets\DateTimePicker;
+use humhub\modules\ui\form\widgets\ActiveForm;
 use humhub\widgets\ModalButton;
 
 /* @var $this yii\web\View */

@@ -4,7 +4,6 @@ namespace humhub\modules\external_calendar\widgets;
 
 use humhub\modules\external_calendar\assets\Assets;
 use humhub\modules\external_calendar\permissions\ManageCalendar;
-use Yii;
 
 /**
  * @inheritdoc
@@ -53,7 +52,6 @@ class WallEntryCalendar extends \humhub\modules\content\widgets\WallEntry
         return $this->render('wallEntryCalendar', [
             'calendar' => $this->contentObject,
             'collapse' => $this->collapse,
-            'contentContainer' => $this->contentObject->content->container
         ]);
     }
 

@@ -1,8 +1,8 @@
 <?php
 
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
-use humhub\widgets\ColorPickerField;
+use humhub\modules\ui\form\widgets\ActiveForm;
+use humhub\modules\ui\form\widgets\ColorPicker;
 
 /* @var $this yii\web\View */
 /* @var $model \humhub\modules\external_calendar\models\ExternalCalendar */
@@ -22,7 +22,7 @@ if ($model->color == null && isset($contentContainer->color)) {
     <?php $form = ActiveForm::begin(); ?>
 
     <div id="event-color-field" class="form-group space-color-chooser-edit" style="margin-top: 5px;">
-        <?= $form->field($model, 'color')->widget(ColorPickerField::className(), ['container' => 'event-color-field'])->label(Yii::t('ExternalCalendarModule.views_calendar', 'Title and Color')); ?>
+        <?= $form->field($model, 'color')->widget(ColorPicker::className(), ['container' => 'event-color-field'])->label(Yii::t('ExternalCalendarModule.views_calendar', 'Title and Color')); ?>
 
         <?= $form->field($model, 'title', ['template' => '
                                     {label}

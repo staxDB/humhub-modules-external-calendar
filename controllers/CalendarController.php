@@ -15,7 +15,7 @@ use humhub\widgets\ModalClose;
 /**
  * CalendarController implements the CRUD actions for all external calendars
  *
- * @author davidborn
+ * @author David Born ([staxDB](https://github.com/staxDB))
  */
 class CalendarController extends ContentContainerController
 {

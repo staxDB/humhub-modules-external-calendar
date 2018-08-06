@@ -53,7 +53,7 @@ use humhub\modules\calendar\interfaces\AbstractCalendarQuery;
  *  - [[responded()]]: Entries where given user has given any response (accepted/declined...)
  *  - [[notResponded()]]: Entries where given user has not given any response yet (accepted/declined...)
  *
- * @author davidborn
+ * @author David Born ([staxDB](https://github.com/staxDB))
  */
 class ExternalCalendarEntryQuery extends AbstractCalendarQuery
 {

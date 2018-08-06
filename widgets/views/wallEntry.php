@@ -1,10 +1,7 @@
 <?php
 
-use humhub\libs\Helpers;
 use humhub\widgets\MarkdownView;
-use humhub\widgets\Button;
 use yii\helpers\Html;
-use humhub\modules\external_calendar\models\ExternalCalendarEntry;
 
 /* @var $calendarEntry \humhub\modules\external_calendar\models\ExternalCalendarEntry */
 /* @var $stream boolean */

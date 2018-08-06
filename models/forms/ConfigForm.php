@@ -3,13 +3,14 @@
 namespace humhub\modules\external_calendar\models\forms;
 
 use Yii;
+use yii\base\Model;
 
 /**
  * ConfigForm uses for AdminController to set the configs for all external calendars
  *
- * @author davidborn
+ * @author David Born ([staxDB](https://github.com/staxDB))
  */
-class ConfigForm extends \yii\base\Model
+class ConfigForm extends Model
 {
     /**
      * @var boolean determines whether external calendars should be posted to stream

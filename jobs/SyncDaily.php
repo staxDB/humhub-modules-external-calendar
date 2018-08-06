@@ -3,16 +3,12 @@
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2017 HumHub GmbH & Co. KG
  * @license https://www.humhub.com/licences
- *
- *
- * @var $reminder \humhub\modules\task\models\TaskReminder;
- *
  */
 
 namespace humhub\modules\external_calendar\jobs;
 
 
-use humhub\components\queue\ActiveJob;
+use humhub\modules\queue\ActiveJob;
 use humhub\modules\external_calendar\SyncUtils;
 use humhub\modules\external_calendar\models\ExternalCalendar;
 

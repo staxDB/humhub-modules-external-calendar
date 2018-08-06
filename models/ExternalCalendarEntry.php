@@ -35,7 +35,7 @@ use humhub\modules\external_calendar\models\ICS;
  * @property string $time_zone
  * @property integer $all_day
  *
- * @author davidborn
+ * @author David Born ([staxDB](https://github.com/staxDB))
  */
 class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
 {

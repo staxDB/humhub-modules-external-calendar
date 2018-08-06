@@ -13,7 +13,7 @@ use humhub\modules\external_calendar\vendors\ICal\Event;
 /**
  * Description of SyncUtils
  *
- * @author davidborn
+ * @author David Born ([staxDB](https://github.com/staxDB))
  */
 class SyncUtils
 {

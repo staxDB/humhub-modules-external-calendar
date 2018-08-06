@@ -5,7 +5,6 @@ namespace humhub\modules\external_calendar\models;
 use humhub\libs\Html;
 use humhub\modules\content\components\ContentContainerActiveRecord;
 use humhub\modules\external_calendar\models\forms\ConfigForm;
-use humhub\widgets\Label;
 use Yii;
 use humhub\modules\content\components\ContentActiveRecord;
 use humhub\modules\external_calendar\permissions\ManageCalendar;
@@ -30,7 +29,7 @@ use humhub\modules\external_calendar\vendors\ICal\ICal;
  * @property integer $event_mode    Set how old and new Events should be handled
  * @property ExternalCalendarEntry $ExternalCalendarEntries[]
  *
- * @author davidborn
+ * @author David Born ([staxDB](https://github.com/staxDB))
  */
 class ExternalCalendar extends ContentActiveRecord implements Searchable
 {
