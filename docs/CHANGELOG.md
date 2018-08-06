@@ -1,5 +1,11 @@
 Changelog
 =========
+v0.2
+----------------------
+- Updated for Humhub v.1.3 and async tasks
+- Ready for PHP 7.2
+- Added: Export single entries to ICS
+
 v0.1.5
 ----------------------
 - Added: Option for choosing calendar title as `badge-title`

@@ -30,16 +30,9 @@ Right: https://calendar.google.com/calendar/ical/...
 __Module website:__ <https://github.com/staxDB/humhub-modules-external-calendar.git>    
 __Author:__ David Born    
 
-## Changelog
-<https://github.com/staxDB/humhub-modules-external-calendar/commits/master>
-
-## Bugtracker
-<https://github.com/staxDB/humhub-modules-external-calendar/issues>
-
-## ToDos
-- fix bug with calendar-widget "upcoming events"
-- test other calendars than google (only private link tested)
-- add more translations
-
+## Links
+- [Changelog](https://github.com/staxDB/humhub-modules-external-calendar/blob/master/docs/CHANGELOG.md)
+- [Github Changelog](https://github.com/staxDB/humhub-modules-external-calendar/commits/master)
+- [Bugtracker](https://github.com/staxDB/humhub-modules-external-calendar/issues)
 
 This Module uses the Calendar UI Interface in v0.6 - [see dokumentation](https://github.com/humhub/humhub-modules-calendar/blob/master/docs/interface.md)
