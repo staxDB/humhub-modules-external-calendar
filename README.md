@@ -20,8 +20,8 @@ __Author:__ David Born ([staxDB](https://github.com/staxDB))
 
 ## Informations
 This module is in Beta and not tested with other external calendars than google (private) and mep24!
-- Check out the [Changelog](https://github.com/staxDB/humhub-modules-announcements/blob/master/docs/CHANGELOG.md)
-- For installation instructions take a look at the [docs-folder](https://github.com/staxDB/humhub-modules-announcements/blob/master/docs/INSTALL.md).
+- Check out the [Changelog](https://github.com/staxDB/humhub-modules-external-calendar/blob/master/docs/CHANGELOG.md)
+- For installation instructions take a look at the [docs-folder](https://github.com/staxDB/humhub-modules-external-calendar/blob/master/docs/INSTALL.md).
 
 ## Todo
 - testing
