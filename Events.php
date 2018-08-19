@@ -4,13 +4,14 @@ namespace humhub\modules\external_calendar;
 
 use Yii;
 use yii\helpers\Url;
+use yii\base\BaseObject;
 use humhub\modules\external_calendar\models\ExternalCalendarEntry;
 use humhub\modules\external_calendar\integration\calendar\CalendarExtension;
 use humhub\modules\external_calendar\jobs\SyncHourly;
 use humhub\modules\external_calendar\jobs\SyncDaily;
 use humhub\modules\external_calendar\widgets\DownloadIcsLink;
 
-class Events
+class Events extends BaseObjectcd ../e
 {
 
     /**

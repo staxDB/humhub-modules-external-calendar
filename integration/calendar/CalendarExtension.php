@@ -5,13 +5,14 @@ namespace humhub\modules\external_calendar\integration\calendar;
 use humhub\modules\external_calendar\models\ExternalCalendar;
 use humhub\modules\external_calendar\models\ExternalCalendarEntry;
 use humhub\modules\external_calendar\models\ExternalCalendarEntryQuery;
+use yii\base\BaseObject;
 
 /**
  * CalendarExtension implements functions for the Events.php file
  *
  * @author David Born ([staxDB](https://github.com/staxDB))
  */
-class CalendarExtension
+class CalendarExtension extends BaseObject
 {
     /**
      * Default color of external calendar type items.
