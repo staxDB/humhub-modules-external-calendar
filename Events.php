@@ -11,7 +11,7 @@ use humhub\modules\external_calendar\jobs\SyncHourly;
 use humhub\modules\external_calendar\jobs\SyncDaily;
 use humhub\modules\external_calendar\widgets\DownloadIcsLink;
 
-class Events extends BaseObjectcd ../e
+class Events extends BaseObject
 {
 
     /**
