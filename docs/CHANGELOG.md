@@ -1,5 +1,9 @@
 Changelog
 =========
+v0.2.1
+----------------------
+- Updated to yii/base/BaseObject
+
 v0.2
 ----------------------
 - Updated for Humhub v.1.3 and async tasks
