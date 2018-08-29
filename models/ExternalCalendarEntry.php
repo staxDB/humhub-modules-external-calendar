@@ -120,10 +120,10 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
     {
         return [
             [['title', 'start_datetime', 'end_datetime'], 'required'],
-            [['last_modified'], DbDateValidator::className()],
-            [['dtstamp'], DbDateValidator::className()],
-            [['start_datetime'], DbDateValidator::className()],
-            [['end_datetime'], DbDateValidator::className()],
+            [['last_modified'], DbDateValidator::class],
+            [['dtstamp'], DbDateValidator::class],
+            [['start_datetime'], DbDateValidator::class],
+            [['end_datetime'], DbDateValidator::class],
             [['all_day'], 'integer'],
             [['title'], 'string', 'max' => 200],
             [['location'], 'string'],
@@ -361,7 +361,7 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
      */
     public function getCalendar()
     {
-        return $this->hasOne(ExternalCalendar::className(), ['id' => 'calendar_id']);
+        return $this->hasOne(ExternalCalendar::class, ['id' => 'calendar_id']);
     }
 
     public function generateIcs()

@@ -325,7 +325,7 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
      */
     public function getExternalCalendarEntries()
     {
-        return $this->hasMany(ExternalCalendarEntry::className(), ['calendar_id' => 'id']);
+        return $this->hasMany(ExternalCalendarEntry::class, ['calendar_id' => 'id']);
     }
 
     public function addAttributes(ICal $ical)

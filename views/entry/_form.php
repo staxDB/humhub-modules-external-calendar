@@ -21,9 +21,9 @@ use kartik\widgets\DateTimePicker;
 
     <?= $form->field($model, 'location')->textarea(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'start_datetime')->widget(DateTimePicker::className(), ['type' => DateTimePicker::TYPE_COMPONENT_APPEND, 'pluginOptions' => ['format' => 'yyyy-mm-dd hh:ii:ss', 'autoclose' => false]]) ?>
+    <?= $form->field($model, 'start_datetime')->widget(DateTimePicker::class, ['type' => DateTimePicker::TYPE_COMPONENT_APPEND, 'pluginOptions' => ['format' => 'yyyy-mm-dd hh:ii:ss', 'autoclose' => false]]) ?>
 
-    <?= $form->field($model, 'end_datetime')->widget(DateTimePicker::className(), ['type' => DateTimePicker::TYPE_COMPONENT_APPEND, 'pluginOptions' => ['format' => 'yyyy-mm-dd hh:ii:ss', 'autoclose' => false]]) ?>
+    <?= $form->field($model, 'end_datetime')->widget(DateTimePicker::class, ['type' => DateTimePicker::TYPE_COMPONENT_APPEND, 'pluginOptions' => ['format' => 'yyyy-mm-dd hh:ii:ss', 'autoclose' => false]]) ?>
 
     <?= $form->field($model, 'all_day')->checkbox() ?>
 
