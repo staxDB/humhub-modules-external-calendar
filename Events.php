@@ -58,23 +58,47 @@ class Events extends BaseObject
         ));
     }
 
+//    /**
+//     * Defines what to do if cron runs.
+//     *
+//     * @param $event
+//     * @return void
+//     */
+//    public static function onCronRun($event)
+//    {
+//        if (Yii::$app->controller->action->id == 'hourly') {
+//            Yii::$app->queue->push( new SyncHourly());
+//        }
+//        elseif (Yii::$app->controller->action->id == 'daily') {
+//            Yii::$app->queue->push( new SyncDaily());
+//        }
+//
+//        return;
+//    }
+
     /**
-     * Defines what to do if cron runs.
+     * Defines what to do if hourly cron runs.
      *
      * @param $event
      * @return void
      */
-    public static function onCronRun($event)
+    public static function onCronHourlyRun($event)
     {
-        if (Yii::$app->controller->action->id == 'hourly') {
-            Yii::$app->queue->push( new SyncHourly());
-        }
-        elseif (Yii::$app->controller->action->id == 'daily') {
-            Yii::$app->queue->push( new SyncDaily());
-        }
-
-        return;
+        Yii::$app->queue->push( new SyncHourly());
     }
+
+    /**
+     * Defines what to do if daily cron runs.
+     *
+     * @param $event
+     * @return void
+     */
+    public static function onCronDailyRun($event)
+    {
+        Yii::$app->queue->push( new SyncDaily());
+    }
+
+
 
     /**
      * Callback to validate module database records.
