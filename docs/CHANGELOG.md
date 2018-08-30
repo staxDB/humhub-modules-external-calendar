@@ -2,7 +2,6 @@ Changelog
 =========
 v0.2.2
 ----------------------
-- Added Filters for showing hidden external calendars and entries
 - Changed Cron:
     - module now triggers hourly/daily-crons instead of their IDs
 - Removed Deprecations:

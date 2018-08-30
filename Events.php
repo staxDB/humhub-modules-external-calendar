@@ -10,15 +10,9 @@ use humhub\modules\external_calendar\integration\calendar\CalendarExtension;
 use humhub\modules\external_calendar\jobs\SyncHourly;
 use humhub\modules\external_calendar\jobs\SyncDaily;
 use humhub\modules\external_calendar\widgets\DownloadIcsLink;
-use humhub\modules\stream\models\WallStreamQuery;
-use humhub\modules\stream\widgets\WallStreamFilterNavigation;
-use humhub\modules\external_calendar\models\filters\ExternalCalendarStreamFilter;
 
 class Events extends BaseObject
 {
-    const FILTER_BLOCK_EXTERNAL_CALENDAR = 'external_calendar';
-    const FILTER_EXTERNAL_CALENDAR = 'external_calendar';
-
 
     /**
      * @param $event \humhub\modules\calendar\interfaces\CalendarItemTypesEvent
@@ -84,49 +78,6 @@ class Events extends BaseObject
     public static function onCronDailyRun($event)
     {
         Yii::$app->queue->push( new SyncDaily());
-    }
-
-    public static function onStreamFilterBeforeRun($event)
-    {
-//        $settings = EditForm::instantiate();
-//        if (!$settings->showFilters) {
-//            return;
-//        }
-        /** @var $wallFilterNavigation WallStreamFilterNavigation */
-        $wallFilterNavigation = $event->sender;
-
-        // Add a new filter block to the last filter panel
-        $wallFilterNavigation->addFilterBlock(static::FILTER_BLOCK_EXTERNAL_CALENDAR, [
-            'title' => Yii::t('ExternalCalendarModule.base', 'External Calendar'),
-            'sortOrder' => 400
-        ], WallStreamFilterNavigation::PANEL_POSITION_LEFT);
-
-        // Add the filter to the new filter block
-        $wallFilterNavigation->addFilter([
-            'id' => ExternalCalendarStreamFilter::FILTER_SHOW_ENTRIES,
-            'title' => Yii::t('ExternalCalendarModule.models', 'Include hidden entries'),
-            'sortOrder' => 100
-        ],static::FILTER_BLOCK_EXTERNAL_CALENDAR);
-
-        // Add the filter to the new filter block
-        $wallFilterNavigation->addFilter([
-            'id' => ExternalCalendarStreamFilter::FILTER_SHOW_CALENDARS,
-            'title' => Yii::t('ExternalCalendarModule.models', 'Include hidden calendars'),
-            'sortOrder' => 200
-        ],static::FILTER_BLOCK_EXTERNAL_CALENDAR);
-    }
-
-    public static function onStreamFilterBeforeFilter($event)
-    {
-//        $settings = EditForm::instantiate();
-//        if (!$settings->showFilters) {
-//            return;
-//        }
-        /** @var $streamQuery WallStreamQuery */
-        $streamQuery = $event->sender;
-
-        // Add a new filterHandler to WallStreamQuery
-        $streamQuery->filterHandlers[] = ExternalCalendarStreamFilter::class;
     }
 
 
