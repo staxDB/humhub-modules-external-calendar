@@ -31,7 +31,6 @@ class ConfigController extends Controller
         $form = new ConfigForm();
 
         if ($form->load(Yii::$app->request->post()) && $form->save()) {
-//            return $this->redirect(Url::to(['/admin/module/list']));
             $this->view->saved();
         }
 

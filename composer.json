@@ -1,0 +1,9 @@
+{
+  "name": "humhub/humhub-calendar",
+  "description": "HumHub calendar module",
+  "type": "library",
+  "require": {
+    "johngrogg/ics-parser": "^2",
+    "simshaun/recurr": "^4"
+  }
+}

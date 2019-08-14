@@ -16,8 +16,14 @@ class Assets extends AssetBundle
 
     public $jsOptions = ['position' => View::POS_END];
 
-    public $css = [
+    public $publishOptions = [
+        'forceCopy' => true
     ];
+
+    public $css = [
+        'css/humhub.external_calendar.css'
+    ];
+
     public $js = [
         'js/humhub.external_calendar.js'
     ];

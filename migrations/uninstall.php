@@ -9,6 +9,8 @@ class uninstall extends Migration
     {
         $this->dropTable('external_calendar_entry');
         $this->dropTable('external_calendar');
+        $this->dropTable('external_calendar_export');
+        $this->dropTable('external_calendar_export_spaces');
     }
 
     public function down()

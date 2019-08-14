@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use humhub\modules\ui\form\widgets\ActiveForm;
 use humhub\modules\ui\form\widgets\ColorPicker;
+use humhub\widgets\Button;
 
 /* @var $this yii\web\View */
 /* @var $model \humhub\modules\external_calendar\models\ExternalCalendar */
@@ -45,7 +46,7 @@ if ($model->color == null && isset($contentContainer->color)) {
     <?= $form->field($model, 'event_mode')->dropDownList($model->getEventModeItems()) ?>
 
     <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? Yii::t('ExternalCalendarModule.base', 'Save') : Yii::t('ExternalCalendarModule.base', 'Save'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Button::save()->submit() ?>
     </div>
 
     <?php ActiveForm::end(); ?>

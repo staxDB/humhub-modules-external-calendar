@@ -3,6 +3,7 @@
 namespace humhub\modules\external_calendar\models;
 
 
+use Recurr\Rule;
 use Yii;
 use DateTime;
 use humhub\libs\DbDateValidator;
@@ -14,7 +15,7 @@ use humhub\modules\external_calendar\CalendarUtils;
 use DateTimeZone;
 use humhub\libs\Html;
 use humhub\modules\search\interfaces\Searchable;
-use humhub\modules\external_calendar\vendors\ICal\Event;
+use ICal\Event;
 use humhub\modules\external_calendar\models\forms\ConfigForm;
 use humhub\modules\external_calendar\models\ICS;
 
@@ -34,6 +35,14 @@ use humhub\modules\external_calendar\models\ICS;
  * @property string $end_datetime It is the moment immediately after the event has ended. For example, if the last full day of an event is Thursday, the exclusive end of the event will be 00:00:00 on Friday!
  * @property string $time_zone
  * @property integer $all_day
+ * @property string $rrule
+ * @property integer $parent_event_id
+ * @property string $recurrence_id
+ * @property string recurrence_until
+ *
+ * @property ExternalCalendarEntry $recurrences
+ * @property ExternalCalendarEntry $parent
+ *
  *
  * @author David Born ([staxDB](https://github.com/staxDB))
  */
@@ -61,6 +70,14 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
      */
     public $formatter;
 
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return 'external_calendar_entry';
+    }
+
     public function init()
     {
         parent::init();
@@ -80,13 +97,7 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
         }
     }
 
-    /**
-     * @inheritdoc
-     */
-    public static function tableName()
-    {
-        return 'external_calendar_entry';
-    }
+
 
     /**
      * @inheritdoc
@@ -138,6 +149,7 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
      *
      * @param string $attribute attribute name
      * @param array $params parameters
+     * @throws \Exception
      */
     public function validateEndTime($attribute, $params)
     {
@@ -182,12 +194,12 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
     public function beforeSave($insert)
     {
         // TODO: Check is a full day span --> Already done in AdminController->Sync
-        if ($this->all_day == 0 && CalendarUtils::isFullDaySpan(new DateTime($this->start_datetime), new DateTime($this->end_datetime))) {
+        if ($this->all_day === 0 && CalendarUtils::isFullDaySpan(new DateTime($this->start_datetime), new DateTime($this->end_datetime))) {
             $this->all_day = 1;
         }
 
         $end = new DateTime($this->end_datetime, new DateTimeZone(Yii::$app->timeZone));
-        if ($this->all_day == 1 && $end->format('H:i:s') == '00:00:00') {
+        if ($this->all_day === 1 && $end->format('H:i:s') === '00:00:00') {
 //            $date->setTime('23','59','59');
             $end->modify('-1 second');
         }
@@ -198,6 +210,10 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
 
     public function beforeDelete()
     {
+        foreach ($this->recurrences as $recurrence) {
+            $recurrence->delete();
+        }
+
         return parent::beforeDelete();
     }
 
@@ -224,12 +240,13 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
 
 
         return [
-//            'id' => $this->id,
+            'uid' => $this->uid,
             'start' => $start,
             'end' => $end,
             'title' => Html::encode($this->getTitle()),
             'editable' => false,
             'allDay' => $this->isAllDay(),
+            'rrule' => $this->rrule,
             'viewUrl' => $this->content->container->createUrl('/external_calendar/entry/view', ['id' => $this->id, 'cal' => '1']),
 //            'updateUrl' => $this->content->container->createUrl('/external_calendar/entry/update-ajax', ['id' => $this->id]),
             'openUrl' => $this->content->container->createUrl('/external_calendar/entry/view', ['id' => $this->id]),
@@ -287,62 +304,6 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
         return $this->title;
     }
 
-    public function updateByModel(ExternalCalendarEntry &$model)
-    {
-        $this->title = $model->title;
-        $this->description = $model->description;
-        $this->location = $model->location;
-        $this->last_modified = $model->last_modified;
-        $this->dtstamp = $model->dtstamp;
-        $this->start_datetime = $model->start_datetime;
-        $this->end_datetime = $model->end_datetime;
-        $this->all_day = $model->all_day;
-        $this->save();
-    }
-
-    public function setByEvent(Event $event)
-    {
-        // uid MUST be set --> https://www.kanzaki.com/docs/ical/uid.html
-        $this->uid = $event->uid;
-        // summary CAN be set --> https://www.kanzaki.com/docs/ical/summary.html
-        if(!isset($event->summary) || $event->summary == null) {
-            $this->title = Yii::t('ExternalCalendarModule.model_calendar_entry', '(No Title)');
-        }
-        else {
-            $this->title = $event->summary;
-        }
-        // description CAN be set --> https://www.kanzaki.com/docs/ical/description.html
-        $this->description = $event->description;
-        // location CAN be set --> https://www.kanzaki.com/docs/ical/location.html
-        $this->location = $event->location;
-        // lastmodified CAN be set --> http://www.kanzaki.com/docs/ical/lastModified.html
-        if(!isset($event->lastmodified) || $event->lastmodified == null) {
-            if (isset($event->last_modified) && $event->last_modified != null) {
-                $this->last_modified = CalendarUtils::formatDateTimeToString($event->last_modified);
-            }
-            else {
-                $now = new \DateTime('now');
-                $this->last_modified = $now->format('Y-m-d H:i:s');
-                unset($now);
-            }
-        }
-        else {
-            $this->last_modified = CalendarUtils::formatDateTimeToString($event->lastmodified);
-        }
-        // dtstamp MUST be included --> https://www.kanzaki.com/docs/ical/dtstamp.html
-        $this->dtstamp = CalendarUtils::formatDateTimeToString($event->dtstamp);
-        // dtstart MUST be included --> https://www.kanzaki.com/docs/ical/dtstart.html
-        $this->start_datetime = CalendarUtils::formatDateTimeToString($event->dtstart);
-        // dtend CAN be included. If not, dtend is same DateTime as dtstart --> https://www.kanzaki.com/docs/ical/dtend.html
-        if(!isset($event->dtend) || $event->dtend == null) {
-            $this->end_datetime = $this->start_datetime;
-        }
-        else {
-            $this->end_datetime = CalendarUtils::formatDateTimeToString($event->dtend);
-        }
-        $this->time_zone = Yii::$app->timeZone;
-        $this->all_day = CalendarUtils::checkAllDay($event->dtstart, $event->dtend);
-    }
 
     // TODO: Check if used
     public function findByUidAndCalAndTs()
@@ -359,6 +320,38 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getParent()
+    {
+        return $this->hasOne(self::class, ['id' => 'parent_event_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRecurrences()
+    {
+        return $this->hasMany(self::class, ['parent_event_id' => 'id']);
+    }
+
+    /**
+     * @param null|DateTime $lastModification
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public function deleteRecurringInstances($lastModification = null, $eq = '>=')
+    {
+        $instances = (!$lastModification)
+            ? $this->recurrences
+            : $this->getRecurrences()->where([$eq, 'start_datetime', $lastModification])->all();
+
+        foreach ($instances as $recurrence) {
+            $recurrence->delete();
+        }
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getCalendar()
     {
         return $this->hasOne(ExternalCalendar::class, ['id' => 'calendar_id']);
@@ -370,5 +363,45 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
         $timezone = $module->settings->get('timeZone');
         $ics = new ICS($this->title, $this->description,$this->start_datetime, $this->end_datetime, $this->location, null, $timezone, $this->all_day);
         return $ics;
+    }
+
+    public function getRecurrenceUntil()
+    {
+        if(empty($this->rrule)) {
+            return null;
+        }
+
+        return (new Rule($this->rrule))->getUntil();
+    }
+
+    public function createRecurrence($start, $end, $recurrenceId)
+    {
+        $instance = new static($this->content->container, $this->content->visibility);
+        $instance->content->created_by = $this->content->created_by;
+        $instance->parent_event_id = $this->id;
+        $instance->start_datetime = $start;
+        $instance->end_datetime = $end;
+        $instance->title = $this->title;
+        $instance->rrule = $this->rrule;
+        $instance->calendar_id = $this->calendar_id;
+        $instance->description = $this->description;
+        $instance->location = $this->location;
+        $instance->last_modified = $this->last_modified;
+        $instance->dtstamp = $this->dtstamp;
+        $instance->all_day = $this->all_day;
+        $instance->time_zone = $this->time_zone;
+        $instance->recurrence_id = $recurrenceId;
+        $instance->save();
+        return $instance;
+    }
+
+    public function setRRule($rrule)
+    {
+        $this->rrule = $rrule;
+        $until = $this->getRecurrenceUntil();
+        if($until) {
+            $this->recurrence_until = $until->format('Y-m-d H:i:s');
+        }
+
     }
 }

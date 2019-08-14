@@ -3,6 +3,8 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use humhub\widgets\ModalButton;
+use humhub\modules\calendar\widgets\ContainerConfigMenu;
+use humhub\widgets\Button;
 
 /* @var $this yii\web\View */
 /* @var $model \humhub\modules\external_calendar\models\ExternalCalendar */
@@ -14,10 +16,14 @@ $this->title = $model->title;
         <h1><?= Yii::t('ExternalCalendarModule.views_calendar', 'Calendar: {modelClass}', ['modelClass' => Html::encode($this->title),
             ]) ?></h1>
     </div>
+
+    <?= ContainerConfigMenu::widget() ?>
+
     <div class="panel-body">
 
         <div class="btn-group-sm">
-            <?= Html::a('<i class="fa fa-pencil-square-o edit"></i>&nbsp;' . Yii::t('ExternalCalendarModule.base', 'Update'), $contentContainer->createUrl('update', ['id' => $model->id]), ['class' => 'btn btn-primary']) ?>
+            <?= Button::primary(Yii::t('ExternalCalendarModule.base', 'Update'))
+                ->link( $contentContainer->createUrl('edit', ['id' => $model->id]))->icon('fa-pencil-square-o'); ?>
             <?= humhub\widgets\ModalConfirm::widget([
                 'uniqueID' => 'modal_delete_task_' . $model->id,
                 'linkOutput' => 'a',
@@ -68,7 +74,7 @@ $this->title = $model->title;
         </div>
         </br>
         <div>
-            <?= Html::a('<i class="fa fa-arrow-left"></i>&nbsp;' . Yii::t('ExternalCalendarModule.base', 'Back to overview'), $contentContainer->createUrl('index'), ['class' => 'btn-sm btn-default']) ?>
+            <?= Button::back($contentContainer->createUrl('index'), Yii::t('ExternalCalendarModule.base', 'Back to overview'))?>
         </div>
 
     </div>

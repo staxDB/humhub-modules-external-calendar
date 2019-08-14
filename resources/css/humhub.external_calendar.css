@@ -1,0 +1,35 @@
+/* OPTIONS */
+.regular-checkbox:not(:checked) + .regular-checkbox-box {
+    background-color: #fff;
+}
+
+.calendar-selectors {
+    display:inline-block;
+    float:left;
+    margin-right:10px;
+}
+
+.calendar-filters .calendar-filter-spaces .help-block {
+    display:none;
+}
+
+.timeField .form-group {
+    margin-bottom: 0;
+}
+
+.timeField .help-block {
+    margin: 0px;
+}
+
+#calendar-entry-form {
+    padding-top:0px;
+}
+
+#calendar-entry-form .tab-menu {
+    margin-bottom:0px;
+}
+
+.external-calendar-overview textarea {
+    background-color:white !important;
+    cursor: default !important;
+}

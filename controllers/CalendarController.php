@@ -3,10 +3,10 @@
 namespace humhub\modules\external_calendar\controllers;
 
 use Yii;
+use yii\base\InvalidValueException;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
-use humhub\modules\space\models\Space;
-use humhub\modules\external_calendar\SyncUtils;
+use humhub\components\access\ControllerAccess;
 use humhub\modules\external_calendar\permissions\ManageCalendar;
 use humhub\modules\content\components\ContentContainerController;
 use humhub\modules\external_calendar\models\ExternalCalendar;
@@ -25,31 +25,18 @@ class CalendarController extends ContentContainerController
      */
     public $hideSidebar = true;
 
-
-    public function beforeAction($action)
+    public function getAccessRules()
     {
-        if (parent::beforeAction($action)) {
-            if ($this->contentContainer instanceof Space && !$this->contentContainer->isMember()) {
-                throw new HttpException(403, Yii::t('ExternalCalendarModule.permissions', 'You need to be member of the space "%space_name%" to access this calendar!', ['%space_name%' => $this->contentContainer->name]));
-            }
-            return true;
-        }
-
-        return false;
+        return [[ControllerAccess::RULE_PERMISSION => [ManageCalendar::class]]];
     }
 
     /**
      * Lists all ExternalCalendar models.
      * @return mixed
-     * @throws HttpException
      * @throws \yii\base\Exception
      */
     public function actionIndex()
     {
-        if (!$this->canManageCalendar()) {
-            throw new HttpException(403, Yii::t('ExternalCalendarModule.permissions', 'You are not allowed to manage External Calendar!'));
-        }
-
         $models = ExternalCalendar::find()->contentContainer($this->contentContainer)->all();
 
         return $this->render('index', [
@@ -67,143 +54,75 @@ class CalendarController extends ContentContainerController
      */
     public function actionView($id)
     {
-
-        if (!$this->canManageCalendar()) {
-            throw new HttpException(403, Yii::t('ExternalCalendarModule.permissions', 'You are not allowed to manage External Calendar!'));
-        }
-
         $model = $this->findModel($id);
 
-        if ($model !== null) {
-            return $this->render('view', [
-                'model' => $model,
-                'contentContainer' => $this->contentContainer,
-            ]);
-        } else {
-            return $this->redirect($this->contentContainer->createUrl('create', array('id' => $id)));
-        }
+        return $this->render('view', [
+            'model' => $model,
+            'contentContainer' => $this->contentContainer,
+        ]);
     }
 
     /**
      * Ajax-method called via button to sync external calendars.
      * @param integer $id
      * @return mixed
-     * @throws \yii\base\Exception
      * @throws \Exception
      */
     public function actionSync($id)
     {
         set_time_limit(180); // Set max execution time 3 minutes.
-        $calendarModel = ExternalCalendar::find()->contentContainer($this->contentContainer)->where(['external_calendar.id' => $id])->one();
 
-        if ($calendarModel) {
-            $ical = SyncUtils::createICal($calendarModel->url);
-            if ($ical) {
-                // add info to CalendarModel
-                $calendarModel->addAttributes($ical);
-                $calendarModel->save();
-
-                // check events
-                if ($ical->hasEvents()) {
-                    $events = SyncUtils::getEvents($calendarModel, $ical);
-                    $result = SyncUtils::checkAndSubmitModels($events, $calendarModel);
-                    if (!$result) {
-                        return ModalClose::widget(['error' => Yii::t('ExternalCalendarModule.sync_result', 'Error while check and submit models...')]);
-                    } else {
-                        return ModalClose::widget(['success' => Yii::t('ExternalCalendarModule.sync_result', 'Sync successfull!')]);
-                    }
-                }
-            } else {
-                return ModalClose::widget(['error' => Yii::t('ExternalCalendarModule.sync_result', 'Error while creating ical... Check if link is reachable.')]);
-            }
-        } else {
+        try {
+            $calendarModel = $this->findModel($id);
+            $calendarModel->sync();
+            return ModalClose::widget(['success' => Yii::t('ExternalCalendarModule.sync_result', 'Sync successfull!')]);
+        } catch (InvalidValueException $e) {
+            Yii::error($e);
+            return ModalClose::widget(['error' => Yii::t('ExternalCalendarModule.sync_result', $e->getMessage())]);
+        } catch (NotFoundHttpException $e) {
+            Yii::error($e);
             return ModalClose::widget(['error' => Yii::t('ExternalCalendarModule.sync_result', 'Calendar not found!')]);
+        } catch (\Exception $e) {
+            Yii::error($e);
+            return ModalClose::widget(['error' => Yii::t('ExternalCalendarModule.sync_result', 'An unknown error occured while synchronizing your calendar!')]);
         }
-        return ModalClose::widget(['warn' => Yii::t('ExternalCalendarModule.sync_result', 'Warning! Something strange happened. Please try again.')]);
     }
 
     /**
-     * Creates a new ExternalCalendar model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     * @throws HttpException
+     * @param null $id
+     * @return CalendarController|string|\yii\console\Response|\yii\web\Response
+     * @throws NotFoundHttpException
      * @throws \yii\base\Exception
      */
-    public function actionCreate()
+    public function actionEdit($id = null)
     {
-        if (!$this->canManageCalendar()) {
-            throw new HttpException(403, Yii::t('ExternalCalendarModule.permissions', 'You are not allowed to manage External Calendar!'));
+        if (!$id) {
+            $model = new ExternalCalendar($this->contentContainer);
+        } else {
+            $model = $this->findModel($id);
         }
 
-        $model = new ExternalCalendar();
-
-        $model->content->setContainer($this->contentContainer);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            $ical = SyncUtils::createICal($model->url);
-            if ($ical) {
-                // add info to CalendarModel
-                $model->addAttributes($ical);
-                $model->save();
+        try {
+            if ($model->load(Yii::$app->request->post())) {
+                $model->updateICal();
+                $this->view->success(Yii::t('ExternalCalendarModule.results', 'Calendar successfully created!'));
+                return $this->redirect($this->contentContainer->createUrl('view', ['id' => $model->id]));
             } else {
-                $this->view->error(Yii::t('ExternalCalendarModule.results', 'Error while creating iCal File. Please check, if Url is correct and Internet connection of server is enabled.'));
-                return $this->render('create', [
+                return $this->render('edit', [
                     'model' => $model,
                     'contentContainer' => $this->contentContainer
                 ]);
             }
-            $model->changeVisibility();
-            $model->save();
-            $this->view->success(Yii::t('ExternalCalendarModule.results', 'Calendar successfully created!'));
-            return $this->redirect($this->contentContainer->createUrl('view', array('id' => $model->id)));
-        } else {
-            return $this->render('create', [
+        } catch (InvalidValueException $e) {
+            Yii::warning($e);
+            $this->view->error(Yii::t('ExternalCalendarModule.results', 'Error while creating iCal File. Please check, if Url is correct and Internet connection of server is enabled.'));
+            return $this->render('edit', [
                 'model' => $model,
                 'contentContainer' => $this->contentContainer
             ]);
         }
+
     }
-
-
-    /**
-     * Updates an existing ExternalCalendar model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws HttpException
-     * @throws \yii\base\Exception
-     */
-    public function actionUpdate($id)
-    {
-        if (!$this->canManageCalendar()) {
-            throw new HttpException(403, Yii::t('ExternalCalendarModule.permissions', 'You are not allowed to manage External Calendar!'));
-        }
-
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            $ical = SyncUtils::createICal($model->url);
-            if ($ical) {
-                // add info to CalendarModel
-                $model->addAttributes($ical);
-                $model->save();
-            } else {
-                $this->view->error(Yii::t('ExternalCalendarModule.results', 'Error while creating iCal File. Please check, if Url is correct and Internet connection of server is enabled.'));
-                return $this->render('update', [
-                    'model' => $model,
-                    'contentContainer' => $this->contentContainer
-                ]);
-            }
-            $this->view->success(Yii::t('ExternalCalendarModule.results', 'Calendar successfully updated!'));
-            return $this->redirect($this->contentContainer->createUrl('view', array('id' => $model->id)));
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-                'contentContainer' => $this->contentContainer
-            ]);
-        }
-    }
-
 
     /**
      * Deletes an existing ExternalCalendar model.
@@ -214,15 +133,11 @@ class CalendarController extends ContentContainerController
      * @throws \Exception
      * @throws \yii\base\Exception
      * @throws \yii\db\StaleObjectException
+     * @throws \Throwable
      */
     public function actionDelete($id)
     {
-        if (!$this->canManageCalendar()) {
-            throw new HttpException(403, Yii::t('ExternalCalendarModule.base', 'You are not allowed to show External Calendar!'));
-        }
-
         $this->findModel($id)->delete();
-
         $this->view->success(Yii::t('ExternalCalendarModule.results', 'Calendar successfully deleted!'));
         return $this->redirect($this->contentContainer->createUrl('index'));
     }
@@ -239,22 +154,11 @@ class CalendarController extends ContentContainerController
     protected function findModel($id)
     {
         $model = ExternalCalendar::find()->contentContainer($this->contentContainer)->where(['external_calendar.id' => $id])->one();
-        if ($model !== null) {
-            return $model;
-        } else {
+
+        if (!$model) {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
-    }
 
-    /**
-     * Checks the ManageCalendar permission for the given user on the given contentContainer.
-     *
-     * Todo: After 1.2.1 use $model->content->canEdit();
-     *
-     * @return bool
-     */
-    private function canManageCalendar()
-    {
-        return $this->contentContainer->permissionManager->can(ManageCalendar::class);
+        return $model;
     }
 }

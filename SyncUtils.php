@@ -6,8 +6,8 @@ use Yii;
 use humhub\modules\content\models\Content;
 use humhub\modules\external_calendar\models\ExternalCalendarEntry;
 use humhub\modules\external_calendar\models\ExternalCalendar;
-use humhub\modules\external_calendar\vendors\ICal\ICal;
-use humhub\modules\external_calendar\vendors\ICal\Event;
+use ICal\ICal;
+use ICal\Event;
 
 
 /**
@@ -22,15 +22,17 @@ class SyncUtils
         if (!isset($url)) {
             return false;
         }
+
         try {
             // load ical and parse it
-            $ical = new ICal($url, array(
+            $ical = new ICal($url, [
                 'defaultSpan' => 2,     // Default value
                 'defaultTimeZone' => Yii::$app->timeZone,
                 'defaultWeekStart' => 'MO',  // Default value
                 'skipRecurrence' => false, // Default value
                 'useTimeZoneWithRRules' => false, // Default value
-            ));
+            ]);
+
             return $ical;
         } catch (\Exception $e) {
             return false;
@@ -41,13 +43,14 @@ class SyncUtils
      * @param array $events
      * @param ExternalCalendar $calendar
      * @return bool
+     * @throws \yii\base\Exception
      */
     public static function checkAndSubmitModels(array &$events, ExternalCalendar &$calendar)
     {
         if (!isset($events) && !isset($calendar)) {
             return false;
         }
-        $dbModels = $calendar->externalCalendarEntries;
+        $dbModels = $calendar->entries;
 
         // we need to filter recurring events
         $recurringEvents = self::filterRecurringEvents($events);
@@ -100,7 +103,7 @@ class SyncUtils
         foreach ($recurringEvents as $newModelKey => $newModel) {
             $model = self::getModel($newModel, $calendar);
             // recurring event not in db found --> create new
-            $calendar->link('externalCalendarEntries', $model);
+            $calendar->link('entries', $model);
             unset($recurringEvents[$newModelKey]);
         }
 
@@ -108,7 +111,7 @@ class SyncUtils
         foreach ($events as $eventKey => $event) {
             $model = self::getModel($event, $calendar);
             if ($model != false) {
-                $calendar->link('externalCalendarEntries', $model);
+                $calendar->link('entries', $model);
                 unset($events[$eventKey]);
             } else { // error while creating model... skip event
                 unset($events[$eventKey]);  // if we want to test if there was an error, comment this and var_dump($events)
@@ -118,47 +121,52 @@ class SyncUtils
 
         // finally delete items from db
         foreach ($dbModels as $modelKey => $model) {
-            $calendar->unlink('externalCalendarEntries', $model, true);
+            $calendar->unlink('entries', $model, true);
             unset($dbModels[$modelKey]);
         }
 
         return true;
     }
 
+    /**
+     * @param $event
+     * @param ExternalCalendar $calendar
+     * @return bool|ExternalCalendarEntry
+     * @throws \yii\base\Exception
+     */
     public static function getModel($event, ExternalCalendar $calendar)
     {
         // create ExternalCalendarEntry-model without safe
-        if (!isset($events) && !isset($calendar)) {
+        if (!$event && !$calendar) {
             return false;
         }
 
-        $model = new ExternalCalendarEntry();
+        $model = new ExternalCalendarEntry($calendar->content->container,  $calendar->content->visibility);
         $model->setByEvent($event);
-
-        // add contentContainer of ExternalCalendar-Model
-        $model->content->setContainer($calendar->content->container);
         $model->content->created_by = $calendar->content->created_by;
-//        $model->content->created_at = $model->dtstamp;  // set created_at to original created timestamp
-        $model->content->visibility = ($calendar->public) ? Content::VISIBILITY_PUBLIC : Content::VISIBILITY_PRIVATE;
-
         return $model;
     }
 
+    /**
+     * @param ExternalCalendar $calendarModel
+     * @param ICal $ical
+     * @return array
+     * @throws \Exception
+     */
     public static function getEvents(ExternalCalendar $calendarModel, ICal $ical)
     {
-        $events = [];
-        if ($calendarModel->event_mode === ExternalCalendar::EVENT_MODE_CURRENT_MONTH) {
-            $start = new \DateTime('first day of this month');
-            $start = $start->format('Y-m-d 00:00:00');
-            $end = new \DateTime('last day of this month');
-            $end = $end->format('Y-m-d 23:59:59');
+        $start = new \DateTime('first day of this month');
+        $end = new \DateTime('last day of this month');
 
-            $events = $ical->eventsFromRange($start, $end);
-        } else {
-            $events = $ical->events();
+        if ($calendarModel->event_mode === ExternalCalendar::EVENT_MODE_ALL) {
+            $start = $start->sub(new \DateInterval('P1Y'));
+            $end = $end->add(new \DateInterval('P1Y'));
         }
 
-        return $events;
+        $start = $start->format('Y-m-d 00:00:00');
+        $end = $end->format('Y-m-d 23:59:59');
+
+        return $ical->eventsFromRange($start, $end);
     }
 
     protected static function getLastModified(Event $event)
@@ -186,7 +194,20 @@ class SyncUtils
     protected static function filterRecurringEvents(array &$events)
     {
         $recurringEvents = [];
+        foreach ($events as $eventKey => $event) {
+            if(!empty($event->rrule)) {
+                array_push($recurringEvents, $event);
+                unset($events[$eventKey]);
+            }
+        }
+
+        return $recurringEvents;
+
+
         $id_array = [];
+
+
+
         foreach ($events as $eventKey => $event) {
             if (!in_array($event->uid, $id_array)) {
                 array_push($id_array, $event->uid);

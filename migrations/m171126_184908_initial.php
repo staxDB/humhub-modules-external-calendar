@@ -6,7 +6,7 @@ class m171126_184908_initial extends Migration
 {
     public function up()
     {
-        $this->createTable('external_calendar', array(
+        $this->createTable('external_calendar', [
             'id' => 'pk',
             'title' => 'varchar(255) NOT NULL',
             'description' => 'TEXT NULL',
@@ -19,9 +19,9 @@ class m171126_184908_initial extends Migration
             'cal_scale' => 'varchar(60)',
             'sync_mode' => 'tinyint(4) NOT NULL',
             'event_mode' => 'tinyint(4) NOT NULL',
-        ), '');
+        ], '');
 
-        $this->createTable('external_calendar_entry', array(
+        $this->createTable('external_calendar_entry', [
             'id' => 'pk',
             'uid' => 'varchar(255) NOT NULL',
             'calendar_id' => 'int(11) NOT NULL',
@@ -34,7 +34,7 @@ class m171126_184908_initial extends Migration
             'end_datetime' => 'datetime NOT NULL',
             'all_day' => 'tinyint(4) NOT NULL',
             'time_zone' => 'varchar(60) DEFAULT NULL',
-        ), '');
+        ], '');
 
 //        $this->addForeignKey('fk-calendar-entry-calendar', 'external_calendar_entry', 'calendar_id', 'external_calendar', 'id', 'CASCADE','CASCADE');
     }

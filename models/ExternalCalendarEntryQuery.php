@@ -2,6 +2,12 @@
 namespace humhub\modules\external_calendar\models;
 
 use humhub\modules\calendar\interfaces\AbstractCalendarQuery;
+use humhub\modules\calendar\interfaces\CalendarItemWrapper;
+use humhub\modules\calendar\interfaces\VCalendar;
+use humhub\modules\user\models\User;
+use Sabre\VObject\Component\VEvent;
+use Sabre\VObject\Recur\EventIterator;
+use function Complex\add;
 
 
 /**
@@ -61,8 +67,79 @@ class ExternalCalendarEntryQuery extends AbstractCalendarQuery
      * @inheritdocs
      */
     protected static $recordClass = ExternalCalendarEntry::class;
-//
-//    public $startField = 'start_datetime';
-//    public $endField = 'end_datetime';
-//    public $dateFormat = 'Y-m-d H:i:s';
+
+    protected $autoAssignUid = false;
+
+    /**
+     * Sets up the date interval filter with respect to the openRange setting.
+     */
+    protected function setupDateCriteria()
+    {
+        if ($this->_openRange && $this->_from && $this->_to) {
+            //Search for all dates with start and/or end within the given range
+            $this->_query->andFilterWhere(
+                ['or',
+                    ['and',
+                        $this->getStartCriteria($this->_from, '>='),
+                        $this->getStartCriteria($this->_to, '<=')
+                    ],
+                    ['and',
+                        $this->getEndCriteria($this->_from, '>='),
+                        $this->getEndCriteria($this->_to, '<=')
+                    ],
+                    // Include all recurrent root events
+                    ['and',
+                        'external_calendar_entry.rrule IS NOT NULL',
+                        'external_calendar_entry.parent_event_id IS NULL',
+                        // Filter out already finished recurrence events
+                        ['or',
+                            'recurrence_until IS NULL',
+                            ['>=', 'recurrence_until', $this->_from->format($this->dateFormat)]
+                        ]
+                    ],
+                ]
+            );
+            return;
+        }
+
+        if ($this->_from) {
+            $this->_query->andWhere($this->getStartCriteria($this->_from));
+        }
+
+        if ($this->_to) {
+            $this->_query->andWhere($this->getEndCriteria($this->_to));
+        }
+    }
+
+    protected function setupFilters()
+    {
+        parent::setupFilters();
+
+        // Do not include recurrence instances
+        $this->_query->andWhere('external_calendar_entry.parent_event_id IS NULL');
+    }
+
+    /**
+     * @param ExternalCalendarEntry[] $result
+     * @return array
+     */
+    protected function preFilter($result = [])
+    {
+        $endResult = [];
+        foreach($result as $event) {
+            if(empty($event->rrule)) {
+                $endResult[] = $event;
+            } else {
+                $this->addRecurrences($event, $endResult);
+            }
+        }
+
+        return $endResult;
+    }
+
+    private function addRecurrences(ExternalCalendarEntry $event, array &$endResult)
+    {
+        return ICalExpand::expand($event, $this->_from, $this->_to, $endResult);
+    }
+
 }

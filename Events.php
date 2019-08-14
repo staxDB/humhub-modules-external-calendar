@@ -2,7 +2,14 @@
 
 namespace humhub\modules\external_calendar;
 
+use humhub\modules\calendar\widgets\CalendarControls;
+use humhub\modules\calendar\widgets\ContainerConfigMenu;
+use humhub\modules\content\components\ContentContainerActiveRecord;
+use humhub\modules\content\helpers\ContentContainerHelper;
+use humhub\modules\external_calendar\permissions\ManageEntry;
+use humhub\modules\external_calendar\widgets\ExportButton;
 use Yii;
+use yii\base\WidgetEvent;
 use yii\helpers\Url;
 use yii\base\BaseObject;
 use humhub\modules\external_calendar\models\ExternalCalendarEntry;
@@ -13,6 +20,25 @@ use humhub\modules\external_calendar\widgets\DownloadIcsLink;
 
 class Events extends BaseObject
 {
+    /**
+     * @inheritdoc
+     */
+    public static function onBeforeRequest()
+    {
+        static::registerAutoloader();
+    }
+
+    /**
+     * Register composer autoloader when Reader not found
+     */
+    public static function registerAutoloader()
+    {
+        if (class_exists('\ICal\ICal')) {
+            return;
+        }
+
+        require Yii::getAlias('@external_calendar/vendor/autoload.php');
+    }
 
     /**
      * @param $event \humhub\modules\calendar\interfaces\CalendarItemTypesEvent
@@ -27,10 +53,36 @@ class Events extends BaseObject
         }
     }
 
+    /**
+     * @param $event WidgetEvent
+     */
+    public static function onContainerConfigMenuInit($event)
+    {
+        /* @var $container ContentContainerActiveRecord */
+        if($event->sender->contentContainer) {
+            $event->sender->addItem([
+                'label' => Yii::t('ExternalCalendarModule.base', 'External Calendars'),
+                'id' => 'tab-calendar-external',
+                'url' => $event->sender->contentContainer->createUrl('/external_calendar/calendar/index'),
+                'visible' => $event->sender->contentContainer->can(ManageEntry::class),
+                'isActive' => (Yii::$app->controller->module
+                    && Yii::$app->controller->module->id === 'external_calendar'),
+            ]);
+        }
+    }
 
     /**
-     * @param $event
+     * @param $event WidgetEvent
      */
+    public static function onCalendarControlsInit($event)
+    {
+        /* @var $controls CalendarControls */
+        $controls = $event->sender;
+
+        $controls->addWidget(ExportButton::class, ['container' => $controls->container],  ['sortOrder' => 50]);
+    }
+
+
     public static function onFindCalendarItems($event)
     {
         $contentContainer = $event->contentContainer;

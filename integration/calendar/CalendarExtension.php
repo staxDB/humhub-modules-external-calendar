@@ -36,6 +36,7 @@ class CalendarExtension extends BaseObject
 
     /**
      * @param $event \humhub\modules\calendar\interfaces\CalendarItemsEvent
+     * @throws \Throwable
      */
     public static function addItems($event)
     {

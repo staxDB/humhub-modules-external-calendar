@@ -8,6 +8,7 @@ use humhub\widgets\ModalClose;
 use humhub\modules\content\components\ContentContainerController;
 use humhub\modules\external_calendar\permissions\ManageEntry;
 use humhub\modules\external_calendar\models\ExternalCalendarEntry;
+use yii\web\NotFoundHttpException;
 
 /**
  * EntryController implements the CRUD actions for all external calendar entries
@@ -22,20 +23,25 @@ class EntryController extends ContentContainerController
      */
     public $hideSidebar = true;
 
+    public function getAccessRules()
+    {
+        return[
+            ['permission' => ManageEntry::class, 'actions' => ['update']]
+        ];
+    }
+
     /**
      * Displays a single ExternalCalendarEntry model.
      * @param integer $id
      * @param null $cal
      * @return mixed
      * @throws HttpException
+     * @throws \yii\base\Exception
+     * @throws \Throwable
      */
     public function actionView($id, $cal = null)
     {
         $model = $this->getCalendarEntry($id);
-
-        if (!$model) {
-            throw new HttpException('404');
-        }
 
         // We need the $cal information, since the update redirect in case of fullcalendar view is other than stream view
         if ($cal) {
@@ -53,7 +59,7 @@ class EntryController extends ContentContainerController
         return $this->renderAjax('modal', [
             'model' => $model,
             'editUrl' => $this->contentContainer->createUrl('/external_calendar/entry/update', ['id' => $model->id, 'cal' => $cal]),
-            'canManageEntries' => $model->content->canEdit() || $this->canManageEntries(),
+            'canManageEntries' => $model->content->canEdit(),
             'contentContainer' => $this->contentContainer,
         ]);
     }
@@ -66,6 +72,7 @@ class EntryController extends ContentContainerController
      * @return mixed
      * @throws HttpException
      * @throws \Exception
+     * @throws \Throwable
      */
     public function actionUpdate($id, $cal = null)
     {
@@ -73,10 +80,6 @@ class EntryController extends ContentContainerController
 
         if (!$model->content->canEdit()) {
             throw new HttpException(403);
-        }
-
-        if (!$model) {
-            throw new HttpException('404');
         }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -92,23 +95,6 @@ class EntryController extends ContentContainerController
             'contentContainer' => $this->contentContainer,
             'editUrl' => $this->contentContainer->createUrl('/external_calendar/entry/update', ['id' => $model->id, 'cal' => $cal]),
         ]);
-//
-//        // We need the $cal information, since the edit redirect in case of fullcalendar view is other than stream view
-//        if ($cal) {
-//            return $this->renderModal($model, $cal);
-//        }
-    }
-
-    /**
-     * Checks the ManageEntry permission for the given user on the given contentContainer.
-     *
-     * Todo: After 1.2.1 use $entry->content->canEdit();
-     *
-     * @return bool
-     */
-    private function canManageEntries()
-    {
-        return $this->contentContainer->permissionManager->can(new ManageEntry);
     }
 
     /**
@@ -117,16 +103,29 @@ class EntryController extends ContentContainerController
      * @param int $id
      * @return ExternalCalendarEntry
      * @throws \yii\base\Exception
+     * @throws \Throwable
      */
     protected function getCalendarEntry($id)
     {
-        return ExternalCalendarEntry::find()->contentContainer($this->contentContainer)->readable()->where(['external_calendar_entry.id' => $id])->one();
+        $entry = ExternalCalendarEntry::find()->contentContainer($this->contentContainer)->readable()->where(['external_calendar_entry.id' => $id])->one();
+
+        if(!$entry) {
+            throw new NotFoundHttpException();
+        }
+
+        return $entry;
     }
 
+    /**
+     * @return \yii\console\Response|\yii\web\Response
+     * @throws \Throwable
+     * @throws \yii\base\Exception
+     * @throws \yii\web\RangeNotSatisfiableHttpException
+     */
     public function actionGenerateics()
     {
         $calendarEntry = $this->getCalendarEntry(Yii::$app->request->get('id'));
         $ics = $calendarEntry->generateIcs();
-        return Yii::$app->response->sendContentAsFile($ics, uniqid() . '.ics', ['mimeType' => 'text/calendar']);
+        return Yii::$app->response->sendContentAsFile($ics, uniqid('calendar', true) . '.ics', ['mimeType' => 'text/calendar']);
     }
 }
