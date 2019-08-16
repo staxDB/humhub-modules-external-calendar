@@ -4,6 +4,7 @@
 namespace external_calendar;
 
 
+use DateTime;
 use humhub\modules\space\models\Space;
 use Yii;
 use humhub\modules\external_calendar\Events;
@@ -12,8 +13,13 @@ use tests\codeception\_support\HumHubDbTestCase;
 
 class ExternalCalendarTest extends HumHubDbTestCase
 {
+    public $defaultSyncRangeStart;
+    public $defaultSyncRangeEnd;
+
     public function _before()
     {
+        $this->defaultSyncRangeStart = DateTime::createFromFormat('!Ymd', '20180101');
+        $this->defaultSyncRangeEnd = DateTime::createFromFormat('!Ymd', '20200101');
         Events::registerAutoloader();
     }
 

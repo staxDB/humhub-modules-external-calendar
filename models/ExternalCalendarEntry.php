@@ -38,7 +38,7 @@ use humhub\modules\external_calendar\models\ICS;
  * @property string $rrule
  * @property integer $parent_event_id
  * @property string $recurrence_id
- * @property string recurrence_until
+ * @property string $recurrence_until
  *
  * @property ExternalCalendarEntry $recurrences
  * @property ExternalCalendarEntry $parent
@@ -194,12 +194,12 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
     public function beforeSave($insert)
     {
         // TODO: Check is a full day span --> Already done in AdminController->Sync
-        if ($this->all_day === 0 && CalendarUtils::isFullDaySpan(new DateTime($this->start_datetime), new DateTime($this->end_datetime))) {
+        if (!$this->all_day && CalendarUtils::isFullDaySpan(new DateTime($this->start_datetime), new DateTime($this->end_datetime))) {
             $this->all_day = 1;
         }
 
         $end = new DateTime($this->end_datetime, new DateTimeZone(Yii::$app->timeZone));
-        if ($this->all_day === 1 && $end->format('H:i:s') === '00:00:00') {
+        if ($this->all_day && $end->format('H:i:s') === '00:00:00') {
 //            $date->setTime('23','59','59');
             $end->modify('-1 second');
         }
@@ -277,6 +277,11 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
         return new DateTime($this->end_datetime, new DateTimeZone(Yii::$app->timeZone));
     }
 
+    public function getLastModifiedDateTime()
+    {
+        return new DateTime($this->last_modified, new DateTimeZone(Yii::$app->timeZone));
+    }
+
     public function getFormattedTime($format = 'long')
     {
         return $this->formatter->getFormattedTime($format);
@@ -294,6 +299,11 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
         return (boolean)$this->all_day;
     }
 
+    public function isRecurring()
+    {
+        return !empty($this->rrule);
+    }
+
 
     /**
      *
@@ -302,19 +312,6 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
     public function getTitle()
     {
         return $this->title;
-    }
-
-
-    // TODO: Check if used
-    public function findByUidAndCalAndTs()
-    {
-        return self::find()->where(['uid' => $this->uid])->andWhere(['calendar_id' => $this->calendar_id])->andWhere(['>=', 'last_modified', $this->last_modified])->one();
-    }
-
-    // TODO: Check if used
-    public function findByUidAndCal()
-    {
-        return self::find()->where(['uid' => $this->uid])->andWhere(['calendar_id' => $this->calendar_id])->one();
     }
 
     /**
@@ -330,7 +327,9 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
      */
     public function getRecurrences()
     {
-        return $this->hasMany(self::class, ['parent_event_id' => 'id']);
+        return $this->hasMany(self::class, ['parent_event_id' => 'id'])
+            ->andWhere(['calendar_id' => $this->calendar_id])
+            ->andWhere(['uid' => $this->uid]);
     }
 
     /**
@@ -342,11 +341,20 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
     {
         $instances = (!$lastModification)
             ? $this->recurrences
-            : $this->getRecurrences()->where([$eq, 'start_datetime', $lastModification])->all();
+            : $this->getRecurrences()->andFilterWhere([$eq, 'start_datetime', $lastModification->format('Y-m-d H:i:s')])->all();
 
         foreach ($instances as $recurrence) {
             $recurrence->delete();
         }
+    }
+
+    /**
+     * @param $recurrenceId
+     * @return ExternalCalendarEntry
+     */
+    public function getRecurrenceInstance($recurrenceId)
+    {
+        return $this->getRecurrences()->andWhere(['recurrence_id' => $recurrenceId])->one();
     }
 
     /**
@@ -374,10 +382,40 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
         return (new Rule($this->rrule))->getUntil();
     }
 
+    public function syncWithICal(ICalEventIF $icalEvent, $timeZone = null, $save = true)
+    {
+        $this->uid = $icalEvent->getUid();
+        $this->title = $icalEvent->getTitle();
+        $this->description = $icalEvent->getDescription();
+
+        if (!empty($icalEvent->getRrule())) {
+            $this->setRRule(($icalEvent->getRrule()));
+        }
+
+        $this->recurrence_id = $icalEvent->getRecurrenceId();
+
+        $this->location = $icalEvent->getLocation();
+        $this->last_modified = CalendarUtils::formatDateTimeToString($icalEvent->getLastModified());
+        $this->dtstamp = CalendarUtils::formatDateTimeToString($icalEvent->getTimeStamp());
+        $this->start_datetime = CalendarUtils::formatDateTimeToString($icalEvent->getStart());
+        $this->end_datetime = CalendarUtils::formatDateTimeToString($icalEvent->getEnd());
+
+        if($timeZone) {
+            $this->time_zone = $timeZone;
+        }
+
+        $this->all_day = $icalEvent->isAllDay();
+
+        if($save) {
+            $this->save();
+        }
+    }
+
     public function createRecurrence($start, $end, $recurrenceId)
     {
         $instance = new static($this->content->container, $this->content->visibility);
         $instance->content->created_by = $this->content->created_by;
+        $instance->uid = $this->uid;
         $instance->parent_event_id = $this->id;
         $instance->start_datetime = $start;
         $instance->end_datetime = $end;
@@ -397,11 +435,22 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
 
     public function setRRule($rrule)
     {
-        $this->rrule = $rrule;
-        $until = $this->getRecurrenceUntil();
-        if($until) {
-            $this->recurrence_until = $until->format('Y-m-d H:i:s');
+        if(!empty($rrule)) {
+            $this->rrule = $rrule;
+            $until = $this->getRecurrenceUntil();
+            if($until) {
+                $this->recurrence_until = $until->format('Y-m-d H:i:s');
+            } else {
+                $this->recurrence_until = null;
+            }
+        } else {
+            $this->rrule = null;
+            $this->recurrence_until = null;
         }
+    }
 
+    public function wasModifiedSince(ICalEventIF $icalEvent)
+    {
+        return !$icalEvent->getLastModified() || !$this->last_modified ||  CalendarUtils::formatDateTimeToAppTime($icalEvent->getLastModified()) > $this->getLastModifiedDateTime();
     }
 }

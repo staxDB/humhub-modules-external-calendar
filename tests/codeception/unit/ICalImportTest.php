@@ -22,7 +22,7 @@ use humhub\modules\user\models\User;
  * Time: 20:25
  */
 
-class IcsImportTest extends ExternalCalendarTest
+class ICalImportTest extends ExternalCalendarTest
 {
     public function testSimpleEventImport()
     {
@@ -53,7 +53,7 @@ class IcsImportTest extends ExternalCalendarTest
         $firstEvent = $externalCalendar->entries[0];
 
         $externalCalendar->url = Yii::getAlias('@external_calendar/tests/codeception/data/test1Update.ics');
-        $externalCalendar->sync();
+        $externalCalendar->sync($this->defaultSyncRangeStart, $this->defaultSyncRangeEnd);
 
         $this->assertEquals(2, ExternalCalendarEntry::find()->count());
         $this->assertCount(2, $externalCalendar->entries);
@@ -88,7 +88,7 @@ class IcsImportTest extends ExternalCalendarTest
 
         $externalCalendar->url =  Yii::getAlias('@external_calendar/tests/codeception/data/test1.ics');
 
-        $externalCalendar->sync();
+        $externalCalendar->sync($this->defaultSyncRangeStart, $this->defaultSyncRangeEnd);
 
         $this->assertEquals(1, ExternalCalendarEntry::find()->count());
         $this->assertCount(1, $externalCalendar->entries);
@@ -113,10 +113,12 @@ class IcsImportTest extends ExternalCalendarTest
         $this->assertVisibility($externalCalendar, Content::VISIBILITY_PUBLIC);
 
         $externalCalendar->url =  Yii::getAlias('@external_calendar/tests/codeception/data/test1Update.ics');
-        $externalCalendar->sync();
+        $externalCalendar->sync($this->defaultSyncRangeStart, $this->defaultSyncRangeEnd);
 
         $externalCalendar->refresh();
 
         $this->assertVisibility($externalCalendar, Content::VISIBILITY_PUBLIC);
     }
+
+
 }

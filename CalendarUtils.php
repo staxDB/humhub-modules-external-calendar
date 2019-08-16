@@ -29,12 +29,9 @@ class CalendarUtils
             if ($dateInterval->days > 0 && $dateInterval->h == 0 && $dateInterval->i == 0 && $dateInterval->s == 0) {
                 return true;
             }
-        } else {
-            if ($dateInterval->h == 23 && $dateInterval->i == 59) {
+        } else if ($dateInterval->h == 23 && $dateInterval->i == 59) {
                 return true;
-            }
         }
-
 
         return false;
     }

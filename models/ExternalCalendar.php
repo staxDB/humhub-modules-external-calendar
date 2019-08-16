@@ -342,6 +342,15 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
         return $query;
     }
 
+    /**
+     * @return ExternalCalendarEntry[]
+     */
+    public function getRecurringEventRoots()
+    {
+        return $this->getEntries(false)
+            ->andWhere('external_calendar_entry.rrule IS NOT NULL')->all();
+    }
+
     public function addAttributes(ICal $ical)
     {
         // add info to CalendarModel
@@ -383,9 +392,9 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
      * @throws InvalidValueException
      * @throws \yii\base\Exception
      */
-    public function sync()
+    public function sync($rangeStart = null, $rangeEnd = null)
     {
-        ICalSync::sync($this);
+        ICalSync::sync($this, $rangeStart, $rangeEnd);
     }
 
     /**
