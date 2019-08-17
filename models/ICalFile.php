@@ -9,9 +9,10 @@ use ICal\ICal;
 use Recurr\Rule;
 use Yii;
 
-class SimpleICal extends ICal implements ICalIF
+class ICalFile extends ICal implements ICalIF
 {
     public $recurrenceRoots;
+    public $alteredRecurrences;
 
     public function __construct($files = false, array $options = array())
     {
@@ -61,19 +62,20 @@ class SimpleICal extends ICal implements ICalIF
         }
 
         $rangeStart = $rangeStart->getTimestamp();
-        $rangeEnd   = $rangeEnd->getTimestamp();
+        $rangeEnd = $rangeEnd->getTimestamp();
 
         $findRecurrences = $this->recurrenceRoots === null;
 
-        if($findRecurrences) {
+        if ($findRecurrences) {
             $this->recurrenceRoots = [];
+            $this->alteredRecurrences = [];
         }
 
         foreach ($events as $anEvent) {
             $eventStart = $anEvent->dtstart_array[2];
-            $eventEnd   = (isset($anEvent->dtend_array[2])) ? $anEvent->dtend_array[2] : null;
+            $eventEnd = (isset($anEvent->dtend_array[2])) ? $anEvent->dtend_array[2] : null;
 
-            if($findRecurrences) {
+            if ($findRecurrences) {
                 $this->checkForRecurrence($anEvent);
             }
 
@@ -104,13 +106,12 @@ class SimpleICal extends ICal implements ICalIF
 
         if (!empty($array)) {
             foreach ($array as $event) {
-                $events[] = new SimpleICalEvent($event);
+                $events[] = new ICalFileEvent($event);
             }
         }
 
         return $events;
     }
-
 
 
     /**
@@ -178,7 +179,7 @@ class SimpleICal extends ICal implements ICalIF
             $rrule = new Rule($recurrenceRoot->rrule);
             $recurrenceEnd = $rrule->getUntil();
 
-            if($recurrenceEnd) {
+            if ($recurrenceEnd) {
                 $recurrenceEnd = $recurrenceEnd->getTimestamp();
             } else {
                 /**
@@ -188,7 +189,7 @@ class SimpleICal extends ICal implements ICalIF
                 $recurrenceEnd = max($end->add(new DateInterval('P1D'))->getTimestamp(), $recurrenceStart + 1);
             }
 
-            if($this->isWithinRange($recurrenceStart, $recurrenceEnd, $start->getTimestamp(), $end->getTimestamp())) {
+            if ($this->isWithinRange($recurrenceStart, $recurrenceEnd, $start->getTimestamp(), $end->getTimestamp())) {
                 $result[] = $recurrenceRoot;
             }
         }
@@ -217,12 +218,15 @@ class SimpleICal extends ICal implements ICalIF
 
     private function checkForRecurrences()
     {
-        if($this->recurrenceRoots !== null) {
+        if ($this->recurrenceRoots !== null) {
             return;
         }
 
         $this->recurrenceRoots = [];
+        $this->alteredRecurrenceInstances = [];
+
         $events = $this->sortEventsWithOrder($this->events(), SORT_ASC);
+
         foreach ($events as $event) {
             $this->checkForRecurrence($event);
         }
@@ -230,16 +234,46 @@ class SimpleICal extends ICal implements ICalIF
 
     /**
      * Checks if the given event is an recurring root event which is still active within $start
-     * @param $anEvent
+     * @param $anEvent ICalEventIF
      * @param $start
      * @param $end
      * @throws \Recurr\Exception\InvalidRRule
      */
-    private function checkForRecurrence($anEvent)
+    private function checkForRecurrence(ICalEventIF $anEvent)
     {
-        if(!empty($anEvent->rrule) && empty($anEvent->{'RECURRENCE-ID'})) {
+       $this->checkForAlteredRecurrence($anEvent);
+
+        if (!empty($anEvent->rrule) && empty($anEvent->getRecurrenceId())) {
             $this->recurrenceRoots[] = $anEvent;
         }
+    }
+
+    /**
+     * @param ICalEventIF $anEvent
+     */
+    private function checkForAlteredRecurrence(ICalEventIF $anEvent)
+    {
+        // Check if this is a simple recurrence
+        if (!empty($anEvent->getRecurrenceId())) {
+            $this->addAlteredRecurrence($anEvent);
+            return;
+        }
+
+        // Check if the root recurrence instance was altered itself.
+        if (isset($this->alteredRecurrenceInstances[$anEvent->getUid()]['altered-event'])) {
+            $alteredRecurrenceInstance = $this->alteredRecurrenceInstances[$anEvent->getUid()];
+            $alteredEvent = $alteredRecurrenceInstance['altered-event'];
+            $key = key($alteredEvent);
+            $this->addAlteredRecurrence(new ICalFileEvent($alteredEvent[$key]));
+        }
+    }
+
+    private function addAlteredRecurrence(ICalEventIF $event)
+    {
+        if (!isset($this->alteredRecurrences[$event->getUid()])) {
+            $this->alteredRecurrences[$event->getUid()] = [];
+        }
+        $this->alteredRecurrences[$event->getUid()][] = $event;
     }
 
     /**
@@ -247,16 +281,15 @@ class SimpleICal extends ICal implements ICalIF
      */
     public function getAlteredRecurrences($uid)
     {
-        if(!isset($this->alteredRecurrenceInstances[$uid])) {
+        if (empty($this->alteredRecurrences[$uid])) {
             return [];
         }
 
         $result = [];
-        foreach ($this->alteredRecurrenceInstances[$uid] as $alteredInstanceKey => $recurrenceId) {
-            $result[] = new SimpleICalEvent($this->cal['VEVENT'][$alteredInstanceKey]);
+        foreach ($this->alteredRecurrences[$uid] as $alteredEvent) {
+            /** @var ICalEventIF $alteredEvent * */
+            $result[] = $alteredEvent;
         }
-
-
         return $result;
     }
 }

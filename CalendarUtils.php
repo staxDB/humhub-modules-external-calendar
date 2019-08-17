@@ -71,5 +71,4 @@ class CalendarUtils
         $datetime = self::formatDateTimeToAppTime($string);
         return $datetime->format('Y-m-d H:i:s');
     }
-
 }

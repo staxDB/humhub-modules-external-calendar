@@ -22,42 +22,42 @@ class ExternalCalendarEntryTest extends ExternalCalendarTest
 {
     public function testLastModifiedEqualsModel()
     {
-        $dummyEvent = new ICallEventDummy(['options' => ['last_modified' => $this->toICalDate(new DateTime('2019-08-15 19:44:00'))]]);
+        $dummyEvent = new ICalEventDummy(['options' => ['last_modified' => $this->toICalDate(new DateTime('2019-08-15 19:44:00'))]]);
         $model = new ExternalCalendarEntry(['last_modified' => '2019-08-15 19:44:00']);
         $this->assertFalse($model->wasModifiedSince($dummyEvent));
     }
 
     public function testLastModifiedBeforeModel()
     {
-        $dummyEvent = new ICallEventDummy(['options' => ['last_modified' => $this->toICalDate(new DateTime('2019-08-15 19:43:00'))]]);
+        $dummyEvent = new ICalEventDummy(['options' => ['last_modified' => $this->toICalDate(new DateTime('2019-08-15 19:43:00'))]]);
         $model = new ExternalCalendarEntry(['last_modified' => '2019-08-15 19:44:00']);
         $this->assertFalse($model->wasModifiedSince($dummyEvent));
     }
 
     public function testLastModifiedAfterModel()
     {
-        $dummyEvent = new ICallEventDummy(['options' => ['last_modified' => $this->toICalDate(new DateTime('2019-08-15 19:45:00'))]]);
+        $dummyEvent = new ICalEventDummy(['options' => ['last_modified' => $this->toICalDate(new DateTime('2019-08-15 19:45:00'))]]);
         $model = new ExternalCalendarEntry(['last_modified' => '2019-08-15 19:44:00']);
         $this->assertTrue($model->wasModifiedSince($dummyEvent));
     }
 
     public function testLastModifiedNull1()
     {
-        $dummyEvent = new ICallEventDummy();
+        $dummyEvent = new ICalEventDummy();
         $model = new ExternalCalendarEntry();
         $this->assertTrue($model->wasModifiedSince($dummyEvent));
     }
 
     public function testLastModifiedNull2()
     {
-        $dummyEvent = new ICallEventDummy(['options' => ['last_modified' => $this->toICalDate(new DateTime('2019-08-15 19:45:00'))]]);
+        $dummyEvent = new ICalEventDummy(['options' => ['last_modified' => $this->toICalDate(new DateTime('2019-08-15 19:45:00'))]]);
         $model = new ExternalCalendarEntry();
         $this->assertTrue($model->wasModifiedSince($dummyEvent));
     }
 
     public function testLastModifiedNull3()
     {
-        $dummyEvent = new ICallEventDummy();
+        $dummyEvent = new ICalEventDummy();
         $model = new ExternalCalendarEntry(['last_modified' => '2019-08-15 19:44:00']);
         $this->assertTrue($model->wasModifiedSince($dummyEvent));
     }

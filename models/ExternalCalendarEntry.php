@@ -39,6 +39,8 @@ use humhub\modules\external_calendar\models\ICS;
  * @property integer $parent_event_id
  * @property string $recurrence_id
  * @property string $recurrence_until
+ * @property integer $is_altered
+ * @property  string exdate
  *
  * @property ExternalCalendarEntry $recurrences
  * @property ExternalCalendarEntry $parent
@@ -200,7 +202,6 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
 
         $end = new DateTime($this->end_datetime, new DateTimeZone(Yii::$app->timeZone));
         if ($this->all_day && $end->format('H:i:s') === '00:00:00') {
-//            $date->setTime('23','59','59');
             $end->modify('-1 second');
         }
         $this->end_datetime = $end->format('Y-m-d H:i:s');
@@ -210,8 +211,8 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
 
     public function beforeDelete()
     {
-        foreach ($this->recurrences as $recurrence) {
-            $recurrence->delete();
+        if(!$this->isRecurringInstance()) {
+            $this->deleteRecurringInstances();
         }
 
         return parent::beforeDelete();
@@ -247,6 +248,7 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
             'editable' => false,
             'allDay' => $this->isAllDay(),
             'rrule' => $this->rrule,
+            'exdate' => $this->exdate,
             'viewUrl' => $this->content->container->createUrl('/external_calendar/entry/view', ['id' => $this->id, 'cal' => '1']),
 //            'updateUrl' => $this->content->container->createUrl('/external_calendar/entry/update-ajax', ['id' => $this->id]),
             'openUrl' => $this->content->container->createUrl('/external_calendar/entry/view', ['id' => $this->id]),
@@ -304,6 +306,11 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
         return !empty($this->rrule);
     }
 
+    public function isRecurringInstance()
+    {
+        return !empty($this->recurrence_id);
+    }
+
 
     /**
      *
@@ -337,11 +344,15 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
-    public function deleteRecurringInstances($lastModification = null, $eq = '>=')
+    public function deleteRecurringInstances($recurrence_ids = null)
     {
-        $instances = (!$lastModification)
+        if(is_array($recurrence_ids) && empty($recurrence_ids)) {
+            return;
+        }
+
+        $instances = empty($recurrence_ids)
             ? $this->recurrences
-            : $this->getRecurrences()->andFilterWhere([$eq, 'start_datetime', $lastModification->format('Y-m-d H:i:s')])->all();
+            : $this->getRecurrences()->andFilterWhere(['IN', 'recurrence_id', $recurrence_ids])->all();
 
         foreach ($instances as $recurrence) {
             $recurrence->delete();
@@ -354,7 +365,18 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
      */
     public function getRecurrenceInstance($recurrenceId)
     {
+        if($this->recurrence_id === $recurrenceId) {
+            return $this;
+        }
         return $this->getRecurrences()->andWhere(['recurrence_id' => $recurrenceId])->one();
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAlteredRecurrences()
+    {
+        return $this->getRecurrences()->andWhere(['is_altered' => 1]);
     }
 
     /**
@@ -390,15 +412,22 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
 
         if (!empty($icalEvent->getRrule())) {
             $this->setRRule(($icalEvent->getRrule()));
+
+            if(!$this->recurrence_id && !$icalEvent->getRecurrenceId()) {
+                $this->recurrence_id = $icalEvent->getStart();
+            }
         }
 
-        $this->recurrence_id = $icalEvent->getRecurrenceId();
+        if($icalEvent->getRecurrenceId()) {
+            $this->recurrence_id = $icalEvent->getRecurrenceId();
+        }
 
         $this->location = $icalEvent->getLocation();
         $this->last_modified = CalendarUtils::formatDateTimeToString($icalEvent->getLastModified());
         $this->dtstamp = CalendarUtils::formatDateTimeToString($icalEvent->getTimeStamp());
         $this->start_datetime = CalendarUtils::formatDateTimeToString($icalEvent->getStart());
         $this->end_datetime = CalendarUtils::formatDateTimeToString($icalEvent->getEnd());
+        $this->exdate = $icalEvent->getExdate();
 
         if($timeZone) {
             $this->time_zone = $timeZone;

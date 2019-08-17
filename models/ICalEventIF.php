@@ -65,4 +65,14 @@ interface ICalEventIF
      * @return string
      */
     public function getRecurrenceId();
+
+    /**
+     * @return string
+     */
+    public function getExdate();
+
+    /**
+     * @return string[]
+     */
+    public function getExdateArray();
 }

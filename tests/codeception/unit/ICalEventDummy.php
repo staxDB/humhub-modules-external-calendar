@@ -4,7 +4,7 @@ namespace humhub\modules\external_calendar\tests\codeception\unit;
 use yii\base\Model;
 use humhub\modules\external_calendar\models\ICalEventIF;
 
-class ICallEventDummy extends Model implements ICalEventIF
+class ICalEventDummy extends Model implements ICalEventIF
 {
     public $options = [];
 
@@ -107,5 +107,21 @@ class ICallEventDummy extends Model implements ICalEventIF
     public function getRecurrenceId()
     {
         return $this->getOption('recurrence_id');
+    }
+
+    /**
+     * @return string
+     */
+    public function getExdate()
+    {
+        return $this->getOption('exdate');
+    }
+
+    /**
+     * @return array
+     */
+    public function getExdateArray()
+    {
+        return (empty($this->getExdate())) ? [] : explode(',', $this->getExdate());
     }
 }

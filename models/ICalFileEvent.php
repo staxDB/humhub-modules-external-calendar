@@ -9,7 +9,7 @@ use DateTime;
 use ICal\Event;
 use Yii;
 
-class SimpleICalEvent extends Event implements ICalEventIF
+class ICalFileEvent extends Event implements ICalEventIF
 {
 
     public function getUid()
@@ -113,5 +113,19 @@ class SimpleICalEvent extends Event implements ICalEventIF
     public function getRecurrenceId()
     {
         return (isset($this->recurrence_id)) ? $this->recurrence_id : null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getExdate()
+    {
+        return (isset($this->exdate)) ? $this->exdate : null;
+    }
+
+    public function getExdateArray()
+    {
+        $exdateStr = $this->getExdate();
+        return empty($exdateStr) ? [] : explode( ',', $exdateStr);
     }
 }

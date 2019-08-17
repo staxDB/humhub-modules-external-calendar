@@ -30,20 +30,10 @@ class ICalExpand extends Model
         }
 
         $existingModels = $this->getExistingRecurrences($start, $end);
-        $recurrences = $this->getRecurrences($start, $end);
+        $recurrences = $this->calculateRecurrenceInstances($start, $end);
         $this->syncRecurrences($existingModels, $recurrences, $endResult);
 
         return $endResult;
-    }
-
-    protected static function getStartCriteria(DateTime $date, $eq = '>=')
-    {
-        return [$eq, 'start_datetime', $date->format('Y-m-d H:i:s')];
-    }
-
-    protected static function getEndCriteria(DateTime $date, $eq = '<=')
-    {
-        return [$eq, 'end_datetime', $date->format('Y-m-d H:i:s')];
     }
 
     private function getExistingRecurrences(DateTime $start, DateTime $end)
@@ -61,10 +51,10 @@ class ICalExpand extends Model
             ])->all();
     }
 
-    private function getRecurrences(DateTime $start, DateTime $end)
+    private function calculateRecurrenceInstances(DateTime $start, DateTime $end)
     {
+        // Note: VObject supports the EXDATE property for exclusions, but not yet the RDATE and EXRULE properties
         $vCalendar = (new VCalendar())->add(new CalendarItemWrapper(['options' => $this->event->getFullCalendarArray()]));
-        /** @var $vEvents VEvent */
         $expandedVCalendar = $vCalendar->getInstance()->expand($start, $end);
         return $expandedVCalendar->select('VEVENT');
     }
