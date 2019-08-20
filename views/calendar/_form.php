@@ -34,7 +34,7 @@ if ($model->color == null && isset($contentContainer->color)) {
                                         {input}
                                     </div>
                                     {error}{hint}'
-        ])->textInput(['placeholder' => Yii::t('ExternalCalendarModule.model_calendar', 'Title'), 'maxlength' => true])->label(false) ?>
+        ])->textInput(['placeholder' => Yii::t('ExternalCalendarModule.model_calendar', 'Title')])->label(false) ?>
 
     </div>
 

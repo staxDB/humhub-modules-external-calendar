@@ -11,19 +11,15 @@ use yii\base\BaseObject;
  * CalendarExtension implements functions for the Events.php file
  *
  * @author David Born ([staxDB](https://github.com/staxDB))
+ * @author buddh4 ([buddh4](https://github.com/buddh4))
  */
 class CalendarExtension extends BaseObject
 {
     /**
-     * Default color of external calendar type items.
-     */
-    const DEFAULT_COLOR = '#DC0E25';
-
-    const ITEM_TYPE_KEY = 'external_calendar';
-
-    /**
      * @param $event \humhub\modules\calendar\interfaces\CalendarItemTypesEvent
      * @return mixed
+     * @throws \Throwable
+     * @throws \yii\base\Exception
      */
     public static function addItemTypes($event)
     {
@@ -42,36 +38,38 @@ class CalendarExtension extends BaseObject
     {
         /* @var $entries ExternalCalendarEntry[] */
         $entries = ExternalCalendarEntryQuery::findForEvent($event);
-        $calendars = self::getCalendarsForEvent($event);
 
-        foreach ($calendars as $calendar) {
-            $items = [];
-            foreach ($entries as $entry) {
-                if ($entry->calendar->id !== $calendar->id) {
-                    continue;
-                }
-                $items[] = $entry->getFullCalendarArray();
-            }
-            if (!empty($items)) {
-                $event->addItems($calendar->getItemTypeKey(), $items);
-            }
-
+        $calendarsMap = [];
+        foreach (self::getCalendarsForEvent($event) as $calendar) {
+            $calendarsMap[$calendar->id] = $calendar;
         }
 
+        $items = [];
+        foreach ($entries as $entry) {
+            $calendar = (isset($calendarsMap[$entry->calendar_id]))
+                ? $calendarsMap[$entry->calendar_id]
+                : $entry->calendar;
 
-        // old
-//        $event->addItems(static::ITEM_TYPE_KEY, $items);
+            if(!$calendar) {
+                continue;
+            }
+
+            $items[] = $entry->getFullCalendarArray();
+        }
+        $event->addItems($calendar->getItemTypeKey(), $items);
     }
 
+    /**
+     * @param \humhub\modules\calendar\interfaces\CalendarItemsEvent|\humhub\modules\calendar\interfaces\CalendarItemTypesEvent $event
+     * @return ExternalCalendar[]
+     * @throws \Throwable
+     * @throws \yii\base\Exception
+     */
     private static function getCalendarsForEvent($event)
     {
-        if (isset($event->contentContainer) && !empty($event->contentContainer)) {
-            $calendars = ExternalCalendar::find()->contentContainer($event->contentContainer)->all();
-        }
-        else {
-            $calendars = ExternalCalendar::find()->all();
-        }
-        return $calendars;
+        return !$event->contentContainer
+            ? ExternalCalendar::find()->readable()->all()
+            : ExternalCalendar::find()->contentContainer($event->contentContainer)->readable()->all();
     }
 
 }

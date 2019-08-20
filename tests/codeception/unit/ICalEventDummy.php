@@ -124,4 +124,20 @@ class ICalEventDummy extends Model implements ICalEventIF
     {
         return (empty($this->getExdate())) ? [] : explode(',', $this->getExdate());
     }
+
+    /**
+     * @return \DateTimeInterface
+     */
+    public function getStartDateTime()
+    {
+        return new \DateTime($this->getStart());
+    }
+
+    /**
+     * @return \DateTimeInterface
+     */
+    public function getEndDaTetime()
+    {
+        return new \DateTime($this->getEnd());
+    }
 }

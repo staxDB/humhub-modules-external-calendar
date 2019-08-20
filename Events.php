@@ -59,7 +59,7 @@ class Events extends BaseObject
     public static function onContainerConfigMenuInit($event)
     {
         /* @var $container ContentContainerActiveRecord */
-        if($event->sender->contentContainer) {
+        if($event->sender->contentContainer && $event->sender->contentContainer->isModuleEnabled('external_calendar')) {
             $event->sender->addItem([
                 'label' => Yii::t('ExternalCalendarModule.base', 'External Calendars'),
                 'id' => 'tab-calendar-external',
@@ -71,18 +71,6 @@ class Events extends BaseObject
         }
     }
 
-    /**
-     * @param $event WidgetEvent
-     */
-    public static function onCalendarControlsInit($event)
-    {
-        /* @var $controls CalendarControls */
-        $controls = $event->sender;
-
-        $controls->addWidget(ExportButton::class, ['container' => $controls->container],  ['sortOrder' => 50]);
-    }
-
-
     public static function onFindCalendarItems($event)
     {
         $contentContainer = $event->contentContainer;
@@ -92,6 +80,15 @@ class Events extends BaseObject
         }
     }
 
+    /**
+     * @param $event WidgetEvent
+     */
+    public static function onCalendarControlsInit($event)
+    {
+        /* @var $controls CalendarControls */
+        $controls = $event->sender;
+        $controls->addWidget(ExportButton::class, ['container' => $controls->container],  ['sortOrder' => 50]);
+    }
 
     /**
      * Defines what to do if admin menu is initialized.
@@ -100,14 +97,14 @@ class Events extends BaseObject
      */
     public static function onAdminMenuInit($event)
     {
-        $event->sender->addItem(array(
+        $event->sender->addItem([
             'label' => "external_calendar",
             'url' => Url::to(['/external_calendar/admin']),
             'group' => 'manage',
             'icon' => '<i class="fa fa-certificate" style="color: #6fdbe8;"></i>',
             'isActive' => (Yii::$app->controller->module && Yii::$app->controller->module->id == 'external_calendar' && Yii::$app->controller->id == 'admin'),
             'sortOrder' => 99999,
-        ));
+        ]);
     }
 
     /**
@@ -118,7 +115,7 @@ class Events extends BaseObject
      */
     public static function onCronHourlyRun($event)
     {
-        Yii::$app->queue->push( new SyncHourly());
+        Yii::$app->queue->push(new SyncHourly());
     }
 
     /**
@@ -133,12 +130,12 @@ class Events extends BaseObject
     }
 
 
-
     /**
      * Callback to validate module database records.
      *
      * @param Event $event
      * @throws \Exception
+     * @throws \Throwable
      */
     public static function onIntegrityCheck($event)
     {
@@ -151,6 +148,20 @@ class Events extends BaseObject
                 }
             }
         }
+    }
+
+    /**
+     * On Init of Dashboard Sidebar, add the widget
+     *
+     * @param type $event
+     */
+    public static function onDashboardSidebarInit($event)
+    {
+        if (Yii::$app->user->isGuest) {
+            return;
+        }
+
+        $module = Yii::$app->getModule('external_calendar');
     }
 
     public static function onWallEntryLinks($event)

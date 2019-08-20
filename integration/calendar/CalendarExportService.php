@@ -3,14 +3,12 @@
 
 namespace humhub\modules\external_calendar\integration\calendar;
 
-
-use humhub\modules\space\models\Space;
 use Yii;
 use yii\base\BaseObject;
-use DateTime;
+use yii\web\HttpException;
+use humhub\modules\space\models\Space;
 use humhub\modules\calendar\interfaces\VCalendar;
 use humhub\modules\external_calendar\models\CalendarExport;
-use yii\web\HttpException;
 use humhub\modules\calendar\interfaces\CalendarService;
 
 class CalendarExportService extends BaseObject
@@ -45,19 +43,16 @@ class CalendarExportService extends BaseObject
                 Yii::$app->user->setIdentity($export->user);
             }
 
-           // $start = new DateTime('-6 year');
-           // $end = new DateTime('+6 year');
-
             $items = [[]];
             foreach ($export->getContainers() as $container) {
                 if($container instanceof Space && !$container->isMember()) {
                     continue;
                 }
 
-                $items[] = $this->calendarService->getCalendarItems($from, $to, $export->getFilterArray(), $container);
+                $items[] = $this->calendarService->getCalendarItems($from, $to, $export->getFilterArray(), $container, null, false);
             }
 
-            $cal = new VCalendar(['items' => array_merge(...$items)]);
+            $cal = VCalendar::withEvents(array_merge(...$items));
 
             return $cal->serialize();
         } finally {

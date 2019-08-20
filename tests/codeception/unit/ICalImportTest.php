@@ -10,6 +10,9 @@ namespace humhub\modules\external_calendar\tests\codeception\unit;
 
 use DateTime;
 use external_calendar\ExternalCalendarTest;
+use humhub\modules\external_calendar\CalendarUtils;
+use humhub\modules\external_calendar\models\ExternalCalendarEntryQuery;
+use humhub\modules\space\models\Space;
 use Yii;
 use humhub\modules\content\models\Content;
 use humhub\modules\external_calendar\models\ExternalCalendar;
@@ -118,6 +121,36 @@ class ICalImportTest extends ExternalCalendarTest
         $externalCalendar->refresh();
 
         $this->assertVisibility($externalCalendar, Content::VISIBILITY_PUBLIC);
+    }
+
+    public function testTimezone1()
+    {
+        $this->initCalendar('@external_calendar/tests/codeception/data/timezone.ics');
+
+        /** @var $events ExternalCalendarEntry[] */
+        $events = ExternalCalendarEntryQuery::findForFilter(
+            DateTime::createFromFormat('!Ymd', '20190821', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20190822', new \DateTimeZone('Europe/Berlin'))->modify('-1 Minute'),
+            Space::findOne(1));
+
+        $this->assertCount(1, $events);
+        $this->assertEquals('Test2', $events[0]->title);
+        $this->assertEquals('2019-08-21 17:30:00', $events[0]->getStartDateTime()->setTimezone(CalendarUtils::getUserTimeZone())->format('Y-m-d H:i:s'));
+    }
+
+    public function testTimezone2()
+    {
+        $this->initCalendar('@external_calendar/tests/codeception/data/timezone.ics');
+
+        /** @var $events ExternalCalendarEntry[] */
+        $events = ExternalCalendarEntryQuery::findForFilter(
+            DateTime::createFromFormat('!Ymd', '20190822', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20190823', new \DateTimeZone('Europe/Berlin')),
+            Space::findOne(1));
+
+        $this->assertCount(1, $events);
+        $this->assertEquals('Test All Day', $events[0]->title);
+        $this->assertEquals('2019-08-22 00:00:00', $events[0]->getStartDateTime()->format('Y-m-d H:i:s'));
     }
 
 

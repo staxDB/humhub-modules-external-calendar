@@ -3,6 +3,7 @@
 
 namespace humhub\modules\external_calendar\controllers;
 
+use humhub\modules\external_calendar\Module;
 use Yii;
 use yii\web\HttpException;
 use humhub\modules\external_calendar\integration\calendar\CalendarExportService;
@@ -46,7 +47,10 @@ class ExportController extends Controller
         $from = ($from) ? (new \DateTime())->setTimestamp($from) : null;
         $to = ($to) ? (new \DateTime())->setTimestamp($to) : null;
         $ics = $this->exportService->createIcsByExportToken($token, $from, $to);
-        return Yii::$app->response->sendContentAsFile($ics, UUIDUtil::getUUID() . '.ics', ['mimeType' => 'text/calendar']);
+
+        /** @var Module $module */
+        $module = Yii::$app->getModule('external_calendar');
+        return Yii::$app->response->sendContentAsFile($ics, $module->exportFileName, ['mimeType' => $module->exportFileMime]);
     }
 
     public function actionEdit($id = null)

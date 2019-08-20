@@ -63,6 +63,10 @@ class CalendarExport extends ActiveRecord
             return;
         }
 
+        if(empty($this->spaceSelection)) {
+            return;
+        }
+
         foreach ($this->spaceSelection as $guid) {
             $space = Space::findOne(['guid' => $guid]);
             if(!$space || !$space->isMember()) {

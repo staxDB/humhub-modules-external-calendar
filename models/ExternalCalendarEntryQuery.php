@@ -4,9 +4,11 @@ namespace humhub\modules\external_calendar\models;
 use humhub\modules\calendar\interfaces\AbstractCalendarQuery;
 use humhub\modules\calendar\interfaces\CalendarItemWrapper;
 use humhub\modules\calendar\interfaces\VCalendar;
+use humhub\modules\external_calendar\CalendarUtils;
 use humhub\modules\user\models\User;
 use Sabre\VObject\Component\VEvent;
 use Sabre\VObject\Recur\EventIterator;
+use Yii;
 use function Complex\add;
 
 
@@ -70,45 +72,56 @@ class ExternalCalendarEntryQuery extends AbstractCalendarQuery
 
     protected $autoAssignUid = false;
 
+    public $autoSaveExtensions;
+
+    public function init()
+    {
+        parent::init();
+        if($this->autoSaveExtensions === null) {
+            $this->autoSaveExtensions = Yii::$app->getModule('external_calendar')->autoSaveExpansions;
+        }
+    }
+
     /**
      * Sets up the date interval filter with respect to the openRange setting.
      */
     protected function setupDateCriteria()
     {
+        $where = ['or'];
+
         if ($this->_openRange && $this->_from && $this->_to) {
             //Search for all dates with start and/or end within the given range
-            $this->_query->andFilterWhere(
-                ['or',
-                    ['and',
-                        $this->getStartCriteria($this->_from, '>='),
-                        $this->getStartCriteria($this->_to, '<=')
-                    ],
-                    ['and',
-                        $this->getEndCriteria($this->_from, '>='),
-                        $this->getEndCriteria($this->_to, '<=')
-                    ],
-                    // Include all recurrent root events
-                    ['and',
-                        'external_calendar_entry.rrule IS NOT NULL',
-                        'external_calendar_entry.parent_event_id IS NULL',
-                        // Filter out already finished recurrence events
-                        ['or',
-                            'recurrence_until IS NULL',
-                            ['>=', 'recurrence_until', $this->_from->format($this->dateFormat)]
-                        ]
-                    ],
-                ]
-            );
-            return;
+            $where[] = ['and',
+                $this->getStartCriteria($this->_from, '>='),
+                $this->getStartCriteria($this->_to, '<=')
+            ];
+
+            $where[] = ['and',
+                $this->getEndCriteria($this->_from, '>='),
+                $this->getEndCriteria($this->_to, '<=')
+            ];
+        } else {
+            if ($this->_from) {
+                $where[] = [$this->getStartCriteria($this->_from)];
+            }
+
+            if ($this->_to) {
+                $where[] = [$this->getEndCriteria($this->_to)];
+            }
         }
 
-        if ($this->_from) {
-            $this->_query->andWhere($this->getStartCriteria($this->_from));
-        }
+        // add all relevant recurrence roots
+        $where[] = ['and',
+            'external_calendar_entry.rrule IS NOT NULL',
+            'external_calendar_entry.parent_event_id IS NULL',
+            // Filter out already finished recurrence events
+            ['or',
+                'recurrence_until IS NULL',
+                ['>=', 'recurrence_until', $this->_from->format($this->dateFormat)]
+            ]
+        ];
 
-        if ($this->_to) {
-            $this->_query->andWhere($this->getEndCriteria($this->_to));
-        }
+        $this->_query->andFilterWhere($where);
     }
 
     protected function setupFilters()
@@ -120,26 +133,18 @@ class ExternalCalendarEntryQuery extends AbstractCalendarQuery
     }
 
     /**
-     * @param ExternalCalendarEntry[] $result
-     * @return array
+     * @param ExternalCalendarEntry $entry
+     * @param array $result
+     * @throws \Throwable
      */
-    protected function preFilter($result = [])
+    protected function expand($entry, &$expandResult)
     {
-        $endResult = [];
-        foreach($result as $event) {
-            if(empty($event->rrule)) {
-                $endResult[] = $event;
-            } else {
-                $this->addRecurrences($event, $endResult);
-            }
+        if($entry->isRecurringRoot()) {
+            $to = $this->_to ?: (new \DateTime('now', CalendarUtils::getUserTimeZone()))->add(new \DateInterval('P1Y'));
+            $from = $this->_from ?: (new \DateTime('now', CalendarUtils::getUserTimeZone()))->sub(new \DateInterval('P1Y'));
+            ICalExpand::expand($entry,$from, $to, $expandResult, $this->autoSaveExtensions);
+        } else {
+            parent::expand($entry, $expandResult);
         }
-
-        return $endResult;
     }
-
-    private function addRecurrences(ExternalCalendarEntry $event, array &$endResult)
-    {
-        return ICalExpand::expand($event, $this->_from, $this->_to, $endResult);
-    }
-
 }

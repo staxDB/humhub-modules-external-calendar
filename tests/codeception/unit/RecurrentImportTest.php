@@ -9,10 +9,10 @@
 namespace humhub\modules\external_calendar\tests\codeception\unit;
 
 use external_calendar\ExternalCalendarTest;
+use humhub\modules\external_calendar\CalendarUtils;
 use humhub\modules\external_calendar\models\ExternalCalendarEntry;
 use humhub\modules\external_calendar\models\ExternalCalendarEntryQuery;
 use DateTime;
-use humhub\modules\external_calendar\models\ICalSync;
 use humhub\modules\space\models\Space;
 use Yii;
 
@@ -35,6 +35,8 @@ class RecurrentImportTest extends ExternalCalendarTest
      */
     public function testSimpleRecurrenceEventImport()
     {
+        Yii::$app->getModule('external_calendar')->autoSaveExpansions = true;
+
         $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/recurrence1.ics');
         $this->assertEquals(1, ExternalCalendarEntry::find()->count());
         $this->assertCount(1, $externalCalendar->entries);
@@ -47,8 +49,8 @@ class RecurrentImportTest extends ExternalCalendarTest
         // Extract events
         /** @var $events ExternalCalendarEntry[] * */
         $events = ExternalCalendarEntryQuery::findForFilter(
-            DateTime::createFromFormat('!Ymd', '20190801'),
-            DateTime::createFromFormat('!Ymd', '20190829'),
+            DateTime::createFromFormat('!Ymd', '20190801', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20190829', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
 
         $this->assertCount(5, $events);
@@ -57,25 +59,80 @@ class RecurrentImportTest extends ExternalCalendarTest
         $this->assertEquals('2019-08-01 00:00:00', $events[0]->getStartDateTime()->format('Y-m-d H:i:s'));
         $this->assertEquals('2019-08-01 23:59:59', $events[0]->getEndDateTime()->format('Y-m-d H:i:s'));
         $this->assertEmpty($events[0]->parent_event_id);
-        $this->assertEquals('20190801', $events[0]->recurrence_id);
+        $this->assertEquals(CalendarUtils::cleanRecurrentId('20190801'), $events[0]->recurrence_id);
 
         $this->assertEquals('2019-08-08 00:00:00', $events[1]->getStartDateTime()->format('Y-m-d H:i:s'));
         $this->assertEquals('2019-08-08 23:59:59', $events[1]->getEndDateTime()->format('Y-m-d H:i:s'));
         $this->assertEquals('Europe/Berlin', $events[1]->time_zone);
-        $this->assertEquals('20190808', $events[1]->recurrence_id);
+        $this->assertEquals(CalendarUtils::cleanRecurrentId('20190808'), $events[1]->recurrence_id);
 
         $this->assertEquals('2019-08-15 00:00:00', $events[2]->getStartDateTime()->format('Y-m-d H:i:s'));
         $this->assertEquals('2019-08-15 23:59:59', $events[2]->getEndDateTime()->format('Y-m-d H:i:s'));
-        $this->assertEquals('20190815', $events[2]->recurrence_id);
+        $this->assertEquals(CalendarUtils::cleanRecurrentId('20190815'), $events[2]->recurrence_id);
 
         $this->assertEquals('2019-08-22 00:00:00', $events[3]->getStartDateTime()->format('Y-m-d H:i:s'));
         $this->assertEquals('2019-08-22 23:59:59', $events[3]->getEndDateTime()->format('Y-m-d H:i:s'));
-        $this->assertEquals('20190822', $events[3]->recurrence_id);
+        $this->assertEquals(CalendarUtils::cleanRecurrentId('20190822'), $events[3]->recurrence_id);
 
         $this->assertEquals('2019-08-29 00:00:00', $events[4]->getStartDateTime()->format('Y-m-d H:i:s'));
         $this->assertEquals('2019-08-29 23:59:59', $events[4]->getEndDateTime()->format('Y-m-d H:i:s'));
-        $this->assertEquals('20190829', $events[4]->recurrence_id);
+        $this->assertEquals(CalendarUtils::cleanRecurrentId('20190829'), $events[4]->recurrence_id);
     }
+
+    public function testRecurrentEvent1Until()
+    {
+        Yii::$app->getModule('external_calendar')->autoSaveExpansions = true;
+
+        $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/recurrence1.ics');
+        $oldEvents = ExternalCalendarEntryQuery::findForFilter(
+            DateTime::createFromFormat('!Ymd', '20190801', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20190930', new \DateTimeZone('Europe/Berlin')),
+            Space::findOne(1));
+
+        $this->assertCount(9, $oldEvents );
+        $this->assertCount(9, ExternalCalendarEntry::find()->all());
+
+        // Stop the recurrence on 01-09-2019
+        $externalCalendar->url = Yii::getAlias('@external_calendar/tests/codeception/data/recurrence1Until.ics');
+        $externalCalendar->sync($this->defaultSyncRangeStart, $this->defaultSyncRangeEnd);
+
+        // Make sure all overlapping recurrence instances were deleted and other existing ones remained
+        $events = ExternalCalendarEntryQuery::findForFilter(
+            DateTime::createFromFormat('!Ymd', '20190801', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20190930', new \DateTimeZone('Europe/Berlin')),
+            Space::findOne(1));
+
+        $this->assertCount(5, $events);
+        $this->assertCount(5, ExternalCalendarEntry::find()->all());
+
+        $this->assertEquals('2019-08-01 00:00:00', $events[0]->getStartDateTime()->format('Y-m-d H:i:s'));
+        $this->assertEquals('2019-08-01 23:59:59', $events[0]->getEndDateTime()->format('Y-m-d H:i:s'));
+        $this->assertEmpty($events[0]->parent_event_id);
+        $this->assertEquals('20190801T000000', $events[0]->recurrence_id);
+        $this->assertEquals($oldEvents[0]->id, $events[0]->id);
+
+        $this->assertEquals('2019-08-08 00:00:00', $events[1]->getStartDateTime()->format('Y-m-d H:i:s'));
+        $this->assertEquals('2019-08-08 23:59:59', $events[1]->getEndDateTime()->format('Y-m-d H:i:s'));
+        $this->assertEquals('Europe/Berlin', $events[1]->time_zone);
+        $this->assertEquals('20190808T000000', $events[1]->recurrence_id);
+        $this->assertEquals($oldEvents[1]->id, $events[1]->id);
+
+        $this->assertEquals('2019-08-15 00:00:00', $events[2]->getStartDateTime()->format('Y-m-d H:i:s'));
+        $this->assertEquals('2019-08-15 23:59:59', $events[2]->getEndDateTime()->format('Y-m-d H:i:s'));
+        $this->assertEquals('20190815T000000', $events[2]->recurrence_id);
+        $this->assertEquals($oldEvents[2]->id, $events[2]->id);
+
+        $this->assertEquals('2019-08-22 00:00:00', $events[3]->getStartDateTime()->format('Y-m-d H:i:s'));
+        $this->assertEquals('2019-08-22 23:59:59', $events[3]->getEndDateTime()->format('Y-m-d H:i:s'));
+        $this->assertEquals('20190822T000000', $events[3]->recurrence_id);
+        $this->assertEquals($oldEvents[3]->id, $events[3]->id);
+
+        $this->assertEquals('2019-08-29 00:00:00', $events[4]->getStartDateTime()->format('Y-m-d H:i:s'));
+        $this->assertEquals('2019-08-29 23:59:59', $events[4]->getEndDateTime()->format('Y-m-d H:i:s'));
+        $this->assertEquals('20190829T000000', $events[4]->recurrence_id);
+        $this->assertEquals($oldEvents[4]->id, $events[4]->id);
+    }
+
 
     /**
      * In this test we import the simple recurring event (every thursday). And then update the calendar by splitting
@@ -86,11 +143,13 @@ class RecurrentImportTest extends ExternalCalendarTest
      */
     public function testSplitRecurringEvent1()
     {
+        Yii::$app->getModule('external_calendar')->autoSaveExpansions = true;
+
         $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/recurrence1.ics');
 
         ExternalCalendarEntryQuery::findForFilter(
-            DateTime::createFromFormat('!Ymd', '20190801'),
-            DateTime::createFromFormat('!Ymd', '20191231'),
+            DateTime::createFromFormat('!Ymd', '20190801', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20191231', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
 
         $this->assertCount(22, ExternalCalendarEntry::find()->all());
@@ -98,13 +157,13 @@ class RecurrentImportTest extends ExternalCalendarTest
         $externalCalendar->url = Yii::getAlias('@external_calendar/tests/codeception/data/recurrence1Split.ics');
         $externalCalendar->sync($this->defaultSyncRangeStart, $this->defaultSyncRangeEnd);
 
-        // Make sure old recurrences are deleted (this may be change in the future with smarter rrule change analysis
-        $this->assertCount(2, ExternalCalendarEntry::find()->all());
+        // Make sure old overlapping recurrences are deleted
+        $this->assertCount(10, ExternalCalendarEntry::find()->all());
 
         /** @var $events ExternalCalendarEntry[] * */
         $events = ExternalCalendarEntryQuery::findForFilter(
-            DateTime::createFromFormat('!Ymd', '20190801'),
-            DateTime::createFromFormat('!Ymd', '20190929'),
+            DateTime::createFromFormat('!Ymd', '20190801', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20190929', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
 
         $this->assertCount(9, $events);
@@ -141,8 +200,8 @@ class RecurrentImportTest extends ExternalCalendarTest
 
         /** @var $events ExternalCalendarEntry[] * */
         $events = ExternalCalendarEntryQuery::findForFilter(
-            DateTime::createFromFormat('!Ymd', '20191001'),
-            DateTime::createFromFormat('!Ymd', '20191031'),
+            DateTime::createFromFormat('!Ymd', '20191001', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20191031', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
 
         $this->assertCount(9, $events);
@@ -177,8 +236,8 @@ class RecurrentImportTest extends ExternalCalendarTest
 
         /** @var $events ExternalCalendarEntry[] * */
         $events = ExternalCalendarEntryQuery::findForFilter(
-            DateTime::createFromFormat('!Ymd', '20191201'),
-            DateTime::createFromFormat('!Ymd', '20191231'),
+            DateTime::createFromFormat('!Ymd', '20191201', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20191231', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
 
         $this->assertCount(8, $events);
@@ -217,14 +276,16 @@ class RecurrentImportTest extends ExternalCalendarTest
      */
     public function testSplitRecurringEvent2()
     {
+        Yii::$app->getModule('external_calendar')->autoSaveExpansions = true;
+
         $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/recurrence1.ics');
         $externalCalendar->url = Yii::getAlias('@external_calendar/tests/codeception/data/recurrence1Split.ics');
         $externalCalendar->sync($this->defaultSyncRangeStart, $this->defaultSyncRangeEnd);
 
         /** @var $events ExternalCalendarEntry[] * */
         $events = ExternalCalendarEntryQuery::findForFilter(
-            DateTime::createFromFormat('!Ymd', '20190801'),
-            DateTime::createFromFormat('!Ymd', '20191031'),
+            DateTime::createFromFormat('!Ymd', '20190801', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20191031', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
 
         $this->assertCount(18, $events);
@@ -287,12 +348,14 @@ class RecurrentImportTest extends ExternalCalendarTest
 
     public function testEndSplittedRecurringEvent()
     {
+        Yii::$app->getModule('external_calendar')->autoSaveExpansions = true;
+
         $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/recurrence1Split.ics');
 
         /** @var $events ExternalCalendarEntry[] * */
         $events = ExternalCalendarEntryQuery::findForFilter(
-            DateTime::createFromFormat('!Ymd', '20190801'),
-            DateTime::createFromFormat('!Ymd', '20191231'),
+            DateTime::createFromFormat('!Ymd', '20190801', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20191231', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
 
 
@@ -303,8 +366,8 @@ class RecurrentImportTest extends ExternalCalendarTest
 
         /** @var $events ExternalCalendarEntry[] * */
         $events = ExternalCalendarEntryQuery::findForFilter(
-            DateTime::createFromFormat('!Ymd', '20190801'),
-            DateTime::createFromFormat('!Ymd', '20191231'),
+            DateTime::createFromFormat('!Ymd', '20190801', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20191231', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
 
         $this->assertCount(27, ExternalCalendarEntry::find()->all());
@@ -373,6 +436,8 @@ class RecurrentImportTest extends ExternalCalendarTest
      */
     public function testDeleteRecurrence1()
     {
+        Yii::$app->getModule('external_calendar')->autoSaveExpansions = true;
+
         $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/recurrence1Split.ics');
 
         // Make sure the sync is not skipped
@@ -384,8 +449,8 @@ class RecurrentImportTest extends ExternalCalendarTest
 
         /** @var $events ExternalCalendarEntry[] * */
         ExternalCalendarEntryQuery::findForFilter(
-            DateTime::createFromFormat('!Ymd', '20190801'),
-            DateTime::createFromFormat('!Ymd', '20191231'),
+            DateTime::createFromFormat('!Ymd', '20190801', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20191231', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
 
         $this->assertCount(35, ExternalCalendarEntry::find()->all());
@@ -422,16 +487,16 @@ class RecurrentImportTest extends ExternalCalendarTest
 
         // Expand some events of first event
         $events = ExternalCalendarEntryQuery::findForFilter(
-            DateTime::createFromFormat('!Ymd', '20160101'),
-            DateTime::createFromFormat('!Ymd', '20161231'),
+            DateTime::createFromFormat('!Ymd', '20160101', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20161231', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
 
         $this->assertNotEmpty($events);
 
         // Expand some events of second event
         $events = ExternalCalendarEntryQuery::findForFilter(
-            DateTime::createFromFormat('!Ymd', '20210101'),
-            DateTime::createFromFormat('!Ymd', '20211231'),
+            DateTime::createFromFormat('!Ymd', '20210101', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20211231', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
 
         $this->assertNotEmpty($events);
@@ -458,13 +523,15 @@ class RecurrentImportTest extends ExternalCalendarTest
      * @throws \Throwable
      * @throws \yii\base\Exception
      */
-    public function testRecurrenceWithAlteredEvent1()
+    public function testRecurrenceWithAlteredEvent1Simple()
     {
+        Yii::$app->getModule('external_calendar')->autoSaveExpansions = true;
+
         $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/recurrence1.ics');
 
         $events = ExternalCalendarEntryQuery::findForFilter(
-            DateTime::createFromFormat('!Ymd', '20190801'),
-            DateTime::createFromFormat('!Ymd', '20190829'),
+            DateTime::createFromFormat('!Ymd', '20190801', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20190829', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
 
         $this->assertEquals('2019-08-01 00:00:00', $events[0]->getStartDateTime()->format('Y-m-d H:i:s'));
@@ -474,13 +541,13 @@ class RecurrentImportTest extends ExternalCalendarTest
         $this->assertEquals('2019-08-29 00:00:00', $events[4]->getStartDateTime()->format('Y-m-d H:i:s'));
 
         $recurrentEvent = $externalCalendar->getRecurringEventRoots()[0];
-        $this->assertEquals('20190808', $recurrentEvent->recurrences[0]->recurrence_id);
+        $this->assertEquals('20190808T000000', $recurrentEvent->recurrences[0]->recurrence_id);
 
         $externalCalendar->url = Yii::getAlias('@external_calendar/tests/codeception/data/recurrence1WithAlteredEvent.ics');
         $externalCalendar->sync( $this->defaultSyncRangeStart, $this->defaultSyncRangeEnd);
 
         $recurrentEvent = $externalCalendar->getRecurringEventRoots()[0];
-        $this->assertEquals('20190808', $recurrentEvent->recurrences[0]->recurrence_id);
+        $this->assertEquals('20190808T000000', $recurrentEvent->recurrences[0]->recurrence_id);
 
         $alteredEvent = $recurrentEvent->getRecurrenceInstance('20190808');
         $this->assertEquals('Recurring Test Overwritten', $alteredEvent->getTitle());
@@ -488,11 +555,11 @@ class RecurrentImportTest extends ExternalCalendarTest
         $this->assertEquals('2019-08-09 23:59:59', $alteredEvent->end_datetime);
 
         // Make sure there is only one recurrence instance
-        $this->assertCount(1, ExternalCalendarEntry::find()->where(['recurrence_id' => '20190808'])->all());
+        $this->assertCount(1, ExternalCalendarEntry::find()->where(['recurrence_id' => '20190808T000000'])->all());
 
         $events = ExternalCalendarEntryQuery::findForFilter(
-            DateTime::createFromFormat('!Ymd', '20190801'),
-            DateTime::createFromFormat('!Ymd', '20190829'),
+            DateTime::createFromFormat('!Ymd', '20190801', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20190829', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
 
         $this->assertEquals('2019-08-01 00:00:00', $events[0]->getStartDateTime()->format('Y-m-d H:i:s'));
@@ -510,12 +577,14 @@ class RecurrentImportTest extends ExternalCalendarTest
      */
     public function testRecurrenceWithAlteredEvent1NoExpansion()
     {
+        Yii::$app->getModule('external_calendar')->autoSaveExpansions = true;
+
         $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/recurrence1.ics');
         $externalCalendar->url = Yii::getAlias('@external_calendar/tests/codeception/data/recurrence1WithAlteredEvent.ics');
         $externalCalendar->sync( $this->defaultSyncRangeStart, $this->defaultSyncRangeEnd);
 
         $recurrentEvent = $externalCalendar->getRecurringEventRoots()[0];
-        $this->assertEquals('20190808', $recurrentEvent->recurrences[0]->recurrence_id);
+        $this->assertEquals('20190808T000000', $recurrentEvent->recurrences[0]->recurrence_id);
 
         $alteredEvent = $recurrentEvent->getRecurrenceInstance('20190808');
         $this->assertEquals('Recurring Test Overwritten', $alteredEvent->getTitle());
@@ -523,11 +592,11 @@ class RecurrentImportTest extends ExternalCalendarTest
         $this->assertEquals('2019-08-09 23:59:59', $alteredEvent->end_datetime);
 
         // Make sure there is only one recurrence instance
-        $this->assertCount(1, ExternalCalendarEntry::find()->where(['recurrence_id' => '20190808'])->all());
+        $this->assertCount(1, ExternalCalendarEntry::find()->where(['recurrence_id' => '20190808T000000'])->all());
 
         $events = ExternalCalendarEntryQuery::findForFilter(
-            DateTime::createFromFormat('!Ymd', '20190801'),
-            DateTime::createFromFormat('!Ymd', '20190829'),
+            DateTime::createFromFormat('!Ymd', '20190801', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20190829', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
 
         $this->assertEquals('2019-08-01 00:00:00', $events[0]->getStartDateTime()->format('Y-m-d H:i:s'));
@@ -547,6 +616,8 @@ class RecurrentImportTest extends ExternalCalendarTest
      */
     public function testRecurrenceWithAlteredEvent1NonExpanded()
     {
+        Yii::$app->getModule('external_calendar')->autoSaveExpansions = true;
+
         $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/recurrence1.ics');
         $externalCalendar->url = Yii::getAlias('@external_calendar/tests/codeception/data/recurrence1WithAlteredEvent.ics');
         $externalCalendar->sync( $this->defaultSyncRangeStart, $this->defaultSyncRangeEnd);
@@ -559,11 +630,11 @@ class RecurrentImportTest extends ExternalCalendarTest
         $this->assertEquals('2019-08-09 23:59:59', $alteredEvent->end_datetime);
 
         // Make sure there is only one recurrence instance for the altered event
-        $this->assertCount(1, ExternalCalendarEntry::find()->where(['recurrence_id' => '20190808'])->all());
+        $this->assertCount(1, ExternalCalendarEntry::find()->where(['recurrence_id' => '20190808T000000'])->all());
 
         $events = ExternalCalendarEntryQuery::findForFilter(
-            DateTime::createFromFormat('!Ymd', '20190801'),
-            DateTime::createFromFormat('!Ymd', '20190829'),
+            DateTime::createFromFormat('!Ymd', '20190801', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20190829', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
 
         $this->assertEquals('2019-08-01 00:00:00', $events[0]->getStartDateTime()->format('Y-m-d H:i:s'));
@@ -575,6 +646,8 @@ class RecurrentImportTest extends ExternalCalendarTest
 
     public function testAlteredEvent1Deletion()
     {
+        Yii::$app->getModule('external_calendar')->autoSaveExpansions = true;
+
         $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/recurrence1.ics');
         $externalCalendar->url = Yii::getAlias('@external_calendar/tests/codeception/data/recurrence1WithAlteredEvent.ics');
         $externalCalendar->sync( $this->defaultSyncRangeStart, $this->defaultSyncRangeEnd);
@@ -583,8 +656,8 @@ class RecurrentImportTest extends ExternalCalendarTest
         $externalCalendar->sync( $this->defaultSyncRangeStart, $this->defaultSyncRangeEnd);
 
         $events = ExternalCalendarEntryQuery::findForFilter(
-            DateTime::createFromFormat('!Ymd', '20190801'),
-            DateTime::createFromFormat('!Ymd', '20190829'),
+            DateTime::createFromFormat('!Ymd', '20190801', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20190829', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
 
         $this->assertEquals('2019-08-01 00:00:00', $events[0]->getStartDateTime()->format('Y-m-d H:i:s'));
@@ -600,19 +673,21 @@ class RecurrentImportTest extends ExternalCalendarTest
      */
     public function testRecurrenceWithAlteredEvent2()
     {
+        Yii::$app->getModule('external_calendar')->autoSaveExpansions = true;
+
         $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/recurrence1.ics');
 
         ExternalCalendarEntryQuery::findForFilter(
-            DateTime::createFromFormat('!Ymd', '20190801'),
-            DateTime::createFromFormat('!Ymd', '20190829'),
+            DateTime::createFromFormat('!Ymd', '20190801', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20190829', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
 
         $externalCalendar->url = Yii::getAlias('@external_calendar/tests/codeception/data/recurrence1WithAlteredEvent2.ics');
         $externalCalendar->sync( $this->defaultSyncRangeStart, $this->defaultSyncRangeEnd);
 
         $events = ExternalCalendarEntryQuery::findForFilter(
-            DateTime::createFromFormat('!Ymd', '20190801'),
-            DateTime::createFromFormat('!Ymd', '20190829'),
+            DateTime::createFromFormat('!Ymd', '20190801', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20190829', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
 
         $this->assertEquals('2019-08-02 00:00:00', $events[0]->getStartDateTime()->format('Y-m-d H:i:s'));
@@ -626,13 +701,13 @@ class RecurrentImportTest extends ExternalCalendarTest
         $recurrenceRoot = $externalCalendar->getRecurringEventRoots()[0];
 
         $this->assertEquals(1, $recurrenceRoot->is_altered);
-        $this->assertEquals('20190801', $recurrenceRoot->recurrence_id);
+        $this->assertEquals('20190801T000000', $recurrenceRoot->recurrence_id);
         $this->assertEquals('2019-08-02 00:00:00', $recurrenceRoot->getStartDateTime()->format('Y-m-d H:i:s'));
         $this->assertEquals('2019-08-02 23:59:59', $recurrenceRoot->getEndDateTime()->format('Y-m-d H:i:s'));
 
         $otherAlteredEvent = $recurrenceRoot->getRecurrenceInstance('20190815');
         $this->assertEquals(1, $otherAlteredEvent->is_altered);
-        $this->assertEquals('20190815', $otherAlteredEvent->recurrence_id);
+        $this->assertEquals('20190815T000000', $otherAlteredEvent->recurrence_id);
         $this->assertEquals('2019-08-16 00:00:00', $otherAlteredEvent->getStartDateTime()->format('Y-m-d H:i:s'));
         $this->assertEquals('2019-08-16 23:59:59', $otherAlteredEvent->getEndDateTime()->format('Y-m-d H:i:s'));
     }
@@ -648,19 +723,21 @@ class RecurrentImportTest extends ExternalCalendarTest
      */
     public function testAlteredEvent2Deletion()
     {
+        Yii::$app->getModule('external_calendar')->autoSaveExpansions = true;
+
         $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/recurrence1.ics');
 
         ExternalCalendarEntryQuery::findForFilter(
-            DateTime::createFromFormat('!Ymd', '20190801'),
-            DateTime::createFromFormat('!Ymd', '20190829'),
+            DateTime::createFromFormat('!Ymd', '20190801', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20190829', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
 
         $externalCalendar->url = Yii::getAlias('@external_calendar/tests/codeception/data/recurrence1WithAlteredEvent2.ics');
         $externalCalendar->sync( $this->defaultSyncRangeStart, $this->defaultSyncRangeEnd);
 
         ExternalCalendarEntryQuery::findForFilter(
-            DateTime::createFromFormat('!Ymd', '20190801'),
-            DateTime::createFromFormat('!Ymd', '20190829'),
+            DateTime::createFromFormat('!Ymd', '20190801', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20190829', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
 
         $externalCalendar->url = Yii::getAlias('@external_calendar/tests/codeception/data/recurrence1.ics');
@@ -669,13 +746,13 @@ class RecurrentImportTest extends ExternalCalendarTest
         $recurrenceRoot = $externalCalendar->getRecurringEventRoots()[0];
 
         $this->assertEquals(0, $recurrenceRoot->is_altered);
-        $this->assertEquals('20190801', $recurrenceRoot->recurrence_id);
+        $this->assertEquals('20190801T000000', $recurrenceRoot->recurrence_id);
         $this->assertEquals('2019-08-01 00:00:00', $recurrenceRoot->getStartDateTime()->format('Y-m-d H:i:s'));
         $this->assertEquals('2019-08-01 23:59:59', $recurrenceRoot->getEndDateTime()->format('Y-m-d H:i:s'));
 
         $events = ExternalCalendarEntryQuery::findForFilter(
-            DateTime::createFromFormat('!Ymd', '20190801'),
-            DateTime::createFromFormat('!Ymd', '20190829'),
+            DateTime::createFromFormat('!Ymd', '20190801', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20190829', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
 
         $this->assertEquals('2019-08-01 00:00:00', $events[0]->getStartDateTime()->format('Y-m-d H:i:s'));
@@ -686,7 +763,7 @@ class RecurrentImportTest extends ExternalCalendarTest
 
         $otherAlteredEvent = $recurrenceRoot->getRecurrenceInstance('20190815');
         $this->assertEquals(0, $otherAlteredEvent->is_altered);
-        $this->assertEquals('20190815', $otherAlteredEvent->recurrence_id);
+        $this->assertEquals('20190815T000000', $otherAlteredEvent->recurrence_id);
         $this->assertEquals('2019-08-15 00:00:00', $otherAlteredEvent->getStartDateTime()->format('Y-m-d H:i:s'));
         $this->assertEquals('2019-08-15 23:59:59', $otherAlteredEvent->getEndDateTime()->format('Y-m-d H:i:s'));
 
@@ -695,11 +772,13 @@ class RecurrentImportTest extends ExternalCalendarTest
 
     public function testRecurrentEventWithAlteredEvent2Edited()
     {
+        Yii::$app->getModule('external_calendar')->autoSaveExpansions = true;
+
         $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/recurrence1WithAlteredEvent2.ics');
 
         $events = ExternalCalendarEntryQuery::findForFilter(
-            DateTime::createFromFormat('!Ymd', '20190801'),
-            DateTime::createFromFormat('!Ymd', '20190829'),
+            DateTime::createFromFormat('!Ymd', '20190801', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20190829', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
 
         $this->assertEquals('2019-08-02 00:00:00', $events[0]->getStartDateTime()->format('Y-m-d H:i:s'));
@@ -712,8 +791,8 @@ class RecurrentImportTest extends ExternalCalendarTest
         $externalCalendar->sync( $this->defaultSyncRangeStart, $this->defaultSyncRangeEnd);
 
         $events = ExternalCalendarEntryQuery::findForFilter(
-            DateTime::createFromFormat('!Ymd', '20190801'),
-            DateTime::createFromFormat('!Ymd', '20190829'),
+            DateTime::createFromFormat('!Ymd', '20190801', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20190829', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
 
         $this->assertEquals('2019-08-03 00:00:00', $events[0]->getStartDateTime()->format('Y-m-d H:i:s'));
@@ -739,27 +818,29 @@ class RecurrentImportTest extends ExternalCalendarTest
 
     public function testRecurrentEvent1WithExdate()
     {
+        Yii::$app->getModule('external_calendar')->autoSaveExpansions = true;
+
         $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/recurrence1.ics');
 
         $recurrentEvent = $externalCalendar->getRecurringEventRoots()[0];
 
         ExternalCalendarEntryQuery::findForFilter(
-            DateTime::createFromFormat('!Ymd', '20190801'),
-            DateTime::createFromFormat('!Ymd', '20190829'),
+            DateTime::createFromFormat('!Ymd', '20190801', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20190829', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
 
         $this->assertNotNull($recurrentEvent->getRecurrenceInstance('20190815'));
         $this->assertNotNull($recurrentEvent->getRecurrenceInstance('20190822'));
 
         $externalCalendar->url = Yii::getAlias('@external_calendar/tests/codeception/data/recurrence1WithExdate.ics');
-        $externalCalendar->sync( $this->defaultSyncRangeStart, $this->defaultSyncRangeEnd);
+        $externalCalendar->sync($this->defaultSyncRangeStart, $this->defaultSyncRangeEnd);
 
         $this->assertNull($recurrentEvent->getRecurrenceInstance('20190815'));
         $this->assertNull($recurrentEvent->getRecurrenceInstance('20190822'));
 
         $events = ExternalCalendarEntryQuery::findForFilter(
-            DateTime::createFromFormat('!Ymd', '20190801'),
-            DateTime::createFromFormat('!Ymd', '20190829'),
+            DateTime::createFromFormat('!Ymd', '20190801', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20190829', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
 
         $this->assertNull($recurrentEvent->getRecurrenceInstance('20190815'));
@@ -768,9 +849,58 @@ class RecurrentImportTest extends ExternalCalendarTest
         $this->assertEquals('2019-08-01 00:00:00', $events[0]->getStartDateTime()->format('Y-m-d H:i:s'));
         $this->assertEquals('2019-08-08 00:00:00', $events[1]->getStartDateTime()->format('Y-m-d H:i:s'));
         $this->assertEquals('2019-08-29 00:00:00', $events[2]->getStartDateTime()->format('Y-m-d H:i:s'));
-
         $this->assertCount(3, ExternalCalendarEntry::find()->all());
     }
+
+    public function testTimezone1()
+    {
+        $this->initCalendar('@external_calendar/tests/codeception/data/timezone.ics');
+
+        /** @var $events ExternalCalendarEntry[] */
+        $events = ExternalCalendarEntryQuery::findForFilter(
+            DateTime::createFromFormat('!Ymd', '20190820', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20190821', new \DateTimeZone('Europe/Berlin'))->modify('-1 Minute'),
+            Space::findOne(1));
+
+        $this->assertCount(1, $events);
+        $this->assertEquals('Recurrent with time', $events[0]->title);
+        $this->assertEquals('2019-08-20 19:00:00', $events[0]->getStartDateTime()->setTimezone(CalendarUtils::getUserTimeZone())->format('Y-m-d H:i:s'));
+
+        $events = ExternalCalendarEntryQuery::findForFilter(
+            DateTime::createFromFormat('!Ymd', '20190827', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20190828', new \DateTimeZone('Europe/Berlin'))->modify('-1 Minute'),
+            Space::findOne(1));
+
+        $this->assertCount(1, $events);
+        $this->assertEquals('Recurrent with time', $events[0]->title);
+        $this->assertEquals('2019-08-27 19:00:00', $events[0]->getStartDateTime()->setTimezone(CalendarUtils::getUserTimeZone())->format('Y-m-d H:i:s'));
+    }
+
+    public function testTimezone2()
+    {
+        Yii::$app->timeZone = 'Europe/Berlin';
+        $this->initCalendar('@external_calendar/tests/codeception/data/timezone.ics');
+
+        /** @var $events ExternalCalendarEntry[] */
+        $events = ExternalCalendarEntryQuery::findForFilter(
+            DateTime::createFromFormat('!Ymd', '20190820', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20190821', new \DateTimeZone('Europe/Berlin'))->modify('-1 Minute'),
+            Space::findOne(1));
+
+        $this->assertCount(1, $events);
+        $this->assertEquals('Recurrent with time', $events[0]->title);
+        $this->assertEquals('2019-08-20 19:00:00', $events[0]->getStartDateTime()->setTimezone(CalendarUtils::getUserTimeZone())->format('Y-m-d H:i:s'));
+
+        $events = ExternalCalendarEntryQuery::findForFilter(
+            DateTime::createFromFormat('!Ymd', '20190827', new \DateTimeZone('Europe/Berlin')),
+            DateTime::createFromFormat('!Ymd', '20190828', new \DateTimeZone('Europe/Berlin'))->modify('-1 Minute'),
+            Space::findOne(1));
+
+        $this->assertCount(1, $events);
+        $this->assertEquals('Recurrent with time', $events[0]->title);
+        $this->assertEquals('2019-08-27 19:00:00', $events[0]->getStartDateTime()->setTimezone(CalendarUtils::getUserTimeZone())->format('Y-m-d H:i:s'));
+    }
+
 
     // Test root is exdate
     // Test deletion of altered recurrence root

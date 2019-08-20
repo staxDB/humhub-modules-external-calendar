@@ -12,9 +12,12 @@ return [
     'id' => 'external_calendar',
     'class' => Module::class,
     'namespace' => 'humhub\modules\external_calendar',
+    'urlManagerRules' => [
+        ['class' => 'humhub\modules\external_calendar\components\PageUrlRule']
+    ],
     'events' => [
-        ['class' => Application::class, 'event' => Application::EVENT_BEFORE_REQUEST, 'callback' => ['humhub\modules\calendar\Events', 'onBeforeRequest']],
-        ['class' => Sidebar::class, 'event' => Sidebar::EVENT_INIT, 'callback' => [Module::class, 'onDashboardSidebarInit']],
+        ['class' => Application::class, 'event' => Application::EVENT_BEFORE_REQUEST, 'callback' => [Events::class, 'onBeforeRequest']],
+        ['class' => Sidebar::class, 'event' => Sidebar::EVENT_INIT, 'callback' => [Events::class, 'onDashboardSidebarInit']],
         ['class' => 'humhub\modules\calendar\interfaces\CalendarService', 'event' => 'getItemTypes', 'callback' => [Events::class, 'onGetCalendarItemTypes']],
         ['class' => 'humhub\modules\calendar\interfaces\CalendarService', 'event' => 'findItems', 'callback' => [Events::class, 'onFindCalendarItems']],
         ['class' => CronController::class, 'event' => CronController::EVENT_ON_HOURLY_RUN, 'callback' => [Events::class, 'onCronHourlyRun']],

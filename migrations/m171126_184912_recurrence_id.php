@@ -7,6 +7,7 @@ class m171126_184912_recurrence_id extends Migration
     public function up()
     {
         $this->addColumn('external_calendar_entry', 'recurrence_id', $this->string());
+        $this->createIndex('idx_unique_external-calendar_entry_recurrence', 'external_calendar_entry', ['parent_event_id', 'recurrence_id']);
     }
 
     public function down()

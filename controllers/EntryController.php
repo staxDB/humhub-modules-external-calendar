@@ -2,6 +2,7 @@
 
 namespace humhub\modules\external_calendar\controllers;
 
+use humhub\modules\external_calendar\models\ICalExpand;
 use Yii;
 use yii\web\HttpException;
 use humhub\widgets\ModalClose;
@@ -41,8 +42,11 @@ class EntryController extends ContentContainerController
      */
     public function actionView($id, $cal = null)
     {
-        $model = $this->getCalendarEntry($id);
+        return $this->renderEntry($this->getCalendarEntry($id), $cal);
+    }
 
+    private function renderEntry($model, $cal = null)
+    {
         // We need the $cal information, since the update redirect in case of fullcalendar view is other than stream view
         if ($cal) {
             return $this->renderModal($model, $cal);
@@ -62,6 +66,32 @@ class EntryController extends ContentContainerController
             'canManageEntries' => $model->content->canEdit(),
             'contentContainer' => $this->contentContainer,
         ]);
+    }
+
+    /**
+     * @param $parent_id
+     * @param $recurrence_id
+     * @param null $cal
+     * @return string
+     * @throws \Throwable
+     * @throws \yii\base\Exception
+     */
+    public function actionViewRecurrence($parent_id, $recurrence_id, $cal = null)
+    {
+        $recurrenceRoot = $this->getCalendarEntry($parent_id);
+        $recurrence = $recurrenceRoot->getRecurrenceInstance($recurrence_id);
+
+        if($recurrence) {
+            return $this->renderEntry($recurrence, $cal);
+        }
+
+        $recurrence = ICalExpand::expandSingle($recurrenceRoot, $recurrence_id);
+
+        if(!$recurrence) {
+            throw new NotFoundHttpException();
+        }
+
+        return $this->renderEntry($recurrence, $cal);
     }
 
     /**

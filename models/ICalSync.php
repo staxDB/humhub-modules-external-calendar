@@ -3,10 +3,11 @@
 
 namespace humhub\modules\external_calendar\models;
 
+use humhub\modules\external_calendar\helpers\RRuleHelper;
+use Recurr\Rule;
 use Yii;
 use yii\base\InvalidValueException;
 use yii\base\Model;
-use humhub\modules\external_calendar\CalendarUtils;
 use DateTime;
 
 class ICalSync extends Model
@@ -94,20 +95,20 @@ class ICalSync extends Model
 
     private function setupSearchRange()
     {
-        if(!$this->rangeStart) {
+        if (!$this->rangeStart) {
             $this->rangeStart = new \DateTime('first day of this month');
             if ($this->calendarModel->event_mode === ExternalCalendar::EVENT_MODE_ALL) {
                 $this->rangeStart = $this->rangeStart->sub(new \DateInterval($this->rangeStartInterval));
             }
-            $this->rangeStart->setTime(0,0,0);
+            $this->rangeStart->setTime(0, 0, 0);
         }
 
-        if(!$this->rangeEnd) {
+        if (!$this->rangeEnd) {
             $this->rangeEnd = new \DateTime('last day of this month');
             if ($this->calendarModel->event_mode === ExternalCalendar::EVENT_MODE_ALL) {
                 $this->rangeEnd = $this->rangeEnd->add(new \DateInterval($this->rangeEndInterval));
             }
-            $this->rangeEnd->setTime(23,59,59);
+            $this->rangeEnd->setTime(23, 59, 59);
         }
     }
 
@@ -146,13 +147,13 @@ class ICalSync extends Model
         foreach ($icalEventsInRange as $eventKey => $icalEvent) {
 
             // We skip recurring events
-            if($icalEvent->getRrule() || $icalEvent->getRecurrenceId()) {
+            if ($icalEvent->getRrule() || $icalEvent->getRecurrenceId()) {
                 unset($icalEventsInRange[$eventKey]);
                 continue;
             }
 
             foreach ($existingModelsInRange as $index => $model) {
-                if($model->uid === $icalEvent->getUid() && $model->wasModifiedSince($icalEvent)) {
+                if ($model->uid === $icalEvent->getUid() && $model->wasModifiedSince($icalEvent)) {
                     $model->syncWithICal($icalEvent, $this->calendarModel->time_zone);
                     unset($icalEventsInRange[$eventKey], $existingModelsInRange[$index]);
                     break;
@@ -162,7 +163,6 @@ class ICalSync extends Model
 
         // create remaining non recurring events
         foreach ($icalEventsInRange as $eventKey => $icalEvent) {
-            // TODO: Make sure there is no existing model outside of range
             $this->createEventModel($icalEvent);
         }
 
@@ -186,6 +186,21 @@ class ICalSync extends Model
         ])->andWhere('external_calendar_entry.rrule IS NULL')->all();
     }
 
+    /**
+     * @param ExternalCalendarEntry[] $eventModels
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    private function deleteNonRecurringEvents($eventModels)
+    {
+        // finally delete items from db
+        foreach ($eventModels as $model) {
+            if (!$model->isRecurring()) {
+                $model->delete();
+            }
+        }
+    }
+
     private function syncRecurringEvents()
     {
         // This will include recurring events that start before range and end after the rangeStart
@@ -194,19 +209,13 @@ class ICalSync extends Model
 
         foreach ($recurringICalEvents as $eventKey => $recurringICalEvent) {
             foreach ($existingModels as $index => $model) {
-                if($model->uid !== $recurringICalEvent->getUid()) {
+                if ($model->uid !== $recurringICalEvent->getUid()) {
                     continue;
                 }
 
                 // Note: We reset all altered root events here, if the root event is still altered we overwrite it in syncAlteredEvents
-                if($model->is_altered || $model->wasModifiedSince($recurringICalEvent)) {
-                    // We backup the rrule in order to know if this event was an recurring event prior the update
-                    $currentRRule = $model->rrule;
-                    $currentStart = $model->getStartDateTime();
-                    $currentExDate = $model->exdate;
-                    $model->is_altered = 0;
-                    $model->syncWithICal($recurringICalEvent, $this->calendarModel->time_zone);
-                    $this->syncRecurringEvent($model, $recurringICalEvent, $currentRRule, $currentStart, $currentExDate);
+                if ($model->is_altered || $model->wasModifiedSince($recurringICalEvent)) {
+                    $this->syncRecurringEvent($model, $recurringICalEvent);
                 }
 
                 // Sync altered events regardless of the modification date
@@ -217,10 +226,9 @@ class ICalSync extends Model
             }
         }
 
-        // create remaining recurring ical events
+        // create remaining recurring ical events and check for alterations
         foreach ($recurringICalEvents as $icalEvent) {
-            $model = $this->createEventModel($icalEvent);
-            $this->syncAlteredEvents($model);
+            $this->syncAlteredEvents($this->createEventModel($icalEvent));
         }
 
         // delete remaining models
@@ -229,64 +237,54 @@ class ICalSync extends Model
         }
     }
 
-    /**
-     * @param ExternalCalendarEntry $model
-     * @throws \yii\base\Exception
-     * @throws \Throwable
-     */
-    private function syncAlteredEvents(ExternalCalendarEntry $model)
+    private function syncRecurringEvent(ExternalCalendarEntry $model, ICalEventIF $icalEvent)
     {
-        $alteredICalEvents = $this->ical->getAlteredRecurrences($model->uid);
+        // First backup some data prior to model sync
+        $currentRRule = $model->rrule;
+        $currentStart = $model->getStartDateTime();
+        $currentExdate = $model->exdate;
+        $model->is_altered = 0;
+        $model->syncWithICal($icalEvent, $this->calendarModel->time_zone);
+        $this->handleRecurrenceChanges($model, $currentStart, $currentRRule);
+        $this->syncExdates($model, $icalEvent, $currentExdate);
+    }
 
-        if(empty($alteredICalEvents)) {
-            foreach ($model->getAlteredRecurrences()->all() as $remainingAlteredModels) {
-                $remainingAlteredModels->delete();
-            }
+    private function handleRecurrenceChanges(ExternalCalendarEntry $model, DateTime $currentStart, $currentRRule)
+    {
+        // If the start time changed we delete all recurrence instances
+        if($currentStart !=  $model->getStartDateTime()) {
+            $model->deleteRecurringInstances();
             return;
         }
 
-        $alteredRecurrenceIds = [];
-        foreach($alteredICalEvents as $alteredEvent) {
-            $alteredRecurrenceIds[] = $alteredEvent->getRecurrenceId();
-            $recurrenceInstanceModel = $model->getRecurrenceInstance($alteredEvent->getRecurrenceId());
-
-            if(!$recurrenceInstanceModel) {
-                $recurrenceInstanceModel = $this->createEventModel($alteredEvent);
-                $recurrenceInstanceModel->parent_event_id = $model->id;
-            }
-
-            $recurrenceInstanceModel->is_altered = 1;
-            $recurrenceInstanceModel->syncWithICal($alteredEvent, $this->calendarModel->time_zone);
+        // Event was transformed from non recurrent to an recurrence root, no instances to delete here
+        if(empty($currentRRule)) {
+            return;
         }
 
-        // Delete remaining db models
-        $remainingAlteredModels = $model->getAlteredRecurrences()->andWhere(['NOT IN', 'recurrence_id', $alteredRecurrenceIds])->all();
-        foreach ($remainingAlteredModels as $remainingAlteredModel) {
-            $remainingAlteredModel->delete();
+        // There were changes other then until
+        if(!RRuleHelper::compare($currentRRule, $model->rrule, true)) {
+            $model->deleteRecurringInstances();
+            return;
+        }
+
+        $currentRRuleUntil = (new Rule($currentRRule))->getUntil();
+        $newRRuleUntil = $model->getRecurrenceUntil();
+
+        // Check if the new until is prior to the old until boundary and remove overlapping instances
+        if((!$currentRRuleUntil && $newRRuleUntil) || $newRRuleUntil < $currentRRuleUntil) {
+            $model->deleteRecurringInstances($newRRuleUntil);
         }
     }
 
-    private function syncRecurringEvent(ExternalCalendarEntry $model, ICalEventIF $icalEvent, $currentRRule, $currentStart, $currentExdate)
+    private function syncExdates(ExternalCalendarEntry $model, ICalEventIF $icalEvent, $currentExdate)
     {
-        if(empty($icalEvent->getRrule())) {
-            if(!empty($currentRRule)) {
-                $model->deleteRecurringInstances();
-            }
-            return;
-        }
-
-        // TODO: only until changed test
-
-        if($icalEvent->getRrule() !== $currentRRule || $currentStart != $model->getStartDateTime()) {
-            // TODO: we could do some further analysis to check if recurrence-id's are still valid (only added events)
-            $model->deleteRecurringInstances();
-        }
-
         // We only care if exdates were added since removed exdates will be created while expanding the event
-        if($currentExdate !== $icalEvent->getExdate() && !empty($icalEvent->getExdate())) {
+        if ($currentExdate !== $icalEvent->getExdate() && !empty($icalEvent->getExdate())) {
             $currentExdate = empty($currentExdate) ? '' : $currentExdate;
             $recurrencesToDelete = array_diff($icalEvent->getExdateArray(), explode(',', $currentExdate));
-            if(!empty($recurrencesToDelete)) {
+
+            if (!empty($recurrencesToDelete)) {
                 $model->deleteRecurringInstances($recurrencesToDelete);
             }
         }
@@ -302,22 +300,43 @@ class ICalSync extends Model
         $eventModel = new ExternalCalendarEntry($this->calendarModel->content->container, $this->calendarModel->content->visibility);
         $eventModel->content->created_by = $this->calendarModel->content->created_by;
         $eventModel->calendar_id = $this->calendarModel->id;
-        $eventModel->syncWithICal($icalEvent, $this->calendarModel->time_zone);
-        return $eventModel;
+        return $eventModel->syncWithICal($icalEvent, $this->calendarModel->time_zone);
     }
 
     /**
-     * @param ExternalCalendarEntry[] $eventModels
+     * @param ExternalCalendarEntry $model
+     * @throws \yii\base\Exception
      * @throws \Throwable
-     * @throws \yii\db\StaleObjectException
      */
-    private function deleteNonRecurringEvents($eventModels)
+    private function syncAlteredEvents(ExternalCalendarEntry $model)
     {
-        // finally delete items from db
-        foreach ($eventModels as $model) {
-            if(!$model->isRecurring()) {
-                $model->delete();
+        $alteredICalEvents = $this->ical->getAlteredRecurrences($model->uid);
+
+        if (empty($alteredICalEvents)) {
+            foreach ($model->getAlteredRecurrences()->all() as $remainingAlteredModels) {
+                $remainingAlteredModels->delete();
             }
+            return;
+        }
+
+        $alteredRecurrenceIds = [];
+        foreach ($alteredICalEvents as $alteredICalEvent) {
+            $alteredRecurrenceIds[] = $alteredICalEvent->getRecurrenceId();
+            $recurrenceInstanceModel = $model->getRecurrenceInstance($alteredICalEvent->getRecurrenceId());
+
+            if (!$recurrenceInstanceModel) {
+                $recurrenceInstanceModel = $this->createEventModel($alteredICalEvent);
+                $recurrenceInstanceModel->parent_event_id = $model->id;
+            }
+
+            $recurrenceInstanceModel->is_altered = 1;
+            $recurrenceInstanceModel->syncWithICal($alteredICalEvent, $this->calendarModel->time_zone);
+        }
+
+        // Delete remaining db models
+        $remainingAlteredModels = $model->getAlteredRecurrences()->andWhere(['NOT IN', 'recurrence_id', $alteredRecurrenceIds])->all();
+        foreach ($remainingAlteredModels as $remainingAlteredModel) {
+            $remainingAlteredModel->delete();
         }
     }
 }

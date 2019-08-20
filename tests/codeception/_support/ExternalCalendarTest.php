@@ -27,6 +27,7 @@ class ExternalCalendarTest extends HumHubDbTestCase
     {
         if($asAdmin) {
             $this->becomeUser('Admin');
+            Yii::$app->user->getIdentity()->time_zone = 'Europe/Berlin';
         }
 
         $externalCalendar = new ExternalCalendar(Space::findOne(1), [
@@ -38,7 +39,7 @@ class ExternalCalendarTest extends HumHubDbTestCase
 
         $this->assertTrue($externalCalendar->save());
 
-        $externalCalendar->sync();
+        $externalCalendar->sync($this->defaultSyncRangeStart, $this->defaultSyncRangeEnd);
 
         return $externalCalendar;
     }

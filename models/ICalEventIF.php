@@ -52,9 +52,19 @@ interface ICalEventIF
     public function getStart();
 
     /**
+     * @return \DateTimeInterface
+     */
+    public function getStartDateTime();
+
+    /**
      * @return string
      */
     public function getEnd();
+
+    /**
+     * @return \DateTimeInterface
+     */
+    public function getEndDaTetime();
 
     /**
      * @return bool
