@@ -119,4 +119,12 @@ class ICalFileEvent extends Event implements ICalEventIF
 
         return $this->getStartDateTime();
     }
+
+    /**
+     * @return mixed
+     */
+    public function getCreated()
+    {
+        return $this->created;
+    }
 }

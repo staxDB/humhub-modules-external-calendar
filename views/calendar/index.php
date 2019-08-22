@@ -9,10 +9,18 @@ use humhub\widgets\GridView;
 use yii\data\ArrayDataProvider;
 
 /* @var $this yii\web\View */
-/* @var $models [] \humhub\modules\external_calendar\models\ExternalCalendar */
+/* @var $models \humhub\modules\external_calendar\models\ExternalCalendar[] */
+/* @var $contentContainer \humhub\modules\content\components\ContentContainerActiveRecord */
 /* @var $model \humhub\modules\external_calendar\models\ExternalCalendar */
 
 $this->title = Yii::t('ExternalCalendarModule.views_calendar', 'External Calendars');
+$publicText = Yii::t('ExternalCalendarModule.views_calendar', 'Public');
+$privateText = Yii::t('ExternalCalendarModule.views_calendar', 'Private');
+
+$helpText = ($contentContainer instanceof Space)
+    ? Yii::t('ExternalCalendarModule.config', 'This view lists all calenders configured for this space')
+    : Yii::t('ExternalCalendarModule.config', 'This view lists all calenders configured in your profile');
+
 ?>
 <div class="panel panel-default">
 
@@ -21,76 +29,65 @@ $this->title = Yii::t('ExternalCalendarModule.views_calendar', 'External Calenda
     <?= ContainerConfigMenu::widget() ?>
 
     <div class="panel-body">
-        <div class="btn-group-sm clearfix">
+        <div class="clearfix">
             <?= Button::success(Yii::t('ExternalCalendarModule.views_calendar', 'Add Calendar'))
-                ->icon('fa-plus')->link($contentContainer->createUrl('edit'))->right() ?>
-        </div>
-        <div>
+                ->icon('fa-plus')->link($contentContainer->createUrl('edit'))->right()->sm() ?>
 
+            <h4>
+                <?= Yii::t('ExternalCalendarModule.config', 'External Calendars Overview'); ?>
+            </h4>
+
+            <div class="help-block">
+                <?= $helpText ?>
+            </div>
+        </div>
+
+        <div>
             <?= GridView::widget([
                 'dataProvider' => new ArrayDataProvider(['models' => $models]),
+                'summary' => '',
+                'showHeader' => false,
                 'columns' => [
-                    'title',
+                    'title' => [
+                        'format' => 'raw',
+                        'value' => function ($data) use ($contentContainer) {
+                            /* @var $data \humhub\modules\external_calendar\models\ExternalCalendar */
+                            return \humhub\widgets\Link::to(Html::encode($data->title), $contentContainer
+                                ->createUrl('view', ['id' => $data->id]));
+                        },
+                    ],
                     'visibility' => [
                         'header' => '&nbsp;',
                         'attribute' => 'public',
                         'options' => ['style' => 'width:40px;'],
                         'format' => 'raw',
-                        'value' => function ($data) {
+                        'value' => function ($data) use ($privateText, $publicText) {
                             /* @var $data \humhub\modules\external_calendar\models\ExternalCalendar */
-                            return $data->content->visibility ? '<i class="fa fa-globe"></i>' : '<i class="fa fa-lock"></i>';
+                            return $data->content->visibility
+                                ? "<i class=\"fa fa-globe tt\" title=\"{$publicText}\"></i>"
+                                : "<i class=\"fa fa-lock tt\"  title=\"{$privateText}\"></i>";
                         },
                     ],
                     [
-                        'header' => Yii::t('AdminModule.views_user_index', 'Actions'),
+                        'header' => '',
                         'class' => 'yii\grid\ActionColumn',
                         'options' => ['style' => 'width:80px; min-width:80px;'],
                         'buttons' => [
                             'view' => function ($url, $model) use ($contentContainer) {
-                                return Html::a('<i class="fa fa-eye view"></i> ', $contentContainer
-                                    ->createUrl('view', ['id' => $model->id]),
-                                    ['class' => 'tt', 'data-toggle' => 'tooltip', 'data-placement' => 'top',
-                                        'data-original-title' => Yii::t('ExternalCalendarModule.base', 'View')]);
+                                $viewUrl = $contentContainer->createUrl('view', ['id' => $model->id]);
+                                return Button::primary()->icon('fa-eye')
+                                    ->link($viewUrl)->tooltip(Yii::t('ExternalCalendarModule.base', 'View'))->sm()->right();
                             },
-                            'update' => function ($url, $model) use ($contentContainer) {
-                                return Html::a('<i class="fa fa-pencil-square-o edit"></i> ',
-                                    $contentContainer->createUrl('edit', ['id' => $model->id]),
-                                    ['class' => 'tt', 'data-toggle' => 'tooltip', 'data-placement' => 'top',
-                                        'data-original-title' => Yii::t('ExternalCalendarModule.base', 'Update')]);
+                            'update' => function () {
+                                return '';
                             },
-                            'delete' => function ($url, $model) use ($contentContainer) {
-                                return humhub\widgets\ModalConfirm::widget([
-                                    'uniqueID' => 'modal_delete_task_' . $model->id,
-                                    'linkOutput' => 'a',
-                                    'title' => Yii::t('ExternalCalendarModule.base', '<strong>Confirm</strong> deleting'),
-                                    'message' => Yii::t('ExternalCalendarModule.base', 'Are you sure you want to delete this item?'),
-                                    'buttonTrue' => Yii::t('ExternalCalendarModule.base', 'Delete'),
-                                    'buttonFalse' => Yii::t('ExternalCalendarModule.base', 'Cancel'),
-                                    'linkContent' => '<i class="fa fa-trash-o delete"></i>',
-                                    'linkHref' => $contentContainer->createUrl('delete', ['id' => $model->id]),
-                                    'linkTooltipText' => Yii::t('ExternalCalendarModule.base', 'Delete'),
-                                    'cssClass' => 'tt'
-                                ]);
-
+                            'delete' => function () {
+                                return '';
                             }
                         ],
                     ]
                 ]
             ]); ?>
         </div>
-        </br>
-        <div>
-            <?php
-            if ($contentContainer instanceof Space) {
-                $configUrl = $contentContainer->createUrl('/space/manage/module');
-            } elseif ($contentContainer instanceof User) {
-                $configUrl = $contentContainer->createUrl('/user/account/edit-modules');
-            } else {
-                $configUrl = '';
-            }
-            ?>
-            <?= Html::a('<i class="fa fa-arrow-left"></i>&nbsp;' . Yii::t('ExternalCalendarModule.base', 'Back to overview'), $configUrl, ['class' => 'btn btn-sm btn-default']) ?>
-        </div>
-
     </div>
 </div>

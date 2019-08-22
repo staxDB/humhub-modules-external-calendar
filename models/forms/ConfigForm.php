@@ -15,17 +15,12 @@ class ConfigForm extends Model
     /**
      * @var boolean determines whether external calendars should be posted to stream
      */
-    public $autopost_calendar = false;
+    public $autopost_calendar = true;
 
     /**
      * @var boolean determines whether external calendar entries should be posted to stream
      */
-    public $autopost_entries = false;
-
-    /**
-     * @var boolean determines if the title of the calendar should be used as badge-title for the upcoming-events widget
-     */
-    public $useBadgeTitle = false;
+    public $autopost_entries = true;
 
     /**
      * @inheritdocs
@@ -35,7 +30,6 @@ class ConfigForm extends Model
         $settings = Yii::$app->getModule('external_calendar')->settings;
         $this->autopost_calendar = $settings->get('autopost_calendar', $this->autopost_calendar);
         $this->autopost_entries = $settings->get('autopost_entries', $this->autopost_entries);
-        $this->useBadgeTitle = $settings->get('useBadgeTitle', $this->useBadgeTitle);
     }
 
     /**
@@ -53,8 +47,8 @@ class ConfigForm extends Model
     public function rules()
     {
         return [
-            [['autopost_calendar', 'autopost_entries', 'useBadgeTitle'], 'required'],
-            [['autopost_calendar', 'autopost_entries', 'useBadgeTitle'], 'boolean'],
+            [['autopost_calendar', 'autopost_entries'], 'required'],
+            [['autopost_calendar', 'autopost_entries'], 'boolean'],
         ];
     }
 
@@ -66,9 +60,8 @@ class ConfigForm extends Model
     public function attributeLabels()
     {
         return array(
-            'autopost_calendar' => Yii::t('ExternalCalendarModule.model_config', 'Auto post calendar'),
-            'autopost_entries' => Yii::t('ExternalCalendarModule.model_config', 'Auto post entries'),
-            'useBadgeTitle' => Yii::t('ExternalCalendarModule.model_config', 'Use calendar title for badge-title in widget'),
+            'autopost_calendar' => Yii::t('ExternalCalendarModule.model_config', 'Post new calendar on stream'),
+            'autopost_entries' => Yii::t('ExternalCalendarModule.model_config', 'Post new entries on stream'),
         );
     }
     
@@ -84,7 +77,6 @@ class ConfigForm extends Model
         $settings = Yii::$app->getModule('external_calendar')->settings;
         $settings->set('autopost_calendar', $this->autopost_calendar);
         $settings->set('autopost_entries', $this->autopost_entries);
-        $settings->set('useBadgeTitle', $this->useBadgeTitle);
 
         return true;
 

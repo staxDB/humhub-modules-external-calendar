@@ -23,19 +23,21 @@ class ExternalCalendarTest extends HumHubDbTestCase
         Events::registerAutoloader();
     }
 
-    protected function initCalendar($file = '@external_calendar/tests/codeception/data/test1.ics', $mode = ExternalCalendar::EVENT_MODE_ALL, $asAdmin = true)
+    protected function initCalendar($file = '@external_calendar/tests/codeception/data/test1.ics', $params = [], $asAdmin = true)
     {
         if($asAdmin) {
             $this->becomeUser('Admin');
             Yii::$app->user->getIdentity()->time_zone = 'Europe/Berlin';
         }
 
-        $externalCalendar = new ExternalCalendar(Space::findOne(1), [
+        $params = array_merge([
             'allowFiles' => true,
             'title' => 'test',
             'event_mode' => ExternalCalendar::EVENT_MODE_ALL,
             'url' => Yii::getAlias($file)
-        ]);
+        ], $params);
+
+        $externalCalendar = new ExternalCalendar(Space::findOne(1), $params);
 
         $this->assertTrue($externalCalendar->save());
 
@@ -48,7 +50,7 @@ class ExternalCalendarTest extends HumHubDbTestCase
     {
         $this->assertEquals($visibility, $calendar->content->visibility);
 
-        foreach ($calendar->entries as $entry) {
+        foreach ($calendar->getEntries()->all() as $entry) {
             $this->assertEquals($visibility, $entry->content->visibility);
         }
     }

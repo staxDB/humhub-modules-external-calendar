@@ -7,7 +7,7 @@ class m171126_184912_add_parent_event extends Migration
     public function up()
     {
         $this->addColumn('external_calendar_entry', 'parent_event_id', $this->integer()->null());
-        $this->addForeignKey('fk-external-calendar-parent-entry','external_calendar_entry','parent_event_id', 'external_calendar_entry', 'id',  'CASCADE');
+        $this->addForeignKey('fk-external-calendar-parent-entry','external_calendar_entry','parent_event_id', 'external_calendar_entry', 'id');
     }
 
     public function down()

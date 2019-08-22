@@ -70,8 +70,19 @@ class ExternalCalendarEntryQuery extends AbstractCalendarQuery
      */
     protected static $recordClass = ExternalCalendarEntry::class;
 
+    /**
+     * @inheritdocs
+     */
+    public $expand = true;
+
+    /**
+     * @inheritdocs
+     */
     protected $autoAssignUid = false;
 
+    /**
+     * @var boolean
+     */
     public $autoSaveExtensions;
 
     public function init()

@@ -42,6 +42,11 @@ interface ICalEventIF
     public function getLastModified();
 
     /**
+     * @return mixed
+     */
+    public function getCreated();
+
+    /**
      * @return string
      */
     public function getTimeStamp();

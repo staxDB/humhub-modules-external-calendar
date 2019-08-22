@@ -140,4 +140,12 @@ class ICalEventDummy extends Model implements ICalEventIF
     {
         return new \DateTime($this->getEnd());
     }
+
+    /**
+     * @return mixed
+     */
+    public function getCreated()
+    {
+        return $this->getOption('created');
+    }
 }

@@ -5,6 +5,7 @@ namespace humhub\modules\external_calendar\models;
 use Colors\RandomColor;
 use humhub\libs\Html;
 use humhub\modules\content\components\ContentContainerActiveRecord;
+use humhub\modules\external_calendar\jobs\UpdateCalendarVisibility;
 use humhub\modules\external_calendar\models\forms\ConfigForm;
 use humhub\modules\external_calendar\SyncUtils;
 use Yii;
@@ -66,9 +67,12 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
 
     /**
      * @inheritdoc
-     * set post to stream to false
      */
     public $streamChannel = null;
+
+    /**
+     * @inheritdoc
+     */
     public $silentContentCreation = true;
 
     /**
@@ -116,11 +120,13 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
     {
         parent::init();
 
-        if($this->isNewRecord) {
+        if(!$this->color) {
             $this->color = RandomColor::one(['luminosity' => 'light']);
         }
 
-        $this->setSettings();
+        if($this->event_mode === null) {
+            $this->event_mode = static::EVENT_MODE_ALL;
+        }
     }
 
     public function afterFind()
@@ -128,17 +134,6 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
         parent::afterFind();
         if($this->public === null) {
             $this->public = $this->content->visibility;
-        }
-    }
-
-    private function setSettings()
-    {
-        $settings = ConfigForm::instantiate();
-
-        if ($settings->autopost_calendar) {
-            // set back to autopost true
-            $this->streamChannel = 'default';
-            $this->silentContentCreation = false;
         }
     }
 
@@ -222,8 +217,8 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
             'version' => Yii::t('ExternalCalendarModule.model_calendar', 'iCal Version'),
             'cal_name' => Yii::t('ExternalCalendarModule.model_calendar', 'Original Calendar Name'),
             'cal_scale' => Yii::t('ExternalCalendarModule.model_calendar', 'Original Calendar Scale'),
-            'sync_mode' => Yii::t('ExternalCalendarModule.model_calendar', 'Sync Mode'),
-            'event_mode' => Yii::t('ExternalCalendarModule.model_calendar', 'Event Selection'),
+            'sync_mode' => Yii::t('ExternalCalendarModule.model_calendar', 'Automatic synchronization'),
+            'event_mode' => Yii::t('ExternalCalendarModule.model_calendar', 'Synchronization interval'),
         ];
     }
 
@@ -256,14 +251,35 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
      */
     public function beforeSave($insert)
     {
+        $this->setSettings();
         $this->content->visibility = $this->public;
         return parent::beforeSave($insert);
     }
 
+    private function setSettings()
+    {
+        $settings = ConfigForm::instantiate();
+
+        if ($settings->autopost_calendar) {
+            // set back to autopost true
+            $this->streamChannel = 'default';
+            $this->silentContentCreation = false;
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function afterSave($insert, $changedAttributes)
     {
-        $this->changeEntriesVisibility();
+        // Do not touch the order of this check, old attributes are cleared in afterSave!
+        $visibilityChanged = $this->content->visibility != $this->content->getOldAttribute('visibility');
+
         parent::afterSave($insert, $changedAttributes);
+
+        if($visibilityChanged) {
+            Yii::$app->queue->push(new UpdateCalendarVisibility(['calendarId' => $this->id]));
+        }
     }
 
     public function afterMove(ContentContainerActiveRecord $container = null)
@@ -284,8 +300,8 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
     {
         return [
             self::SYNC_MODE_NONE => Yii::t('ExternalCalendarModule.model_calendar', 'No auto synchronization'),
-            self::SYNC_MODE_HOURLY => Yii::t('ExternalCalendarModule.model_calendar', 'Hourly synchronization'),
-            self::SYNC_MODE_DAILY => Yii::t('ExternalCalendarModule.model_calendar', 'Daily synchronization'),
+            self::SYNC_MODE_HOURLY => Yii::t('ExternalCalendarModule.model_calendar', 'Hourly'),
+            self::SYNC_MODE_DAILY => Yii::t('ExternalCalendarModule.model_calendar', 'Daily'),
         ];
     }
 
@@ -296,10 +312,10 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
                 return Yii::t('ExternalCalendarModule.model_calendar', 'No auto synchronization');
                 break;
             case (self::SYNC_MODE_HOURLY):
-                return Yii::t('ExternalCalendarModule.model_calendar', 'Hourly synchronization');
+                return Yii::t('ExternalCalendarModule.model_calendar', 'Hourly');
                 break;
             case (self::SYNC_MODE_DAILY):
-                return Yii::t('ExternalCalendarModule.model_calendar', 'Daily synchronization');
+                return Yii::t('ExternalCalendarModule.model_calendar', 'Daily');
                 break;
             default:
                 return;
@@ -310,7 +326,7 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
     {
         return [
             self::EVENT_MODE_CURRENT_MONTH => Yii::t('ExternalCalendarModule.model_calendar', 'Only sync events from current month'),
-            self::EVENT_MODE_ALL => Yii::t('ExternalCalendarModule.model_calendar', 'Sync all events'),
+            self::EVENT_MODE_ALL => Yii::t('ExternalCalendarModule.model_calendar', 'Synchronize all events'),
         ];
     }
 
@@ -318,10 +334,10 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
     {
         switch ($this->event_mode) {
             case (self::EVENT_MODE_CURRENT_MONTH):
-                return Yii::t('ExternalCalendarModule.model_calendar', 'Only sync events from current month');
+                return Yii::t('ExternalCalendarModule.model_calendar', 'Only synchronize events from current month');
                 break;
             case (self::EVENT_MODE_ALL):
-                return Yii::t('ExternalCalendarModule.model_calendar', 'Sync all events');
+                return Yii::t('ExternalCalendarModule.model_calendar', 'Synchronize all events');
                 break;
             default:
                 return;
@@ -364,13 +380,6 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
         }
     }
 
-    public function changeEntriesVisibility()
-    {
-        foreach ($this->entries as $entry) {
-            $entry->content->updateAttributes(['visibility' => $this->content->visibility]);
-        }
-    }
-
     public function getItemTypeKey()
     {
         return (static::ITEM_TYPE_KEY . '_' . $this->id);
@@ -391,10 +400,12 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
      *
      * @throws InvalidValueException
      * @throws \yii\base\Exception
+     * @return static
      */
     public function sync($rangeStart = null, $rangeEnd = null)
     {
         ICalSync::sync($this, $rangeStart, $rangeEnd);
+        return $this;
     }
 
     /**

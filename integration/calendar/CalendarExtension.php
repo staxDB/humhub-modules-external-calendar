@@ -40,23 +40,26 @@ class CalendarExtension extends BaseObject
         $entries = ExternalCalendarEntryQuery::findForEvent($event);
 
         $calendarsMap = [];
+        $itemsMap = [];
         foreach (self::getCalendarsForEvent($event) as $calendar) {
             $calendarsMap[$calendar->id] = $calendar;
+            $itemsMap[$calendar->id] = [];
         }
 
-        $items = [];
-        foreach ($entries as $entry) {
-            $calendar = (isset($calendarsMap[$entry->calendar_id]))
-                ? $calendarsMap[$entry->calendar_id]
-                : $entry->calendar;
 
-            if(!$calendar) {
+        foreach ($entries as $entry) {
+            // Note we only allow visible calendars, there are may entries which visibility is not updated yet (see jobs/UpdateCalendarVisibility).
+            if(!isset($calendarsMap[$entry->calendar_id])) {
                 continue;
             }
 
-            $items[] = $entry->getFullCalendarArray();
+            $calendar = $calendarsMap[$entry->calendar_id];
+            $itemsMap[$calendar->id][] = $entry->getFullCalendarArray();
         }
-        $event->addItems($calendar->getItemTypeKey(), $items);
+
+        foreach ($calendarsMap as $id => $calendar) {
+            $event->addItems($calendar->getItemTypeKey(), $itemsMap[$id]);
+        }
     }
 
     /**

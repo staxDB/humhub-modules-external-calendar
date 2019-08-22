@@ -26,8 +26,6 @@ use humhub\widgets\Button;
 
             <?= $form->field($model, 'autopost_calendar')->checkbox(); ?>
             <?= $form->field($model, 'autopost_entries')->checkbox(); ?>
-            <?= $form->field($model, 'useBadgeTitle')->checkbox()
-                ->hint(Yii::t('ExternalCalendarModule.views_admin', 'If this option is not checked, "Event" will be set as badge-title.')); ?>
 
             <hr>
 

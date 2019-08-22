@@ -42,6 +42,8 @@ class ICalImportTest extends ExternalCalendarTest
         $this->assertEquals( DateTime::createFromFormat('!Ymd', '20190514'), $event->getStartDateTime());
         $this->assertEquals( DateTime::createFromFormat('!Ymd', '20190514')->setTime(23,59,59), $event->getEndDateTime());
 
+        $this->assertEquals('2019-05-03 16:49:37', $event->content->created_at);
+        $this->assertEquals('2019-05-03 16:49:37', $event->content->stream_sort_date);
         $this->assertEquals('xxxxxxxxxxxxxx@google.com', $event->uid);
         $this->assertEquals('Test Event', $event->description);
         $this->assertEquals('Europe/Berlin', $event->time_zone);
@@ -99,8 +101,9 @@ class ICalImportTest extends ExternalCalendarTest
     }
 
 
-    public function testImportPrivateVisibility()
+    public function testImportPublicVisibility()
     {
+        $this->becomeUser('Admin');
         $externalCalendar =  new ExternalCalendar(User::findOne(1), [
             'allowFiles' => true,
             'title' => 'test',
@@ -108,9 +111,6 @@ class ICalImportTest extends ExternalCalendarTest
             'url' => Yii::getAlias('@external_calendar/tests/codeception/data/test1.ics')
         ]);
 
-        $this->assertVisibility($externalCalendar, Content::VISIBILITY_PUBLIC);
-
-        $externalCalendar->public = Content::VISIBILITY_PUBLIC;
         $externalCalendar->save();
 
         $this->assertVisibility($externalCalendar, Content::VISIBILITY_PUBLIC);
@@ -118,6 +118,48 @@ class ICalImportTest extends ExternalCalendarTest
         $externalCalendar->url =  Yii::getAlias('@external_calendar/tests/codeception/data/test1Update.ics');
         $externalCalendar->sync($this->defaultSyncRangeStart, $this->defaultSyncRangeEnd);
 
+        $externalCalendar->refresh();
+
+        $this->assertVisibility($externalCalendar, Content::VISIBILITY_PUBLIC);
+    }
+
+    public function testImportPrivateVisibility()
+    {
+        $this->becomeUser('Admin');
+        $externalCalendar =  new ExternalCalendar(User::findOne(1), [
+            'allowFiles' => true,
+            'title' => 'test',
+            'public' => Content::VISIBILITY_PRIVATE,
+            'url' => Yii::getAlias('@external_calendar/tests/codeception/data/test1.ics')
+        ]);
+
+        $externalCalendar->save();
+
+        $this->assertVisibility($externalCalendar, Content::VISIBILITY_PRIVATE);
+
+        $externalCalendar->url =  Yii::getAlias('@external_calendar/tests/codeception/data/test1Update.ics');
+        $externalCalendar->sync($this->defaultSyncRangeStart, $this->defaultSyncRangeEnd);
+
+        $externalCalendar->refresh();
+
+        $this->assertVisibility($externalCalendar, Content::VISIBILITY_PRIVATE);
+    }
+
+    /**
+     * @throws \yii\base\Exception
+     */
+    public function testImportChangeVisibility()
+    {
+        $this->becomeUser('Admin');
+        $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/test1.ics', [
+            'public' => Content::VISIBILITY_PRIVATE,
+            'event_mode' => ExternalCalendar::EVENT_MODE_ALL,
+        ])->sync($this->defaultSyncRangeStart, $this->defaultSyncRangeEnd);
+
+        $this->assertVisibility($externalCalendar, Content::VISIBILITY_PRIVATE);
+
+        $externalCalendar->public = Content::VISIBILITY_PUBLIC;
+        $externalCalendar->save();
         $externalCalendar->refresh();
 
         $this->assertVisibility($externalCalendar, Content::VISIBILITY_PUBLIC);

@@ -87,11 +87,9 @@ class ICalExpand extends Model
             $end = (new DateTime('now', $this->targetTimezone))->add(new \DateInterval('P2Y'));
         }
 
-        ExternalCalendarEntry::getDb()->transaction(function() use ($start, $end, &$endResult) {
-            $existingModels = $this->getExistingRecurrences($start, $end);
-            $recurrences = $this->calculateRecurrenceInstances($start, $end);
-            $this->syncRecurrences($existingModels, $recurrences, $endResult);
-        });
+        $existingModels = $this->getExistingRecurrences($start, $end);
+        $recurrences = $this->calculateRecurrenceInstances($start, $end);
+        $this->syncRecurrences($existingModels, $recurrences, $endResult);
 
         return $endResult;
     }
@@ -128,29 +126,33 @@ class ICalExpand extends Model
     private function syncRecurrences(array $existingModels, array $recurrences, &$endResult)
     {
         foreach($recurrences as $vEvent) {
-            $model = null;
-            $vEventStart =  $vEvent->DTSTART->getDateTime();
+            try {
+                $model = null;
+                $vEventStart = $vEvent->DTSTART->getDateTime();
 
-            // Check if this recurrence is the first one
-            if($this->event->getStartDateTime() == $vEventStart) {
-                if(!$this->event->recurrence_id) {
-                    $this->event->updateAttributes(['recurrence_id' =>  $this->getRecurrenceId($vEvent)]);
+                // Check if this recurrence is the first one
+                if ($this->event->getStartDateTime() == $vEventStart) {
+                    if (!$this->event->recurrence_id) {
+                        $this->event->updateAttributes(['recurrence_id' => $this->getRecurrenceId($vEvent)]);
+                    }
+                    $model = $this->event;
                 }
-                $model = $this->event;
-            }
 
-            if(!$model) {
-                $model = $this->findRecurrenceModel($existingModels, $vEvent);
-            }
+                if (!$model) {
+                    $model = $this->findRecurrenceModel($existingModels, $vEvent);
+                }
 
-            if(!$model) {
-                $model = $this->event->createRecurrence($vEventStart,
-                    $vEvent->DTEND->getDateTime(),
-                    $this->getRecurrenceId($vEvent),
-                    $this->saveInstnace);
-            }
+                if (!$model) {
+                    $model = $this->event->createRecurrence($vEventStart,
+                        $vEvent->DTEND->getDateTime(),
+                        $this->getRecurrenceId($vEvent),
+                        $this->saveInstnace);
+                }
 
-            $endResult[] = $model;
+                $endResult[] = $model;
+            } catch (\Exception $e) {
+                Yii::error($e);
+            }
         }
     }
 
