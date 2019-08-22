@@ -121,16 +121,18 @@ class ExternalCalendarEntryQuery extends AbstractCalendarQuery
             }
         }
 
-        // add all relevant recurrence roots
-        $where[] = ['and',
-            'external_calendar_entry.rrule IS NOT NULL',
-            'external_calendar_entry.parent_event_id IS NULL',
-            // Filter out already finished recurrence events
-            ['or',
-                'recurrence_until IS NULL',
-                ['>=', 'recurrence_until', $this->_from->format($this->dateFormat)]
-            ]
-        ];
+        if($this->expand && $this->_from) {
+            // add all relevant recurrence roots
+            $where[] = ['and',
+                'external_calendar_entry.rrule IS NOT NULL',
+                'external_calendar_entry.parent_event_id IS NULL',
+                // Filter out already finished recurrence events
+                ['or',
+                    'recurrence_until IS NULL',
+                    ['>=', 'recurrence_until', $this->_from->format($this->dateFormat)]
+                ]
+            ];
+        }
 
         $this->_query->andFilterWhere($where);
     }

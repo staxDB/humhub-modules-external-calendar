@@ -4,11 +4,15 @@ Calendar extension for integration of external calendars with [iCalendar-format]
 This module has **only been tested** in **Humhub v1.2.3 and v1.2.4** with the **calendar module version 0.6.3**!
 
 **Be careful!**
-some calendars are not intended for permanent synchronization. These do not send a "last_modified" timestamp. Please do not select the option `auto sync hourly` for these. It could slow down your system..
+some calendars are not intended for permanent synchronization. These do not send a "last_modified" timestamp. 
+Please do not select the option `auto sync hourly` for these. It could slow down your system..
 
 
 __Module website:__ <https://github.com/staxDB/humhub-modules-external-calendar>  
 __Author:__ David Born ([staxDB](https://github.com/staxDB))
+### v1.0 Works with
+- Humhub version 1.3.14
+- PHP 5.6
 
 ### v0.2.* Works with
 - Humhub version 1.3.*

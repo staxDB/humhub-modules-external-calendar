@@ -3,10 +3,12 @@
   "description": "HumHub calendar module",
   "type": "library",
   "require": {
-    "php": ">=5.6.0",
+    "php": ">=5.6",
     "johngrogg/ics-parser": "^2",
     "nesbot/carbon": "^1.39.0",
-    "simshaun/recurr": "^4"
+    "simshaun/recurr": "^4",
+    "symfony/translation": "v3.4.30",
+    "doctrine/collections": "v1.4.0"
   },
   "require-dev": {
     "phpunit/php-timer": "^1.0.9"
