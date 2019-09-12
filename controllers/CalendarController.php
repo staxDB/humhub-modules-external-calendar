@@ -2,6 +2,7 @@
 
 namespace humhub\modules\external_calendar\controllers;
 
+use humhub\modules\external_calendar\models\ICalSync;
 use Yii;
 use yii\base\InvalidValueException;
 use yii\web\HttpException;
@@ -93,18 +94,15 @@ class CalendarController extends ContentContainerController
      * @return CalendarController|string|\yii\console\Response|\yii\web\Response
      * @throws NotFoundHttpException
      * @throws \yii\base\Exception
+     * @throws \Throwable
      */
     public function actionEdit($id = null)
     {
-        if (!$id) {
-            $model = new ExternalCalendar($this->contentContainer);
-        } else {
-            $model = $this->findModel($id);
-        }
+        $model = ($id) ? $this->findModel($id) : new ExternalCalendar($this->contentContainer);
 
         try {
             if ($model->load(Yii::$app->request->post())) {
-                $model->updateICal();
+                (new ICalSync(['calendarModel' => $model, 'skipEvents' => true]))->syncICal();
                 $this->view->success(Yii::t('ExternalCalendarModule.results', 'Calendar successfully created!'));
                 return $this->redirect($this->contentContainer->createUrl('view', ['id' => $model->id]));
             } else {
@@ -113,7 +111,7 @@ class CalendarController extends ContentContainerController
                     'contentContainer' => $this->contentContainer
                 ]);
             }
-        } catch (InvalidValueException $e) {
+        } catch (\Exception $e) {
             Yii::warning($e);
             $this->view->error(Yii::t('ExternalCalendarModule.results', 'Error while creating iCal File. Please check, if Url is correct and Internet connection of server is enabled.'));
             return $this->render('edit', [
@@ -121,7 +119,6 @@ class CalendarController extends ContentContainerController
                 'contentContainer' => $this->contentContainer
             ]);
         }
-
     }
 
     /**

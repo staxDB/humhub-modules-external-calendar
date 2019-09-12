@@ -7,7 +7,6 @@ use humhub\libs\Html;
 use humhub\modules\content\components\ContentContainerActiveRecord;
 use humhub\modules\external_calendar\jobs\UpdateCalendarVisibility;
 use humhub\modules\external_calendar\models\forms\ConfigForm;
-use humhub\modules\external_calendar\SyncUtils;
 use Yii;
 use humhub\modules\content\components\ContentActiveRecord;
 use humhub\modules\external_calendar\permissions\ManageCalendar;
@@ -406,27 +405,5 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
     {
         ICalSync::sync($this, $rangeStart, $rangeEnd);
         return $this;
-    }
-
-    /**
-     * Loads ical attributes from the given $url and saves the record in case the request succeeded.
-     * @param bool $save
-     * @return ICal
-     */
-    public function updateICal($save = true) {
-        $ical = SyncUtils::createICal($this->url);
-
-        if (!$ical) {
-            throw new InvalidValueException(Yii::t('ExternalCalendarModule.sync_result', 'Error while creating ical... Check if link is reachable.'));
-        }
-
-        // add info to CalendarModel
-        $this->addAttributes($ical);
-
-        if ($save && !$this->save()) {
-            throw new InvalidValueException(Yii::t('ExternalCalendarModule.sync_result', 'Error while saving calendar attribute models...'));
-        }
-
-        return $ical;
     }
 }

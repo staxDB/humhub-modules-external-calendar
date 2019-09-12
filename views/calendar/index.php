@@ -21,6 +21,14 @@ $helpText = ($contentContainer instanceof Space)
     ? Yii::t('ExternalCalendarModule.config', 'This view lists all calenders configured for this space')
     : Yii::t('ExternalCalendarModule.config', 'This view lists all calenders configured in your profile');
 
+// This check was added due to a strange error on customer side
+// yii\base\ErrorException: count(): Parameter must be an array or an object that implements
+// Countable in /usr/www/users/itksic/humhub/protected/vendor/yiisoft/yii2/data/ArrayDataProvider.php
+// This should already be fixed by Yii, also I don't know why the query would return null...
+if(!is_array($models)) {
+    $models = [];
+}
+
 ?>
 <div class="panel panel-default">
 

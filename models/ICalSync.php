@@ -49,6 +49,11 @@ class ICalSync extends Model
     public $errorMessage;
 
     /**
+     * @var bool whether or not to skip event synchronization
+     */
+    public $skipEvents = false;
+
+    /**
      * Static sync function.
      *
      * @param ExternalCalendar $calendarModel
@@ -77,7 +82,10 @@ class ICalSync extends Model
 
         $this->setupSearchRange();
         $this->syncICalAttributes();
-        $this->syncICalEvents();
+
+        if(!$this->skipEvents) {
+            $this->syncICalEvents();
+        }
 
         $this->calendarModel->save();
         $this->calendarModel->refresh();
@@ -336,7 +344,7 @@ class ICalSync extends Model
     private function createEventModel(ICalEventIF $icalEvent)
     {
         $eventModel = new ExternalCalendarEntry($this->calendarModel->content->container, $this->calendarModel->content->visibility);
-
+        $eventModel->content->created_by = $this->calendarModel->content->created_by;
         $eventModel->calendar_id = $this->calendarModel->id;
         $eventModel->syncWithICal($icalEvent, $this->calendarModel->time_zone);
 
