@@ -5,6 +5,7 @@ namespace humhub\modules\external_calendar\controllers;
 use humhub\modules\external_calendar\models\ICalSync;
 use Yii;
 use yii\base\InvalidValueException;
+use yii\data\ActiveDataProvider;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use humhub\components\access\ControllerAccess;
@@ -38,10 +39,12 @@ class CalendarController extends ContentContainerController
      */
     public function actionIndex()
     {
-        $models = ExternalCalendar::find()->contentContainer($this->contentContainer)->all();
+        $dataProvider = new ActiveDataProvider([
+            'query' => ExternalCalendar::find()->contentContainer($this->contentContainer)
+        ]);
 
         return $this->render('index', [
-            'models' => $models,
+            'dataProvider' => $dataProvider,
             'contentContainer' => $this->contentContainer,
         ]);
     }

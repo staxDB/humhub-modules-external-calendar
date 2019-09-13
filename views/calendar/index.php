@@ -9,7 +9,7 @@ use humhub\widgets\GridView;
 use yii\data\ArrayDataProvider;
 
 /* @var $this yii\web\View */
-/* @var $models \humhub\modules\external_calendar\models\ExternalCalendar[] */
+/* @var $dataProvider \yii\data\ActiveDataProvider */
 /* @var $contentContainer \humhub\modules\content\components\ContentContainerActiveRecord */
 /* @var $model \humhub\modules\external_calendar\models\ExternalCalendar */
 
@@ -20,15 +20,6 @@ $privateText = Yii::t('ExternalCalendarModule.views_calendar', 'Private');
 $helpText = ($contentContainer instanceof Space)
     ? Yii::t('ExternalCalendarModule.config', 'This view lists all calenders configured for this space')
     : Yii::t('ExternalCalendarModule.config', 'This view lists all calenders configured in your profile');
-
-// This check was added due to a strange error on customer side
-// yii\base\ErrorException: count(): Parameter must be an array or an object that implements
-// Countable in /usr/www/users/itksic/humhub/protected/vendor/yiisoft/yii2/data/ArrayDataProvider.php
-// This should already be fixed by Yii, also I don't know why the query would return null...
-if(!is_array($models)) {
-    $models = [];
-}
-
 ?>
 <div class="panel panel-default">
 
@@ -52,7 +43,7 @@ if(!is_array($models)) {
 
         <div>
             <?= GridView::widget([
-                'dataProvider' => new ArrayDataProvider(['models' => $models]),
+                'dataProvider' => $dataProvider,
                 'summary' => '',
                 'showHeader' => false,
                 'columns' => [
