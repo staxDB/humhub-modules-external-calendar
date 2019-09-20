@@ -1,5 +1,21 @@
 Changelog
 =========
+v1.1.1
+----------------------
+- Fix: Importing ICal events without Modification Date not working
+- Fix: Importing ICal events with start = end date not working
+
+v1.1
+----------------------
+- Fix: Sync Jobs not working
+
+v1.0
+----------------------
+- Enh: Better calendar integration
+- Chng: Requires Calendar Module version 0.7.3
+- Enh: Enhanced ICal synchronization
+- Enh: Add ICal export
+
 v0.2.2
 ----------------------
 - Changed Cron:

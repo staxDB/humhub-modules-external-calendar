@@ -147,7 +147,7 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
      */
     public function validateEndTime($attribute, $params)
     {
-        if (new DateTime($this->start_datetime) >= new DateTime($this->end_datetime)) {
+        if (new DateTime($this->start_datetime) > new DateTime($this->end_datetime)) {
             $this->addError($attribute, Yii::t('ExternalCalendarModule.base', "End time must be after start time!"));
         }
     }
@@ -200,6 +200,11 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
         }
 
         $end = new DateTime($this->end_datetime, new DateTimeZone(Yii::$app->timeZone));
+
+        if($this->end_datetime === $this->start_datetime) {
+            $end->modify('+1 day');
+        }
+
         if ($this->all_day && $end->format('H:i:s') === '00:00:00') {
             $end->modify('-1 second');
         }
@@ -481,8 +486,9 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
 
         $this->all_day = (int) $icalEvent->isAllDay();
 
-        if ($save) {
-            $this->save();
+        if ($save && !$this->save()) {
+            Yii::error('Could not save ical event '.$icalEvent->getUid());
+            Yii::error($this->getErrors());
         }
 
         return $this;

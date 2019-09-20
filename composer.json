@@ -1,5 +1,5 @@
 {
-  "name": "humhub/humhub-calendar",
+  "name": "humhub/external-humhub-calendar",
   "description": "HumHub calendar module",
   "type": "library",
   "require": {

@@ -46,7 +46,11 @@ class ICalFileEvent extends Event implements ICalEventIF
 
     public function getLastModified()
     {
-        return $this->last_modified;
+        if(isset($this->lastmodified)) {
+            return $this->last_modified;
+        }
+
+        return null;
     }
 
     public function getTimeStamp()
