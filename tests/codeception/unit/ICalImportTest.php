@@ -75,7 +75,7 @@ class ICalImportTest extends ExternalCalendarTest
         $this->assertEquals( DateTime::createFromFormat(CalendarUtils::DB_DATE_FORMAT, '2019-10-30 00:00:00'), $event->getStartDateTime());
         $this->assertEquals( DateTime::createFromFormat(CalendarUtils::DB_DATE_FORMAT, '2019-10-30 00:00:00'), $event->getEndDateTime());
     }
-    
+
     public function testStartEqEndWithTime()
     {
         $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/startEqEndWithTime.ics');
