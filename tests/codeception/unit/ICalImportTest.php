@@ -27,6 +27,15 @@ use humhub\modules\user\models\User;
 
 class ICalImportTest extends ExternalCalendarTest
 {
+    public function testDuration()
+    {
+        $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/testDuration.ics');
+        $event = $externalCalendar->entries[0];
+        $this->assertFalse($event->isAllDay());
+
+        $this->assertEquals( DateTime::createFromFormat(CalendarUtils::DB_DATE_FORMAT, '2019-05-14 00:00:00'), $event->getStartDateTime());
+        $this->assertEquals( DateTime::createFromFormat(CalendarUtils::DB_DATE_FORMAT, '2019-05-14 00:15:00'), $event->getEndDateTime());
+    }
     public function testStartWithoutTimeNoEnd()
     {
         $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/startWithoutTimeNoEnd.ics');
@@ -66,8 +75,7 @@ class ICalImportTest extends ExternalCalendarTest
         $this->assertEquals( DateTime::createFromFormat(CalendarUtils::DB_DATE_FORMAT, '2019-10-30 00:00:00'), $event->getStartDateTime());
         $this->assertEquals( DateTime::createFromFormat(CalendarUtils::DB_DATE_FORMAT, '2019-10-30 00:00:00'), $event->getEndDateTime());
     }
-
-
+    
     public function testStartEqEndWithTime()
     {
         $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/startEqEndWithTime.ics');

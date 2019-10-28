@@ -111,7 +111,7 @@ class ICalFileEvent extends Event implements ICalEventIF
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTime
      * @throws \Exception
      */
     public function getStartDateTime()
@@ -124,7 +124,7 @@ class ICalFileEvent extends Event implements ICalEventIF
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTime
      * @throws \Exception
      */
     public function getEndDatetime()
@@ -137,11 +137,12 @@ class ICalFileEvent extends Event implements ICalEventIF
             return $this->endDateTime = (new DateTime())->setTimestamp($this->dtend_array[2]);
         }
 
-        // TODO: duration support
         $this->endDateTime = clone $this->getStartDateTime();
 
-        // https://tools.ietf.org/html/rfc5545#page-54
-        if($this->isDateOnlyFormat($this->dtstart)) {
+        if(!empty($this->duration_array)) {
+            $this->endDateTime->add($this->duration_array[2]);
+        } else if($this->isDateOnlyFormat($this->dtstart)) {
+            // https://tools.ietf.org/html/rfc5545#page-54
             $this->endDateTime->modify('+1 day');
         }
 
