@@ -1,0 +1,15 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+X-WR-CALNAME:Test
+X-WR-CALDESC:Test Calendar
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:startisendwithtime@test.com
+DTSTAMP:20191030T000000Z
+DTSTART:20191030
+SUMMARY: An event with start = end and with time given
+DESCRIPTION: Test event with start = end and with time given
+END:VEVENT
+END:VCALENDAR

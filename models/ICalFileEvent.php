@@ -5,12 +5,15 @@ namespace humhub\modules\external_calendar\models;
 
 
 use DateTime;
-use humhub\modules\external_calendar\CalendarUtils;
+use humhub\modules\external_calendar\helpers\CalendarUtils;
 use ICal\Event;
 use Yii;
 
 class ICalFileEvent extends Event implements ICalEventIF
 {
+    protected $startDateTime;
+    protected $endDateTime;
+
 
     public function getUid()
     {
@@ -46,7 +49,7 @@ class ICalFileEvent extends Event implements ICalEventIF
 
     public function getLastModified()
     {
-        if(isset($this->lastmodified)) {
+        if(isset($this->last_modified)) {
             return $this->last_modified;
         }
 
@@ -66,14 +69,19 @@ class ICalFileEvent extends Event implements ICalEventIF
     public function getEnd()
     {
         // dtend CAN be included. If not, dtend is same DateTime as dtstart --> https://www.kanzaki.com/docs/ical/dtend.html
-        return empty($this->dtend)
-            ? $this->getStart()
-            : $this->dtend;
+        return $this->dtend;
     }
 
     public function isAllDay()
     {
-        return $this->getStartDateTime()->format('H:i:s') === '00:00:00' && $this->getEndDaTetime()->format('H:i:s') === '00:00:00';
+        // If one of dtstart or dtend has actual time value this can't be an all day event
+        if($this->getStartDateTime()->format('H:i:s') !== '00:00:00' || $this->getEndDaTetime()->format('H:i:s') !== '00:00:00') {
+            return false;
+        }
+
+
+        // If dtstart has a date time value (even if 00:00:00) dtend must not be euqal to dtstart
+        return $this->isDateOnlyFormat($this->dtstart) || ($this->getEndDatetime() > $this->getStartDateTime());
     }
 
     /**
@@ -108,20 +116,50 @@ class ICalFileEvent extends Event implements ICalEventIF
      */
     public function getStartDateTime()
     {
-        return (new DateTime())->setTimestamp($this->dtstart_array[2]);
+        if(!$this->startDateTime) {
+            $this->startDateTime =  (new DateTime())->setTimestamp($this->dtstart_array[2]);
+        }
+
+        return $this->startDateTime;
     }
 
     /**
      * @return \DateTimeInterface
      * @throws \Exception
      */
-    public function getEndDaTetime()
+    public function getEndDatetime()
     {
-        if(!empty($this->dtend_array)) {
-            return (new DateTime())->setTimestamp($this->dtend_array[2]);
+        if($this->endDateTime) {
+            return $this->endDateTime;
         }
 
-        return $this->getStartDateTime();
+        if(!empty($this->dtend_array)) {
+            return $this->endDateTime = (new DateTime())->setTimestamp($this->dtend_array[2]);
+        }
+
+        // TODO: duration support
+        $this->endDateTime = clone $this->getStartDateTime();
+
+        // https://tools.ietf.org/html/rfc5545#page-54
+        if($this->isDateOnlyFormat($this->dtstart)) {
+            $this->endDateTime->modify('+1 day');
+        }
+
+        return $this->endDateTime;
+    }
+
+    private function isDateOnlyFormat($icalDate)
+    {
+        return !$this->isDateTimeFormat($icalDate);
+    }
+
+    private function isDateTimeFormat($icalDate)
+    {
+        if(is_array($icalDate)) {
+            $icalDate = $icalDate[2];
+        }
+
+        return strrpos($icalDate, 'T') > 0;
     }
 
     /**

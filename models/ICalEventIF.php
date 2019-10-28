@@ -67,7 +67,14 @@ interface ICalEventIF
     public function getEnd();
 
     /**
+     *
+     * For cases where a "VEVENT" calendar component specifies a "DTSTART" property with a DATE value type
+     * but no "DTEND" nor "DURATION" property, the event's duration is taken to be one day. For cases where a "VEVENT"
+     * calendar component specifies a "DTSTART" property with a DATE-TIME value type but no "DTEND" property, the event
+     * ends on the same calendar date and time of day specified by the "DTSTART" property.
+     *
      * @return \DateTimeInterface
+     * @see https://tools.ietf.org/html/rfc5545#page-54
      */
     public function getEndDaTetime();
 

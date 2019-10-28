@@ -9,7 +9,7 @@
 namespace humhub\modules\external_calendar\tests\codeception\unit;
 
 use external_calendar\ExternalCalendarTest;
-use humhub\modules\external_calendar\CalendarUtils;
+use humhub\modules\external_calendar\helpers\CalendarUtils;
 use humhub\modules\external_calendar\models\ExternalCalendarEntry;
 use humhub\modules\external_calendar\models\ExternalCalendarEntryQuery;
 use DateTime;

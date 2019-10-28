@@ -3,7 +3,7 @@
 
 namespace humhub\modules\external_calendar\models;
 
-use humhub\modules\external_calendar\CalendarUtils;
+use humhub\modules\external_calendar\helpers\CalendarUtils;
 use humhub\modules\external_calendar\helpers\RRuleHelper;
 use Recurr\Exception;
 use Recurr\Rule;
