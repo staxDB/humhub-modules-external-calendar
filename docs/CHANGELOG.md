@@ -1,5 +1,10 @@
 Changelog
 =========
+v1.1.2
+----------------------
+- Fix: Different cases of dtstart and dtend handled incorrectly
+- Enh: Added vevent duration support
+
 v1.1.1
 ----------------------
 - Fix: Importing ICal events without Modification Date not working

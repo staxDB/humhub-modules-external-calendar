@@ -1,6 +1,6 @@
 <?php
 
-namespace humhub\modules\external_calendar;
+namespace humhub\modules\external_calendar\helpers;
 
 use Yii;
 use DateTime;
@@ -41,27 +41,6 @@ class CalendarUtils
         return false;
     }
 
-    public static function checkAllDay($dtstart, $dtend)
-    {
-        $start = self::formatDateTimeToAppTime($dtstart);
-        $end = self::formatDateTimeToAppTime($dtend);
-
-        if (self::isFullDaySpan($start, $end, true)) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
-
-
-    public static function formatDateTimeToUTC($string)
-    {
-        $timezone = new DateTimeZone('UTC');
-        $datetime = new DateTime($string);
-        return $datetime->setTimezone($timezone);
-    }
-
     public static function cleanRecurrentId($recurrentId, $targetTZ = null)
     {
         $date = ($recurrentId instanceof \DateTimeInterface) ? $recurrentId : new DateTime($recurrentId, new DateTimeZone('UTC'));
@@ -95,19 +74,12 @@ class CalendarUtils
         return static::$userTimezone;
     }
 
-
-    public static function formatDateTimeToString($string)
-    {
-        return self::formatDateTimeToAppTime($string)->format(static::DB_DATE_FORMAT);
-    }
-
     public static function formatDateTimeToAppTime($string)
     {
         $timezone = new DateTimeZone(Yii::$app->timeZone);
         $datetime = new DateTime($string);
         return $datetime->setTimezone($timezone);
     }
-
 
     public static function toDBDateFormat($date)
     {

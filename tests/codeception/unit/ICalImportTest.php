@@ -10,7 +10,7 @@ namespace humhub\modules\external_calendar\tests\codeception\unit;
 
 use DateTime;
 use external_calendar\ExternalCalendarTest;
-use humhub\modules\external_calendar\CalendarUtils;
+use humhub\modules\external_calendar\helpers\CalendarUtils;
 use humhub\modules\external_calendar\models\ExternalCalendarEntryQuery;
 use humhub\modules\space\models\Space;
 use Yii;
@@ -27,11 +27,64 @@ use humhub\modules\user\models\User;
 
 class ICalImportTest extends ExternalCalendarTest
 {
-    public function testProduction()
+    public function testDuration()
     {
-        $this->defaultSyncRangeStart = DateTime::createFromFormat('!Ymd', '20190101');
-        $this->defaultSyncRangeEnd = DateTime::createFromFormat('!Ymd', '20200101');
-        $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/ical-stream.ics');
+        $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/testDuration.ics');
+        $event = $externalCalendar->entries[0];
+        $this->assertFalse($event->isAllDay());
+
+        $this->assertEquals( DateTime::createFromFormat(CalendarUtils::DB_DATE_FORMAT, '2019-05-14 00:00:00'), $event->getStartDateTime());
+        $this->assertEquals( DateTime::createFromFormat(CalendarUtils::DB_DATE_FORMAT, '2019-05-14 00:15:00'), $event->getEndDateTime());
+    }
+    public function testStartWithoutTimeNoEnd()
+    {
+        $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/startWithoutTimeNoEnd.ics');
+        $event = $externalCalendar->entries[0];
+        $this->assertTrue($event->isAllDay());
+
+        $this->assertEquals( DateTime::createFromFormat(CalendarUtils::DB_DATE_FORMAT, '2019-10-30 00:00:00'), $event->getStartDateTime());
+        $this->assertEquals( DateTime::createFromFormat(CalendarUtils::DB_DATE_FORMAT, '2019-10-30 23:59:59'), $event->getEndDateTime());
+    }
+
+    public function testStartWithTimeNoEnd()
+    {
+        $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/startWithTimeNoEnd.ics');
+        $event = $externalCalendar->entries[0];
+        $this->assertFalse($event->isAllDay());
+
+        $this->assertEquals( DateTime::createFromFormat(CalendarUtils::DB_DATE_FORMAT, '2019-10-30 00:00:00'), $event->getStartDateTime());
+        $this->assertEquals( DateTime::createFromFormat(CalendarUtils::DB_DATE_FORMAT, '2019-10-30 00:00:00'), $event->getEndDateTime());
+    }
+
+    public function testStartEqEndNoTime()
+    {
+        $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/startEqEndNoTime.ics');
+        $event = $externalCalendar->entries[0];
+        $this->assertTrue($event->isAllDay());
+
+        $this->assertEquals( DateTime::createFromFormat(CalendarUtils::DB_DATE_FORMAT, '2019-10-30 00:00:00'), $event->getStartDateTime());
+        $this->assertEquals( DateTime::createFromFormat(CalendarUtils::DB_DATE_FORMAT, '2019-10-30 23:59:59'), $event->getEndDateTime());
+    }
+
+    public function testStartEqEndZeroTime()
+    {
+        $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/startEqEndWithZeroTime.ics');
+        $event = $externalCalendar->entries[0];
+        $this->assertFalse($event->isAllDay());
+
+        $this->assertEquals( DateTime::createFromFormat(CalendarUtils::DB_DATE_FORMAT, '2019-10-30 00:00:00'), $event->getStartDateTime());
+        $this->assertEquals( DateTime::createFromFormat(CalendarUtils::DB_DATE_FORMAT, '2019-10-30 00:00:00'), $event->getEndDateTime());
+    }
+
+    public function testStartEqEndWithTime()
+    {
+        $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/startEqEndWithTime.ics');
+        $event = $externalCalendar->entries[0];
+        $this->assertFalse($event->isAllDay());
+        $this->assertFalse($event->isAllDay());
+
+        $this->assertEquals( DateTime::createFromFormat(CalendarUtils::DB_DATE_FORMAT, '2019-10-30 16:00:00'), $event->getStartDateTime());
+        $this->assertEquals( DateTime::createFromFormat(CalendarUtils::DB_DATE_FORMAT, '2019-10-30 16:00:00'), $event->getEndDateTime());
     }
 
     public function testSimpleEventImport()

@@ -11,7 +11,7 @@ use humhub\widgets\Label;
 use humhub\modules\content\components\ContentActiveRecord;
 use humhub\modules\external_calendar\permissions\ManageEntry;
 use humhub\modules\external_calendar\widgets\WallEntry;
-use humhub\modules\external_calendar\CalendarUtils;
+use humhub\modules\external_calendar\helpers\CalendarUtils;
 use DateTimeZone;
 use humhub\libs\Html;
 use humhub\modules\search\interfaces\Searchable;
@@ -195,19 +195,22 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
     {
         $this->setSettings();
 
-        if (!$this->all_day && CalendarUtils::isFullDaySpan(new DateTime($this->start_datetime), new DateTime($this->end_datetime))) {
+
+        // We removed this since the sync logic is responsible for checking full day events
+        /*if (!$this->all_day && CalendarUtils::isFullDaySpan(new DateTime($this->start_datetime), new DateTime($this->end_datetime))) {
             $this->all_day = 1;
-        }
+        }*/
 
         $end = new DateTime($this->end_datetime, new DateTimeZone(Yii::$app->timeZone));
 
-        if($this->end_datetime === $this->start_datetime) {
+        if($this->all_day && ($this->end_datetime === $this->start_datetime)) {
             $end->modify('+1 day');
         }
 
         if ($this->all_day && $end->format('H:i:s') === '00:00:00') {
             $end->modify('-1 second');
         }
+
         $this->end_datetime = $end->format('Y-m-d H:i:s');
     }
 

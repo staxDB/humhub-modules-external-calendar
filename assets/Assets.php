@@ -17,7 +17,7 @@ class Assets extends AssetBundle
     public $jsOptions = ['position' => View::POS_END];
 
     public $publishOptions = [
-        'forceCopy' => true
+        'forceCopy' => false
     ];
 
     public $css = [
