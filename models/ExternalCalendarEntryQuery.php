@@ -113,11 +113,11 @@ class ExternalCalendarEntryQuery extends AbstractCalendarQuery
             ];
         } else {
             if ($this->_from) {
-                $where[] = [$this->getStartCriteria($this->_from)];
+                $where[] = $this->getStartCriteria($this->_from);
             }
 
             if ($this->_to) {
-                $where[] = [$this->getEndCriteria($this->_to)];
+                $where[] = $this->getEndCriteria($this->_to);
             }
         }
 

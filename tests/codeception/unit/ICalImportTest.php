@@ -27,6 +27,13 @@ use humhub\modules\user\models\User;
 
 class ICalImportTest extends ExternalCalendarTest
 {
+    public function testProduction()
+    {
+        $this->defaultSyncRangeStart = DateTime::createFromFormat('!Ymd', '20190101');
+        $this->defaultSyncRangeEnd = DateTime::createFromFormat('!Ymd', '20200101');
+        $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/ical-stream.ics');
+    }
+
     public function testSimpleEventImport()
     {
         $externalCalendar = $this->initCalendar();
