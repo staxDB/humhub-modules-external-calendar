@@ -265,6 +265,7 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
             'rrule' => $this->rrule,
             'exdate' => $this->exdate,
             'viewUrl' => $viewUrl,
+            'viewMode' => 'redirect',
             'openUrl' => $openUrl,
             'badge' =>  Label::asColor($this->calendar->color, $this->getContentName())->icon('fa-calendar-o')->right()
         ];
