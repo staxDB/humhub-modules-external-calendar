@@ -1,33 +1,20 @@
 ## Description
 Calendar extension for integration of external calendars with [iCalendar-format](https://en.wikipedia.org/wiki/ICalendar).
 
-This module has **only been tested** in **Humhub v1.2.3 and v1.2.4** with the **calendar module version 0.6.3**!
+This module supports importing, syncrhonization and exporting of iCalendar calendar feeds.
+
+Depending on the export service you use for your ical import, you may notice different results due to differences in the used iCal format. In case you experience any unexpected results, please let us know in the issue section.
+
+- Note: The export feature will be available without the need of a space level module installation. In order to use the import of external calendar, this module has to be installed on a space level.
+
+**Requirements**
+ - HumHub v1.3.14
+ - Calendar Module v0.7.5
 
 **Be careful!**
-some calendars are not intended for permanent synchronization. These do not send a "last_modified" timestamp. 
+Some calendars are not intended for permanent synchronization. These do not send a "last_modified" timestamp. 
 Please do not select the option `auto sync hourly` for these. It could slow down your system..
 
-
-__Module website:__ <https://github.com/staxDB/humhub-modules-external-calendar>  
+This module was forked from:
 __Author:__ David Born ([staxDB](https://github.com/staxDB))
-### v1.0 Works with
-- Humhub version 1.3.14
-- PHP 5.6
-
-### v0.2.* Works with
-- Humhub version 1.3.*
-- PHP 7.2
-
-### v0.1.* Works with
-- Humhub version 1.2.*
-
-
-## Informations
-This module is in Beta and not tested with other external calendars than google (private) and mep24!
-- Check out the [Changelog](https://github.com/staxDB/humhub-modules-external-calendar/blob/master/docs/CHANGELOG.md)
-- For installation instructions take a look at the [docs-folder](https://github.com/staxDB/humhub-modules-external-calendar/blob/master/docs/INSTALL.md).
-
-## Todo
-- testing
-- translation
-- export every entry of an calendar as ICS
+__Module website:__ <https://github.com/staxDB/humhub-modules-external-calendar>  
