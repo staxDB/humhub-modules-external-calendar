@@ -1,7 +1,6 @@
 <?php
 
 return [
-    'Auto post calendar' => '',
-    'Auto post entries' => '',
-    'Use calendar title for badge-title in widget' => '',
+    'Post new calendar on stream' => '',
+    'Post new entries on stream' => '',
 ];

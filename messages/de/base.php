@@ -1,7 +1,6 @@
 <?php
 
 return [
-    'Download as ICS file' => 'Herunterladen als ICS Datei',
     '<strong>Confirm</strong> deleting' => 'Löschen <strong>bestätigen</strong>',
     'Are you sure you want to delete this item?' => 'Wollen Sie diesen Eintrag wirklich löschen?',
     'Back to overview' => 'Zurück zur Übersicht',
@@ -9,6 +8,7 @@ return [
     'Close' => 'Schließen',
     'Create' => 'Anlegen',
     'Delete' => 'Löschen',
+    'Download as ICS file' => 'Herunterladen als ICS Datei',
     'Edit' => 'Bearbeiten',
     'End time must be after start time!' => 'Das Ende muss nach dem Start liegen!',
     'Event' => 'Termin',
@@ -17,8 +17,16 @@ return [
     'External Calendar Entry' => 'Externer Kalendereintrag',
     'Manage external calendar for your profile.' => 'Verwalte hier externe Kalender für dein Profil.',
     'Manage external calendar here.' => 'Verwalte hier deine externen Kalender.',
-    'Save' => 'Speichern',
     'Update' => 'Bearbeiten',
     'View' => 'Anzeigen',
-    'You are not allowed to show External Calendar!' => 'Sie haben keine Berechtigung, externe Kalender zu sehen!',
+    '<strong>Calendar</strong> export' => '',
+    'Could not sync altered events of recurrent ical event' => '',
+    'Edit export' => '',
+    'Error creating event in ical synchronization' => '',
+    'Error while synchronizing recurring ical event' => '',
+    'External Calendars' => '',
+    'Generate export Url' => '',
+    'My exports' => '',
+    'New export' => '',
+    'There was an error while synchronizing an ical calendar' => '',
 ];
