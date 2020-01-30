@@ -1,7 +1,6 @@
 <?php
-
-return [
-    'Back to modules' => '',
-    'Calendar Extension Configuration' => '',
-    'Save' => '',
-];
+return array (
+  'Back to modules' => '返回模块',
+  'Calendar Extension Configuration' => '',
+  'Save' => '保存',
+);

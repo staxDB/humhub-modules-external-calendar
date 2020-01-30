@@ -1,7 +1,6 @@
 <?php
-
-return [
-    'Back to modules' => '',
-    'Calendar Extension Configuration' => '',
-    'Save' => '',
-];
+return array (
+  'Back to modules' => 'Torna al mòduls',
+  'Calendar Extension Configuration' => '',
+  'Save' => 'Desa',
+);

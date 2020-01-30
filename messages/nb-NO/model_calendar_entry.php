@@ -1,16 +1,15 @@
 <?php
-
-return [
-    '(No Title)' => '',
-    'All Day' => '',
-    'Calendar' => '',
-    'DT Stamp' => '',
-    'Description' => '',
-    'End Datetime' => '',
-    'ID' => '',
-    'Last Modified' => '',
-    'Location' => '',
-    'Start Datetime' => '',
-    'Title' => '',
-    'UID' => '',
-];
+return array (
+  '(No Title)' => '',
+  'All Day' => 'Hele dagen',
+  'Calendar' => 'Kalender',
+  'DT Stamp' => '',
+  'Description' => 'Beskrivelse',
+  'End Datetime' => '',
+  'ID' => 'ID',
+  'Last Modified' => '',
+  'Location' => 'Sted',
+  'Start Datetime' => '',
+  'Title' => 'Tittel',
+  'UID' => '',
+);

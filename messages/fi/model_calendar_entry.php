@@ -1,16 +1,15 @@
 <?php
-
-return [
-    '(No Title)' => '',
-    'All Day' => '',
-    'Calendar' => '',
-    'DT Stamp' => '',
-    'Description' => '',
-    'End Datetime' => '',
-    'ID' => '',
-    'Last Modified' => '',
-    'Location' => '',
-    'Start Datetime' => '',
-    'Title' => '',
-    'UID' => '',
-];
+return array (
+  '(No Title)' => '',
+  'All Day' => 'Koko päivä',
+  'Calendar' => 'Kalenteri',
+  'DT Stamp' => '',
+  'Description' => 'Kuvaus',
+  'End Datetime' => '',
+  'ID' => 'ID',
+  'Last Modified' => '',
+  'Location' => 'Sijainti',
+  'Start Datetime' => '',
+  'Title' => 'Otsikko',
+  'UID' => '',
+);
