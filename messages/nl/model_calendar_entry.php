@@ -1,15 +1,15 @@
 <?php
 return array (
-  '(No Title)' => '',
+  '(No Title)' => '(Geen titel)',
   'All Day' => 'De hele dag',
   'Calendar' => 'Agenda',
-  'DT Stamp' => '',
+  'DT Stamp' => 'Datumtijd-stempel',
   'Description' => 'Beschrijving',
-  'End Datetime' => '',
+  'End Datetime' => 'Einddatumtijd',
   'ID' => 'ID',
-  'Last Modified' => '',
+  'Last Modified' => 'Laatst gewijzigd',
   'Location' => 'Plaats',
-  'Start Datetime' => '',
+  'Start Datetime' => 'Startdatumtijd',
   'Title' => 'Titel',
-  'UID' => '',
+  'UID' => 'UID',
 );

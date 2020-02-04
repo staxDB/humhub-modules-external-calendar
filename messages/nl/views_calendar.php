@@ -1,10 +1,10 @@
 <?php
 return array (
-  'Add Calendar' => '',
-  'Add external Calendar' => '',
-  'External Calendars' => '',
+  'Add Calendar' => 'Agenda toevoegen',
+  'Add external Calendar' => 'Externe agenda toevoegen',
+  'External Calendars' => 'Externe agenda\\\'s',
   'Private' => 'Privé',
   'Public' => 'Openbaar',
-  'Sync Calendar' => '',
+  'Sync Calendar' => 'Agenda synchroniseren',
   'Title and Color' => 'Samenvatting en kleur',
 );
