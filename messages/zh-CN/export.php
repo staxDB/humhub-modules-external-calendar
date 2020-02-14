@@ -1,0 +1,21 @@
+<?php
+return array (
+  'Additional filters:' => '',
+  'All my spaces' => '',
+  'Calendar export name' => '',
+  'Copy to clipboard' => '复制到剪贴板',
+  'Delete' => '删除',
+  'Download' => '',
+  'Edit' => '编辑',
+  'Include events from:' => '',
+  'Invalid space selection' => '',
+  'Name' => '名字',
+  'No spaces' => '',
+  'Only following spaces:' => '',
+  'Only include events I\'am participating' => '',
+  'Only include events I\'ve created' => '',
+  'Only include public events' => '',
+  'Please select at least one space.' => '',
+  'Profile' => '属性',
+  'Url' => '网址',
+);

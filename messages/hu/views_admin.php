@@ -1,8 +1,6 @@
 <?php
-
-return [
-    'Back to modules' => '',
-    'Calendar Extension Configuration' => '',
-    'If this option is not checked, "Event" will be set as badge-title.' => '',
-    'Save' => '',
-];
+return array (
+  'Back to modules' => 'Vissza a modulokhoz',
+  'Calendar Extension Configuration' => '',
+  'Save' => 'Mentés',
+);

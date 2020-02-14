@@ -1,0 +1,21 @@
+<?php
+return array (
+  'Additional filters:' => 'Zusätzliche Filter:',
+  'All my spaces' => 'Alle meine Spaces',
+  'Calendar export name' => 'Name',
+  'Copy to clipboard' => 'In die Zwischenablage kopieren',
+  'Delete' => 'Löschen',
+  'Download' => 'Download',
+  'Edit' => 'Bearbeiten',
+  'Include events from:' => 'Termin einbeziehen von:',
+  'Invalid space selection' => 'Spaceauswahl ungültig',
+  'Name' => 'Name',
+  'No spaces' => 'Keine Spaces',
+  'Only following spaces:' => 'Nur gefolgten Spaces:',
+  'Only include events I\'am participating' => 'Nur Termine an denen ich teilnehme berücksichtigen',
+  'Only include events I\'ve created' => 'Nur Termine die ich erstellt haben berücksichtigen',
+  'Only include public events' => 'Nur öffentliche Termine berücksichtigen',
+  'Please select at least one space.' => 'Bitte wähle mindestens einen Space aus.',
+  'Profile' => 'Profil',
+  'Url' => 'URL',
+);

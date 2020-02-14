@@ -1,0 +1,23 @@
+<?php
+return array (
+  'Automatic synchronization' => '',
+  'Color' => '',
+  'Daily' => '每日',
+  'Event Mode' => '',
+  'Hourly' => '每小時',
+  'ID' => '',
+  'No auto synchronization' => '',
+  'Only sync events from current month' => '',
+  'Only synchronize events from current month' => '',
+  'Original Calendar Name' => '',
+  'Original Calendar Scale' => '',
+  'Public' => '',
+  'Synchronization Mode' => '',
+  'Synchronization interval' => '',
+  'Synchronize all events' => '',
+  'Timezone' => '',
+  'Title' => '標題',
+  'Url' => '',
+  'e.g. https://calendar.google.com/calendar/ical/...' => '',
+  'iCal Version' => '',
+);

@@ -1,0 +1,23 @@
+<?php
+return array (
+  'Automatic synchronization' => '',
+  'Color' => 'Farge',
+  'Daily' => 'Daglig',
+  'Event Mode' => '',
+  'Hourly' => 'Hver time',
+  'ID' => 'ID',
+  'No auto synchronization' => '',
+  'Only sync events from current month' => '',
+  'Only synchronize events from current month' => '',
+  'Original Calendar Name' => '',
+  'Original Calendar Scale' => '',
+  'Public' => 'Offentlig',
+  'Synchronization Mode' => '',
+  'Synchronization interval' => '',
+  'Synchronize all events' => '',
+  'Timezone' => '',
+  'Title' => 'Tittel',
+  'Url' => 'URL',
+  'e.g. https://calendar.google.com/calendar/ical/...' => '',
+  'iCal Version' => '',
+);

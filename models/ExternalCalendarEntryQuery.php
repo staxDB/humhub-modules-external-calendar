@@ -2,14 +2,8 @@
 namespace humhub\modules\external_calendar\models;
 
 use humhub\modules\calendar\interfaces\AbstractCalendarQuery;
-use humhub\modules\calendar\interfaces\CalendarItemWrapper;
-use humhub\modules\calendar\interfaces\VCalendar;
 use humhub\modules\external_calendar\helpers\CalendarUtils;
-use humhub\modules\user\models\User;
-use Sabre\VObject\Component\VEvent;
-use Sabre\VObject\Recur\EventIterator;
 use Yii;
-use function Complex\add;
 
 
 /**
@@ -113,11 +107,11 @@ class ExternalCalendarEntryQuery extends AbstractCalendarQuery
             ];
         } else {
             if ($this->_from) {
-                $where[] = [$this->getStartCriteria($this->_from)];
+                $where[] = $this->getStartCriteria($this->_from);
             }
 
             if ($this->_to) {
-                $where[] = [$this->getEndCriteria($this->_to)];
+                $where[] = $this->getEndCriteria($this->_to);
             }
         }
 

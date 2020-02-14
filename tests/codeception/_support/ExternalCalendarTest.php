@@ -20,6 +20,7 @@ class ExternalCalendarTest extends HumHubDbTestCase
     {
         $this->defaultSyncRangeStart = DateTime::createFromFormat('!Ymd', '20180101');
         $this->defaultSyncRangeEnd = DateTime::createFromFormat('!Ymd', '20200101');
+        \humhub\modules\calendar\Module::registerAutoloader();
         Events::registerAutoloader();
     }
 

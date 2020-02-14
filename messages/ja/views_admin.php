@@ -1,8 +1,6 @@
 <?php
-
-return [
-    'Back to modules' => '',
-    'Calendar Extension Configuration' => '',
-    'If this option is not checked, "Event" will be set as badge-title.' => '',
-    'Save' => '',
-];
+return array (
+  'Back to modules' => 'モジュールへ戻る',
+  'Calendar Extension Configuration' => '',
+  'Save' => '保存',
+);

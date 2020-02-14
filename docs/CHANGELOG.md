@@ -1,19 +1,26 @@
 Changelog
 =========
-v1.1.3
+v1.1.5
 ----------------------
 - Fix #1: HTML content description is encoded
 - Fix #2: Unique index may throw `max key length` error
+
+v1.1.4
+---------------------------
+- Enh: Updated translations
+
 
 v1.1.2
 ----------------------
 - Fix: Different cases of dtstart and dtend handled incorrectly
 - Enh: Added vevent duration support
 
+
 v1.1.1
 ----------------------
 - Fix: Importing ICal events without Modification Date not working
 - Fix: Importing ICal events with start = end date not working
+
 
 v1.1
 ----------------------
