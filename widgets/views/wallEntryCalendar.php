@@ -8,6 +8,14 @@ use yii\helpers\Html;
 /* @var $collapse boolean */
 
 $color = $calendar->color ? $calendar->color : $this->theme->variable('info');
+
+$description = $calendar->description;
+
+if($description) {
+    $config = \HTMLPurifier_Config::createDefault();
+    $description = \yii\helpers\HtmlPurifier::process($calendar->description, $config);
+}
+
 ?>
 <div class="media event">
     <div class="y" style="padding-left:10px; border-left: 3px solid <?= $color ?>">
@@ -25,11 +33,11 @@ $color = $calendar->color ? $calendar->color : $this->theme->variable('info');
                 <?= Yii::t('ExternalCalendarModule.widgets', 'A new Calendar has been added.'); ?>
             </h5>
         </div>
-        <?php if (!empty($calendar->description)) : ?>
+        <?php if (!empty($description)) : ?>
             <div <?= ($collapse) ? 'data-ui-show-more' : '' ?>
                     data-read-more-text="<?= Yii::t('ExternalCalendarModule.widgets', "Read full description...") ?>"
                     style="overflow:hidden">
-                <?= MarkdownView::widget(['markdown' => $calendar->description]); ?>
+                <?= $description ?>
             </div>
         <?php endif; ?>
     </div>

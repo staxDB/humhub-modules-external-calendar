@@ -23,7 +23,7 @@ class CalendarUtils
      *
      * @param DateTime $date1
      * @param DateTime $date2
-     * @param bool|type $endDateMomentAfter
+     * @param bool $endDateMomentAfter
      * @return bool
      */
     public static function isFullDaySpan(DateTime $date1, DateTime $date2, $endDateMomentAfter = false)

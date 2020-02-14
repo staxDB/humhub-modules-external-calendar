@@ -41,7 +41,7 @@ class Events extends BaseObject
     }
 
     /**
-     * @param $event \humhub\modules\calendar\interfaces\CalendarItemTypesEvent
+     * @param $event \humhub\modules\calendar\interfaces\event\CalendarItemTypesEvent
      * @return mixed
      */
     public static function onGetCalendarItemTypes($event)

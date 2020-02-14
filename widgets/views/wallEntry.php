@@ -8,6 +8,14 @@ use yii\helpers\Html;
 /* @var $collapse boolean */
 
 $color = $calendarEntry->calendar->color ? $calendarEntry->calendar->color : $this->theme->variable('info');
+
+$description = $calendarEntry->description;
+
+if($description) {
+    $config = \HTMLPurifier_Config::createDefault();
+    $description = \yii\helpers\HtmlPurifier::process($calendarEntry->description, $config);
+}
+
 ?>
 <div class="media event">
     <div class="y" style="padding-left:10px; border-left: 3px solid <?= $color ?>">
@@ -24,14 +32,16 @@ $color = $calendarEntry->calendar->color ? $calendarEntry->calendar->color : $th
                 <?= $calendarEntry->getFormattedTime() ?>
             </h5>
         </div>
-        <?php if (!empty($calendarEntry->description) || !empty($calendarEntry->location) || !empty($calendarEntry->calendar->title)) : ?>
+        <?php if (!empty($description) || !empty($calendarEntry->location)) : ?>
             <div <?= ($collapse) ? 'data-ui-show-more' : '' ?>
                     data-read-more-text="<?= Yii::t('ExternalCalendarModule.widgets', "Read full description...") ?>"
                     style="overflow:hidden">
-                <?= MarkdownView::widget(['markdown' => $calendarEntry->description]); ?>
+
+                <?= $description ?>
+
                 <?php if (!empty($calendarEntry->location)) : ?>
                     <i class="fa fa-map-marker colorDefault pull-left" style="font-size: 20px; margin-right: 8px"></i>
-                    <?= MarkdownView::widget(['markdown' => $calendarEntry->location]); ?>
+                    <?= Html::encode( $calendarEntry->location) ?>
                 <?php endif; ?>
             </div>
         <?php endif; ?>

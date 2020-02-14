@@ -16,7 +16,7 @@ use yii\base\BaseObject;
 class CalendarExtension extends BaseObject
 {
     /**
-     * @param $event \humhub\modules\calendar\interfaces\CalendarItemTypesEvent
+     * @param $event \humhub\modules\calendar\interfaces\event\CalendarItemTypesEvent
      * @return mixed
      * @throws \Throwable
      * @throws \yii\base\Exception
@@ -31,7 +31,7 @@ class CalendarExtension extends BaseObject
     }
 
     /**
-     * @param $event \humhub\modules\calendar\interfaces\CalendarItemsEvent
+     * @param $event \humhub\modules\calendar\interfaces\event\CalendarItemsEvent
      * @throws \Throwable
      */
     public static function addItems($event)
@@ -63,7 +63,7 @@ class CalendarExtension extends BaseObject
     }
 
     /**
-     * @param \humhub\modules\calendar\interfaces\CalendarItemsEvent|\humhub\modules\calendar\interfaces\CalendarItemTypesEvent $event
+     * @param \humhub\modules\calendar\interfaces\event\CalendarItemsEvent|\humhub\modules\calendar\interfaces\event\CalendarItemTypesEvent $event
      * @return ExternalCalendar[]
      * @throws \Throwable
      * @throws \yii\base\Exception

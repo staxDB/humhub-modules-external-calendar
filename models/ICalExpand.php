@@ -119,7 +119,7 @@ class ICalExpand extends Model
     }
 
     /**
-     * @param ExternalCalendarEntry[} $existingModels
+     * @param ExternalCalendarEntry[] $existingModels
      * @param VEvent[] $recurrences
      * @param $endResult
      */

@@ -1,5 +1,10 @@
 Changelog
 =========
+v1.1.3
+----------------------
+- Fix #1: HTML content description is encoded
+- Fix #2: Unique index may throw `max key length` error
+
 v1.1.2
 ----------------------
 - Fix: Different cases of dtstart and dtend handled incorrectly
