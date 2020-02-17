@@ -6,7 +6,12 @@ class m171126_184912_recurrence_id extends Migration
 {
     public function up()
     {
-        $this->addColumn('external_calendar_entry', 'recurrence_id', $this->string());
+        $tableSchema = $this->db->getTableSchema('external_calendar_entry', true);
+
+        // If the table does not exists, we want the default exception behavior
+        if(!in_array('recurrence_id', $tableSchema->columnNames, true)) {
+            $this->addColumn('external_calendar_entry', 'recurrence_id', $this->string());
+        }
     }
 
     public function down()

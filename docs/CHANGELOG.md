@@ -1,5 +1,10 @@
 Changelog
 =========
+
+v1.1.6
+----------------------
+- Fix: Patch for duplicate module directory after update due to marketplace validation bug
+
 v1.1.5
 ----------------------
 - Fix #1: HTML content description is encoded
