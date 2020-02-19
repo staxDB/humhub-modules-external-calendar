@@ -18,6 +18,9 @@ class CalendarUtils
 
     const DB_DATE_FORMAT = 'Y-m-d H:i:s';
     const ICAL_TIME_FORMAT        = 'Ymd\THis';
+    const ICAL_DATE_FORMAT        = 'Ymd';
+
+    const REGEX_DBFORMAT_DATETIME = '/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/';
 
     /**
      *
@@ -39,6 +42,11 @@ class CalendarUtils
         }
 
         return false;
+    }
+
+    public static function isInDbFormat($value)
+    {
+        return preg_match(self::REGEX_DBFORMAT_DATETIME, $value);
     }
 
     public static function cleanRecurrentId($recurrentId, $targetTZ = null)
@@ -72,6 +80,11 @@ class CalendarUtils
         }
 
         return static::$userTimezone;
+    }
+
+    public static function getSystemTimeZone($asString = false)
+    {
+        return $asString ? Yii::$app->timeZone : new DateTimeZone(Yii::$app->timeZone);
     }
 
     public static function formatDateTimeToAppTime($string)

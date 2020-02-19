@@ -9,6 +9,13 @@ use humhub\modules\external_calendar\helpers\CalendarUtils;
 use ICal\Event;
 use Yii;
 
+/**
+ * Class ICalFileEvent
+ * @package humhub\modules\external_calendar\models
+ *
+ * @property-read array $dtstart_array
+ * @property-read array $dtend_array
+ */
 class ICalFileEvent extends Event implements ICalEventIF
 {
     protected $startDateTime;
@@ -117,10 +124,25 @@ class ICalFileEvent extends Event implements ICalEventIF
     public function getStartDateTime()
     {
         if(!$this->startDateTime) {
-            $this->startDateTime =  (new DateTime())->setTimestamp($this->dtstart_array[2]);
+            $this->startDateTime = $this->getDateTimeFromDTArray($this->dtstart_array);
         }
 
         return $this->startDateTime;
+    }
+
+    private function getDateTimeFromDTArray($dtArr)
+    {
+        $result = nulL;
+        // We need this since the ICal parser does not ignore timezone values for DATE only values
+        if(isset($dtArr[0]['VALUE']) && $dtArr[0]['VALUE'] === 'DATE' || strlen($dtArr[1]) === 8)  {
+            $result = DateTime::createFromFormat(CalendarUtils::ICAL_DATE_FORMAT, $dtArr[1])->setTime(0,0,0);
+        }
+
+        if(!$result) {
+            $result =  (new DateTime())->setTimestamp($this->dtstart_array[2]);
+        }
+
+        return $result;
     }
 
     /**
@@ -134,7 +156,7 @@ class ICalFileEvent extends Event implements ICalEventIF
         }
 
         if(!empty($this->dtend_array)) {
-            return $this->endDateTime = (new DateTime())->setTimestamp($this->dtend_array[2]);
+            return $this->endDateTime = $this->getDateTimeFromDTArray($this->dtend_array);
         }
 
         $this->endDateTime = clone $this->getStartDateTime();

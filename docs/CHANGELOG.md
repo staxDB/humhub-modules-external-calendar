@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v1.1.7
+----------------------
+- Fix: All day events with given timezone are parsed with time
+- Fix: Removed DBDatevalidator 
+
 v1.1.6
 ----------------------
 - Fix: Patch for duplicate module directory after update due to marketplace validation bug
