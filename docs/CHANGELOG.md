@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v1.1.8
+----------------------
+- Fix #4: Unable to delete calendar exports
+
+
 v1.1.7
 ----------------------
 - Fix: All day events with given timezone are parsed with time
