@@ -15,7 +15,7 @@ return array (
   'End time must be after start time!' => 'Eindtijd moet na de starttijd liggen!',
   'Error creating event in ical synchronization' => 'Fout bij ical-synchronisatie van een nieuwe gebeurtenis',
   'Error while synchronizing recurring ical event' => 'Fout bij ical-synchronisatie van een herhalende gebeurtenis',
-  'Event' => 'Gebeurtenis',
+  'External Event' => 'Gebeurtenis',
   'Extends the Calendar-Module to show external calendars with iCal' => 'Breidt de agendamodule uit om externe agenda\\\'s te tonen met iCal',
   'External Calendar' => 'Externe agenda',
   'External Calendar Entry' => 'Externe agenda-invoer',

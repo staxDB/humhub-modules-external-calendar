@@ -15,7 +15,7 @@ return array (
   'End time must be after start time!' => 'L\'hora final ha de ser després de l\'hora d\'inici!',
   'Error creating event in ical synchronization' => '',
   'Error while synchronizing recurring ical event' => '',
-  'Event' => 'Esdeveniment',
+  'External Event' => 'Esdeveniment',
   'Extends the Calendar-Module to show external calendars with iCal' => '',
   'External Calendar' => '',
   'External Calendar Entry' => '',

@@ -15,7 +15,7 @@ return array (
   'End time must be after start time!' => 'Timpul scadent trebuie să fie după timpul de început!',
   'Error creating event in ical synchronization' => '',
   'Error while synchronizing recurring ical event' => '',
-  'Event' => 'Eveniment',
+  'External Event' => 'Eveniment',
   'Extends the Calendar-Module to show external calendars with iCal' => '',
   'External Calendar' => '',
   'External Calendar Entry' => '',

@@ -15,7 +15,7 @@ return array (
   'End time must be after start time!' => 'Η ώρα λήξης πρέπει να είναι μετά το χρόνο έναρξης!',
   'Error creating event in ical synchronization' => '',
   'Error while synchronizing recurring ical event' => '',
-  'Event' => 'Εκδήλωση',
+  'External Event' => 'Εκδήλωση',
   'Extends the Calendar-Module to show external calendars with iCal' => '',
   'External Calendar' => '',
   'External Calendar Entry' => '',

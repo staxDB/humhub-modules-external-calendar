@@ -11,7 +11,7 @@ return [
     'Download as ICS file' => '',
     'Edit' => '',
     'End time must be after start time!' => '',
-    'Event' => '',
+    'External Event' => '',
     'Extends the Calendar-Module to show external calendars with iCal' => '',
     'External Calendar' => '',
     'External Calendar Entry' => '',

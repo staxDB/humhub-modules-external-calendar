@@ -99,7 +99,7 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
      */
     public function getContentName()
     {
-        return Yii::t('ExternalCalendarModule.base', "Event");
+        return Yii::t('ExternalCalendarModule.base', "External Event");
     }
 
     /**

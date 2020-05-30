@@ -15,7 +15,7 @@ return array (
   'End time must be after start time!' => 'Päättymisaika on oltava alkamisajan jälkeen!',
   'Error creating event in ical synchronization' => '',
   'Error while synchronizing recurring ical event' => '',
-  'Event' => 'Tapahtuma',
+  'External Event' => 'Tapahtuma',
   'Extends the Calendar-Module to show external calendars with iCal' => '',
   'External Calendar' => '',
   'External Calendar Entry' => '',
