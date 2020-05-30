@@ -37,11 +37,13 @@ if($description) {
                     data-read-more-text="<?= Yii::t('ExternalCalendarModule.widgets', "Read full description...") ?>"
                     style="overflow:hidden">
 
-                <?= $description ?>
+                <p><?= $description ?></p>
 
                 <?php if (!empty($calendarEntry->location)) : ?>
-                    <i class="fa fa-map-marker colorDefault pull-left" style="font-size: 20px; margin-right: 8px"></i>
-                    <?= Html::encode( $calendarEntry->location) ?>
+                    <p>
+                        <i class="fa fa-map-marker colorDefault pull-left" style="font-size: 20px; margin-right: 8px"></i>
+                        <?= Html::encode( $calendarEntry->location) ?>
+                    </p>
                 <?php endif; ?>
             </div>
         <?php endif; ?>
