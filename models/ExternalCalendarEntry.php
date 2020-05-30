@@ -545,6 +545,10 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
 
     public function wasModifiedSince(ICalEventIF $icalEvent)
     {
-        return !$icalEvent->getLastModified() || !$this->last_modified || CalendarUtils::formatDateTimeToAppTime($icalEvent->getLastModified()) > $this->getLastModifiedDateTime();
+        if(!$icalEvent->getLastModified()) {
+            return false;
+        }
+
+        return !$this->last_modified || CalendarUtils::formatDateTimeToAppTime($icalEvent->getLastModified()) > $this->getLastModifiedDateTime();
     }
 }

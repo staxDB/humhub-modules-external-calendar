@@ -45,7 +45,7 @@ class ExternalCalendarEntryTest extends ExternalCalendarTest
     {
         $dummyEvent = new ICalEventDummy();
         $model = new ExternalCalendarEntry();
-        $this->assertTrue($model->wasModifiedSince($dummyEvent));
+        $this->assertFalse($model->wasModifiedSince($dummyEvent));
     }
 
     public function testLastModifiedNull2()
@@ -59,7 +59,7 @@ class ExternalCalendarEntryTest extends ExternalCalendarTest
     {
         $dummyEvent = new ICalEventDummy();
         $model = new ExternalCalendarEntry(['last_modified' => '2019-08-15 19:44:00']);
-        $this->assertTrue($model->wasModifiedSince($dummyEvent));
+        $this->assertFalse($model->wasModifiedSince($dummyEvent));
     }
 
     private function toICalDate(DateTime $date)

@@ -1,6 +1,10 @@
 Changelog
 =========
 
+v1.1.7
+----------------------
+- Fix #7: Sync events only if LAST-MODIFIED is set
+
 v1.1.6
 ----------------------
 - Fix: Patch for duplicate module directory after update due to marketplace validation bug
