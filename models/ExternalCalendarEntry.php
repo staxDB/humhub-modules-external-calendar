@@ -125,16 +125,20 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
     {
         return [
             [['title', 'start_datetime', 'end_datetime'], 'required'],
-            [['last_modified'], DbDateValidator::class],
-            [['dtstamp'], DbDateValidator::class],
-            [['start_datetime'], DbDateValidator::class],
-            [['end_datetime'], DbDateValidator::class],
+            [['start_datetime', 'end_datetime', 'dtstamp', 'last_modified'], 'validateDate'],
             [['all_day'], 'integer'],
             [['title'], 'string', 'max' => 200],
             [['location'], 'string'],
             [['end_datetime'], 'validateEndTime'],
             [['description'], 'safe'],
         ];
+    }
+
+    public function validateDate($attribute)
+    {
+        if(!empty($this->$attribute) && !CalendarUtils::isInDbFormat($this->$attribute)) {
+            $this->addError($attribute, "Invalid Date format used for $attribute: ".$this->$attribute);
+        }
     }
 
     /**
@@ -284,23 +288,19 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
         return $this->time_zone;
     }
 
-    public function getStartDateTime($timeZone = null)
+    public function getStartDateTime()
     {
-        $timeZone = ($timeZone) ?: Yii::$app->timeZone;
-        if(is_string($timeZone)) {
-            $timeZone = new DateTimeZone($timeZone);
-        }
-        return new DateTime($this->start_datetime, $timeZone);
+        return new DateTime($this->start_datetime,  CalendarUtils::getSystemTimeZone());
     }
 
     public function getEndDateTime()
     {
-        return new DateTime($this->end_datetime, new DateTimeZone(Yii::$app->timeZone));
+        return new DateTime($this->end_datetime, CalendarUtils::getSystemTimeZone());
     }
 
     public function getLastModifiedDateTime()
     {
-        return new DateTime($this->last_modified, new DateTimeZone(Yii::$app->timeZone));
+        return new DateTime($this->last_modified,CalendarUtils::getSystemTimeZone());
     }
 
     public function getFormattedTime($format = 'long')

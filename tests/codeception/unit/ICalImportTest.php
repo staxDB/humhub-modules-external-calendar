@@ -158,8 +158,22 @@ class ICalImportTest extends ExternalCalendarTest
         $this->assertEquals(1, ExternalCalendarEntry::find()->count());
         $this->assertCount(1, $externalCalendar->entries);
         $this->assertEquals('xxxxxxxxxxxxxx@google.com', $externalCalendar->entries[0]->uid);
+        $this->assertEquals('2019-05-14 00:00:00', $externalCalendar->entries[0]->start_datetime);
+        $this->assertEquals('2019-05-14 23:59:59', $externalCalendar->entries[0]->end_datetime);
+        $this->assertEquals(1, $externalCalendar->entries[0]->all_day);
     }
 
+    public function testImportAndDeleteEvent2()
+    {
+        $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/test2.ics');
+        $externalCalendar->sync( DateTime::createFromFormat('!Ymd', '20190101'), DateTime::createFromFormat('!Ymd', '2021101'));
+
+        $this->assertEquals(1, ExternalCalendarEntry::find()->count());
+        $this->assertEquals('xxxxasdf', $externalCalendar->entries[0]->uid);
+        $this->assertEquals('2020-10-31 00:00:00', $externalCalendar->entries[0]->start_datetime);
+        $this->assertEquals('2020-10-31 23:59:59', $externalCalendar->entries[0]->end_datetime);
+        $this->assertEquals(1, $externalCalendar->entries[0]->all_day);
+    }
 
     public function testImportPublicVisibility()
     {

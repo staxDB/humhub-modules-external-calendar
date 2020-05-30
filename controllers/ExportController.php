@@ -72,6 +72,21 @@ class ExportController extends Controller
         return $this->renderAjax('config', ['model' => $model, 'showOverview' => false]);
     }
 
+    public function actionDelete($id)
+    {
+        $this->forcePostRequest();
+
+        $model = CalendarExport::findOne(['id' => $id, 'user_id' => Yii::$app->user->id]);
+
+        if (!$model) {
+            throw new HttpException(404);
+        }
+
+        $model->delete();
+
+        return $this->renderAjax('config', ['model' => new CalendarExport(['user_id' => Yii::$app->user->id]), 'showOverview' => true]);
+    }
+
     public function actionSearchSpace($keyword)
     {
         $result = [];

@@ -1,9 +1,19 @@
 Changelog
 =========
 
-v1.1.7
+v1.1.9
 ----------------------
 - Fix #7: Sync events only if LAST-MODIFIED is set
+
+v1.1.8
+----------------------
+- Fix #4: Unable to delete calendar exports
+
+
+v1.1.7
+----------------------
+- Fix: All day events with given timezone are parsed with time
+- Fix: Removed DBDatevalidator 
 
 v1.1.6
 ----------------------
