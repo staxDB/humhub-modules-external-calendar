@@ -139,7 +139,7 @@ class ICalFileEvent extends Event implements ICalEventIF
         }
 
         if(!$result) {
-            $result =  (new DateTime())->setTimestamp($this->dtstart_array[2]);
+            $result = (new DateTime())->setTimestamp($dtArr[2]);
         }
 
         return $result;
