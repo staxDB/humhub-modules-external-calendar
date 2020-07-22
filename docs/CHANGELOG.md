@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v1.1.10
+----------------------
+- Fix: External calendar validation errors does not redirect to form
+- Enh: Raised max title length to 100
+
 v1.1.9
 ----------------------
 - Fix #7: Sync events only if LAST-MODIFIED is set

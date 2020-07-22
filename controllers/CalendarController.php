@@ -106,13 +106,10 @@ class CalendarController extends ContentContainerController
         try {
             if ($model->load(Yii::$app->request->post())) {
                 (new ICalSync(['calendarModel' => $model, 'skipEvents' => true]))->syncICal();
-                $this->view->success(Yii::t('ExternalCalendarModule.results', 'Calendar successfully created!'));
-                return $this->redirect($this->contentContainer->createUrl('view', ['id' => $model->id]));
-            } else {
-                return $this->render('edit', [
-                    'model' => $model,
-                    'contentContainer' => $this->contentContainer
-                ]);
+                if(!$model->hasErrors()) {
+                    $this->view->success(Yii::t('ExternalCalendarModule.results', 'Calendar successfully created!'));
+                    return $this->redirect($this->contentContainer->createUrl('view', ['id' => $model->id]));
+                }
             }
         } catch (\Exception $e) {
             Yii::warning($e);
@@ -122,6 +119,11 @@ class CalendarController extends ContentContainerController
                 'contentContainer' => $this->contentContainer
             ]);
         }
+
+        return $this->render('edit', [
+            'model' => $model,
+            'contentContainer' => $this->contentContainer
+        ]);
     }
 
     /**

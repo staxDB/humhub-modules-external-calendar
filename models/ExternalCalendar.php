@@ -142,7 +142,7 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
     public function rules()
     {
         $result = [
-            [['title'], 'string', 'max' => 15],
+            [['title'], 'string', 'max' => 100],
             [['url'], 'string', 'max' => 255],
             [['title', 'url'], 'required'],
             [['time_zone'], 'string', 'max' => 60],
