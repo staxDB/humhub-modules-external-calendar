@@ -15,7 +15,7 @@ return array (
   'End time must be after start time!' => 'Ngày kết thúc phải sau ngày bắt đầu!',
   'Error creating event in ical synchronization' => '',
   'Error while synchronizing recurring ical event' => '',
-  'Event' => 'Sự kiện',
+  'External Event' => 'Sự kiện',
   'Extends the Calendar-Module to show external calendars with iCal' => '',
   'External Calendar' => '',
   'External Calendar Entry' => '',

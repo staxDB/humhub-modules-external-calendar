@@ -15,7 +15,7 @@ return array (
   'End time must be after start time!' => 'A befejezés időpontjának a kezdés időpontja utáni időpontnak kell lennie!',
   'Error creating event in ical synchronization' => '',
   'Error while synchronizing recurring ical event' => '',
-  'Event' => 'Esemény',
+  'External Event' => 'Esemény',
   'Extends the Calendar-Module to show external calendars with iCal' => '',
   'External Calendar' => '',
   'External Calendar Entry' => '',

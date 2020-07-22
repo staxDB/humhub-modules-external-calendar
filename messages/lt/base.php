@@ -15,7 +15,7 @@ return array (
   'End time must be after start time!' => 'Pabaigos laikas turi būti po pradžios laiko!',
   'Error creating event in ical synchronization' => '',
   'Error while synchronizing recurring ical event' => '',
-  'Event' => 'Įvykis',
+  'External Event' => 'Įvykis',
   'Extends the Calendar-Module to show external calendars with iCal' => '',
   'External Calendar' => '',
   'External Calendar Entry' => '',

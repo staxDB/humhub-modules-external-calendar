@@ -15,7 +15,7 @@ return array (
   'End time must be after start time!' => 'Datum konce události musí následovat po začátku!',
   'Error creating event in ical synchronization' => '',
   'Error while synchronizing recurring ical event' => '',
-  'Event' => 'Událost',
+  'External Event' => 'Událost',
   'Extends the Calendar-Module to show external calendars with iCal' => '',
   'External Calendar' => '',
   'External Calendar Entry' => '',

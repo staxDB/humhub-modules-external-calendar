@@ -15,7 +15,7 @@ return array (
   'End time must be after start time!' => 'Bitiş saati başlangıç ​​zamanından sonra olmalıdır!',
   'Error creating event in ical synchronization' => '',
   'Error while synchronizing recurring ical event' => '',
-  'Event' => 'Etkinlik',
+  'External Event' => 'Etkinlik',
   'Extends the Calendar-Module to show external calendars with iCal' => '',
   'External Calendar' => '',
   'External Calendar Entry' => '',

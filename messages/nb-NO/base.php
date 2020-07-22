@@ -15,7 +15,7 @@ return array (
   'End time must be after start time!' => 'Aktiviteten kan ikke slutte før den har startet!',
   'Error creating event in ical synchronization' => '',
   'Error while synchronizing recurring ical event' => '',
-  'Event' => 'Aktiviteten',
+  'External Event' => 'Aktiviteten',
   'Extends the Calendar-Module to show external calendars with iCal' => '',
   'External Calendar' => '',
   'External Calendar Entry' => '',
