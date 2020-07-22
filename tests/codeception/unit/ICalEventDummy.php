@@ -136,7 +136,7 @@ class ICalEventDummy extends Model implements ICalEventIF
     /**
      * @return \DateTimeInterface
      */
-    public function getEndDaTetime()
+    public function getEndDateTime()
     {
         return new \DateTime($this->getEnd());
     }

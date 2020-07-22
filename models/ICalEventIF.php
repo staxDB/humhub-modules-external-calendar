@@ -76,7 +76,7 @@ interface ICalEventIF
      * @return \DateTimeInterface
      * @see https://tools.ietf.org/html/rfc5545#page-54
      */
-    public function getEndDaTetime();
+    public function getEndDateTime();
 
     /**
      * @return bool
