@@ -481,7 +481,7 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
         $this->last_modified = CalendarUtils::toDBDateFormat($icalEvent->getLastModified());
         $this->dtstamp = CalendarUtils::toDBDateFormat($icalEvent->getTimeStamp());
         $this->start_datetime = CalendarUtils::toDBDateformat($icalEvent->getStartDateTime());
-        $this->end_datetime = CalendarUtils::toDBDateFormat($icalEvent->getEndDaTetime());
+        $this->end_datetime = CalendarUtils::toDBDateFormat($icalEvent->getEndDateTime());
         $this->exdate = $icalEvent->getExdate();
 
         if ($timeZone) {

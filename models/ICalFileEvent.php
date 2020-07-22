@@ -82,13 +82,13 @@ class ICalFileEvent extends Event implements ICalEventIF
     public function isAllDay()
     {
         // If one of dtstart or dtend has actual time value this can't be an all day event
-        if($this->getStartDateTime()->format('H:i:s') !== '00:00:00' || $this->getEndDaTetime()->format('H:i:s') !== '00:00:00') {
+        if($this->getStartDateTime()->format('H:i:s') !== '00:00:00' || $this->getEndDateTime()->format('H:i:s') !== '00:00:00') {
             return false;
         }
 
 
         // If dtstart has a date time value (even if 00:00:00) dtend must not be euqal to dtstart
-        return $this->isDateOnlyFormat($this->dtstart) || ($this->getEndDatetime() > $this->getStartDateTime());
+        return $this->isDateOnlyFormat($this->dtstart) || ($this->getEndDateTime() > $this->getStartDateTime());
     }
 
     /**
@@ -132,7 +132,7 @@ class ICalFileEvent extends Event implements ICalEventIF
 
     private function getDateTimeFromDTArray($dtArr)
     {
-        $result = nulL;
+        $result = null;
         // We need this since the ICal parser does not ignore timezone values for DATE only values
         if(isset($dtArr[0]['VALUE']) && $dtArr[0]['VALUE'] === 'DATE' || strlen($dtArr[1]) === 8)  {
             $result = DateTime::createFromFormat(CalendarUtils::ICAL_DATE_FORMAT, $dtArr[1])->setTime(0,0,0);
@@ -149,7 +149,7 @@ class ICalFileEvent extends Event implements ICalEventIF
      * @return \DateTime
      * @throws \Exception
      */
-    public function getEndDatetime()
+    public function getEndDateTime()
     {
         if($this->endDateTime) {
             return $this->endDateTime;
