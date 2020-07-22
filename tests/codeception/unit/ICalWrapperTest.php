@@ -10,6 +10,7 @@ namespace humhub\modules\external_calendar\tests\codeception\unit;
 
 use external_calendar\ExternalCalendarTest;
 use DateTime;
+use humhub\modules\external_calendar\helpers\CalendarUtils;
 use humhub\modules\external_calendar\models\ICalFile;
 use humhub\modules\external_calendar\models\ICalFileEvent;
 use Yii;
@@ -122,6 +123,10 @@ class ICalWrapperTest extends ExternalCalendarTest
             DateTime::createFromFormat('!Ymd', '20190816', new \DateTimeZone('Europe/Berlin')),
             DateTime::createFromFormat('!Ymd', '20190817', new \DateTimeZone('Europe/Berlin')));
         $this->assertEquals('xxxxxxxxxxxxxx@google.com', $events[0]->getUid());
+
+        // Y-m-d H:i:s
+        $this->assertEquals('2019-08-16 19:30:00', CalendarUtils::toDBDateFormat($events[0]->getStartDateTime()));
+        $this->assertEquals('2019-08-16 20:30:00', CalendarUtils::toDBDateFormat($events[0]->getEndDateTime()));
         $this->assertFalse($events[0]->isAllDay());
     }
 }
