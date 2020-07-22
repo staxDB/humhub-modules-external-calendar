@@ -173,8 +173,10 @@ class ICalSync extends Model
             }
 
             foreach ($existingModelsInRange as $index => $model) {
-                if ($model->uid === $icalEvent->getUid() && $model->wasModifiedSince($icalEvent)) {
-                    $model->syncWithICal($icalEvent, $this->calendarModel->time_zone);
+                if ($model->uid === $icalEvent->getUid()) {
+                    if ($model->wasModifiedSince($icalEvent)) {
+                        $model->syncWithICal($icalEvent, $this->calendarModel->time_zone);
+                    }
                     unset($icalEventsInRange[$eventKey], $existingModelsInRange[$index]);
                     break;
                 }
