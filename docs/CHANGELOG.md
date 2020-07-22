@@ -5,6 +5,11 @@ v1.1.10
 ----------------------
 - Fix: External calendar validation errors does not redirect to form
 - Enh: Raised max title length to 100
+- Enh #8: Improve formatting of external event wall entries (verement)
+- Enh #9: Rename "Event" content type to "External Event" (verement)
+- Fix #12: External calendar sync on unmodified events overwrites old event (verement)
+- Fix #13: ICalFileEvent:getDateTimeFromDTArray() always using dtstart as fallback when using Datetime format (verement)
+- Fix #14: Inconsistent capitalization of getEndDateTime() (verement)
 
 v1.1.9
 ----------------------
