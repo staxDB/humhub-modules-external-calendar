@@ -134,7 +134,7 @@ class ICalFileEvent extends Event implements ICalEventIF
     {
         $result = null;
         // We need this since the ICal parser does not ignore timezone values for DATE only values
-        if(isset($dtArr[0]['VALUE']) && $dtArr[0]['VALUE'] === 'DATE' || strlen($dtArr[1]) === 8)  {
+        if((isset($dtArr[0]['VALUE']) && $dtArr[0]['VALUE'] === 'DATE') || strlen($dtArr[1]) === 8)  {
             $result = DateTime::createFromFormat(CalendarUtils::ICAL_DATE_FORMAT, $dtArr[1])->setTime(0,0,0);
         }
 
