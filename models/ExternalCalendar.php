@@ -154,7 +154,7 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
         ];
 
         if(!$this->allowFiles) {
-           // $result[] = [['url'], 'url', 'defaultScheme' => 'https', 'message' => Yii::t('ExternalCalendarModule.sync_result', "No valid ical url! Try an url with http / https.")];
+           $result[] = [['url'], 'url', 'defaultScheme' => 'https', 'message' => Yii::t('ExternalCalendarModule.sync_result', "No valid ical url! Try an url with http / https.")];
         }
 
         return $result;
