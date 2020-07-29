@@ -1,7 +1,7 @@
 Changelog
 =========
 
-v1.1.10
+v1.1.10 (July 29, 2020)
 ----------------------
 - Fix: External calendar validation errors does not redirect to form
 - Enh: Raised max title length to 100
