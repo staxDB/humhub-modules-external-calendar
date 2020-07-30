@@ -1,6 +1,10 @@
 Changelog
 =========
 
+v1.1.11(unreleased)
+---------------------
+- Enh: Validation added for better understanding
+
 v1.1.10 (July 29, 2020)
 ----------------------
 - Fix: External calendar validation errors does not redirect to form
