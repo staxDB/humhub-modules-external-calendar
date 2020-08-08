@@ -1,8 +1,9 @@
 Changelog
 =========
 
-v1.1.11(unreleased)
+v1.1.11 (July 31, 2020)
 ---------------------
+- Fix: Recurrent instance exceptions not respected in ICalExpand
 - Enh: Validation added for better understanding
 
 v1.1.10 (July 29, 2020)
