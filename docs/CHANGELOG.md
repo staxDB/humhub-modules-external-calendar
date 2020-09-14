@@ -1,6 +1,10 @@
 Changelog
 =========
 
+v1.1.12 (unreleased)
+----------------------
+- Fix: Fixed 1.6 compatibility global controller access is blocked by strict access
+
 v1.1.11 (July 31, 2020)
 ----------------------
 - Fix: Recurrent instance exceptions not respected in ICalExpand

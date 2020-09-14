@@ -3,12 +3,12 @@
 
 namespace humhub\modules\external_calendar\controllers;
 
+use humhub\components\access\ControllerAccess;
 use humhub\modules\external_calendar\Module;
 use Yii;
 use yii\web\HttpException;
 use humhub\modules\external_calendar\integration\calendar\CalendarExportService;
 use humhub\modules\external_calendar\models\CalendarExport;
-use Sabre\VObject\UUIDUtil;
 use humhub\components\Controller;
 use humhub\modules\external_calendar\models\CalendarExportSpaces;
 use humhub\modules\space\widgets\Chooser;
@@ -16,6 +16,11 @@ use humhub\modules\space\widgets\Chooser;
 class ExportController extends Controller
 {
     public $requireContainer = false;
+
+    /**
+     * @inheritDoc
+     */
+    public $access = ControllerAccess::class;
 
     /**
      * @var CalendarExportService
