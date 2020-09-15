@@ -1,7 +1,7 @@
 Changelog
 =========
 
-v1.1.12 (unreleased)
+v1.1.12 (September 15, 2020)
 ----------------------
 - Fix: Fixed 1.6 compatibility global controller access is blocked by strict access
 
