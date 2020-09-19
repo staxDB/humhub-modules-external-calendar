@@ -5,7 +5,7 @@ use humhub\widgets\ModalDialog;
 
 use humhub\widgets\Tabs;
 
-/* @var $this \humhub\components\View */
+/* @var $this \humhub\modules\ui\view\components\View */
 /* @var $model \humhub\modules\external_calendar\models\CalendarExport */
 /* @var $showOverview boolean */
 

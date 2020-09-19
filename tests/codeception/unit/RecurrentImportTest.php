@@ -872,8 +872,8 @@ class RecurrentImportTest extends ExternalCalendarTest
             Space::findOne(1));
 
         $this->assertCount(1, $events);
-        $this->assertEquals('Recurrent with time', $events[0]->title);
-        $this->assertEquals('2019-08-27 19:00:00', $events[0]->getStartDateTime()->setTimezone(CalendarUtils::getUserTimeZone())->format('Y-m-d H:i:s'));
+        $this->assertEquals('Altered Recurrence With Time', $events[0]->title);
+        $this->assertEquals('2019-08-28 19:00:00', $events[0]->getStartDateTime()->setTimezone(CalendarUtils::getUserTimeZone())->format('Y-m-d H:i:s'));
     }
 
     public function testTimezone2()
@@ -897,8 +897,8 @@ class RecurrentImportTest extends ExternalCalendarTest
             Space::findOne(1));
 
         $this->assertCount(1, $events);
-        $this->assertEquals('Recurrent with time', $events[0]->title);
-        $this->assertEquals('2019-08-27 19:00:00', $events[0]->getStartDateTime()->setTimezone(CalendarUtils::getUserTimeZone())->format('Y-m-d H:i:s'));
+        $this->assertEquals('Altered Recurrence With Time', $events[0]->title);
+        $this->assertEquals('2019-08-28 19:00:00', $events[0]->getStartDateTime()->setTimezone(CalendarUtils::getUserTimeZone())->format('Y-m-d H:i:s'));
     }
 
     public function testRecurrenceStartChange()

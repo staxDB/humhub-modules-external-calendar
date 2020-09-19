@@ -7,7 +7,7 @@ use yii\helpers\Url;
 use humhub\modules\external_calendar\models\CalendarExportSpaces;
 use humhub\modules\external_calendar\models\CalendarExport;
 
-/* @var $this \humhub\components\View */
+/* @var $this \humhub\modules\ui\view\components\View */
 /* @var $model \humhub\modules\external_calendar\models\CalendarExport */
 
 $saveButtonLabel = $model->isNewRecord ? Yii::t('ExternalCalendarModule.base', 'Generate export Url') : Yii::t('base', 'Save');
