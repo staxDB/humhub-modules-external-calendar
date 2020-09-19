@@ -87,27 +87,12 @@ class ICalExpand extends Model
             $end = (new DateTime('now', $this->targetTimezone))->add(new \DateInterval('P2Y'));
         }
 
-        $existingModels = $this->getExistingRecurrences($start, $end);
         $recurrences = $this->calculateRecurrenceInstances($start, $end);
-        $this->syncRecurrences($existingModels, $recurrences, $endResult);
+        $this->syncRecurrences($recurrences, $endResult);
 
         return $endResult;
     }
 
-    private function getExistingRecurrences(DateTime $start, DateTime $end)
-    {
-        return  $this->event->getRecurrences()->andFilterWhere(
-            ['or',
-                ['and',
-                    ['>=', 'start_datetime', $start->format('Y-m-d H:i:s')],
-                    ['<=', 'start_datetime', $end->format('Y-m-d H:i:s')]
-                ],
-                ['and',
-                    ['>=', 'end_datetime', $start->format('Y-m-d H:i:s')],
-                    ['<=', 'end_datetime', $end->format('Y-m-d H:i:s')]
-                ]
-            ])->all();
-    }
 
     private function calculateRecurrenceInstances(DateTime $start, DateTime $end)
     {
@@ -123,7 +108,7 @@ class ICalExpand extends Model
      * @param VEvent[] $recurrences
      * @param $endResult
      */
-    private function syncRecurrences(array $existingModels, array $recurrences, &$endResult)
+    private function syncRecurrences( array $recurrences, &$endResult)
     {
         foreach($recurrences as $vEvent) {
             try {
@@ -139,7 +124,7 @@ class ICalExpand extends Model
                 }
 
                 if (!$model) {
-                    $model = $this->findRecurrenceModel($existingModels, $vEvent);
+                    $model = $this->findRecurrenceModel($vEvent);
                 }
 
                 if (!$model) {
@@ -174,15 +159,9 @@ class ICalExpand extends Model
      * @param VEvent $vEvent
      * @return mixed|null
      */
-    private function findRecurrenceModel(array $existingModels, VEvent $vEvent)
+    private function findRecurrenceModel(VEvent $vEvent)
     {
-        foreach ($existingModels as $existingModel) {
-            if($existingModel->recurrence_id === $this->getRecurrenceId($vEvent)) {
-                return $existingModel;
-            }
-        }
-
-        return null;
+        return $this->event->getRecurrences()->andWhere(['recurrence_id' => $this->getRecurrenceId($vEvent)])->one();
     }
 
 }

@@ -3,7 +3,7 @@
 use humhub\widgets\ModalButton;
 use humhub\widgets\ModalDialog;
 
-/* @var $this \humhub\components\View */
+/* @var $this \humhub\modules\ui\view\components\View */
 /* @var $module \humhub\modules\external_calendar\models\ExternalCalendar */
 /* @var $canManageEntries boolean */
 /* @var $editUrl string */

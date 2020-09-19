@@ -146,7 +146,7 @@ class ICalImportTest extends ExternalCalendarTest
 
     public function testImportAndDeleteEvent()
     {
-        $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/test1Update.ics');
+        $externalCalendar = $this->initCalendar('@external_calendar/tests/codeception/data/test1Update2.ics');
 
         $this->assertEquals(2, ExternalCalendarEntry::find()->count());
         $this->assertCount(2, $externalCalendar->entries);
