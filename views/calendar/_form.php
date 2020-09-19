@@ -1,10 +1,8 @@
 <?php
 
-use yii\helpers\Html;
 use humhub\modules\ui\form\widgets\ActiveForm;
 use humhub\modules\ui\form\widgets\ColorPicker;
 use humhub\widgets\Button;
-use humhub\widgets\Pjax;
 
 /* @var $this yii\web\View */
 /* @var $model \humhub\modules\external_calendar\models\ExternalCalendar */
@@ -20,7 +18,6 @@ if (!isset($model->color) && isset($contentContainer->color)) {
 \humhub\modules\external_calendar\assets\Assets::register($this);
 ?>
 <div class="calendar-extension-calendar-form">
-    <?php Pjax::begin(); ?>
     <?php $form = ActiveForm::begin(['id'=>'add-new-calendar', 'method'=>'post', 'enableClientValidation' => true]); ?>
 
     <?= $form->errorSummary($model) ?>
@@ -53,6 +50,5 @@ if (!isset($model->color) && isset($contentContainer->color)) {
     </div>
 
     <?php ActiveForm::end(); ?>
-    <?php Pjax::end(); ?>
 </div>
 
