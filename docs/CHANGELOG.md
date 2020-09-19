@@ -1,6 +1,10 @@
 Changelog
 =========
 
+v1.1.13 (Unreleased)
+----------------------
+- Enh #17: Added export button tooltip
+
 v1.1.12 (September 15, 2020)
 ----------------------
 - Fix: Fixed 1.6 compatibility global controller access is blocked by strict access
