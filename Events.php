@@ -25,7 +25,11 @@ class Events extends BaseObject
      */
     public static function onBeforeRequest()
     {
-        static::registerAutoloader();
+        try {
+            static::registerAutoloader();
+        } catch (\Throwable $e) {
+            Yii::error($e);
+        }
     }
 
     /**
@@ -43,13 +47,19 @@ class Events extends BaseObject
     /**
      * @param $event \humhub\modules\calendar\interfaces\event\CalendarItemTypesEvent
      * @return mixed
+     * @throws \Throwable
+     * @throws \yii\base\Exception
      */
     public static function onGetCalendarItemTypes($event)
     {
-        $contentContainer = $event->contentContainer;
+        try {
+            $contentContainer = $event->contentContainer;
 
-        if (!$contentContainer || $contentContainer->isModuleEnabled('external_calendar')) {
-            CalendarExtension::addItemTypes($event);
+            if (!$contentContainer || $contentContainer->isModuleEnabled('external_calendar')) {
+                CalendarExtension::addItemTypes($event);
+            }
+        } catch (\Throwable $e) {
+            Yii::error($e);
         }
     }
 
@@ -58,25 +68,33 @@ class Events extends BaseObject
      */
     public static function onContainerConfigMenuInit($event)
     {
-        /* @var $container ContentContainerActiveRecord */
-        if($event->sender->contentContainer && $event->sender->contentContainer->isModuleEnabled('external_calendar')) {
-            $event->sender->addItem([
-                'label' => Yii::t('ExternalCalendarModule.base', 'External Calendars'),
-                'id' => 'tab-calendar-external',
-                'url' => $event->sender->contentContainer->createUrl('/external_calendar/calendar/index'),
-                'visible' => $event->sender->contentContainer->can(ManageEntry::class),
-                'isActive' => (Yii::$app->controller->module
-                    && Yii::$app->controller->module->id === 'external_calendar'),
-            ]);
+        try {
+            /* @var $container ContentContainerActiveRecord */
+            if($event->sender->contentContainer && $event->sender->contentContainer->isModuleEnabled('external_calendar')) {
+                $event->sender->addItem([
+                    'label' => Yii::t('ExternalCalendarModule.base', 'External Calendars'),
+                    'id' => 'tab-calendar-external',
+                    'url' => $event->sender->contentContainer->createUrl('/external_calendar/calendar/index'),
+                    'visible' => $event->sender->contentContainer->can(ManageEntry::class),
+                    'isActive' => (Yii::$app->controller->module
+                        && Yii::$app->controller->module->id === 'external_calendar'),
+                ]);
+            }
+        } catch (\Throwable $e) {
+            Yii::error($e);
         }
     }
 
     public static function onFindCalendarItems($event)
     {
-        $contentContainer = $event->contentContainer;
+        try {
+            $contentContainer = $event->contentContainer;
 
-        if (!$contentContainer || $contentContainer->isModuleEnabled('external_calendar')) {
-            CalendarExtension::addItems($event);
+            if (!$contentContainer || $contentContainer->isModuleEnabled('external_calendar')) {
+                CalendarExtension::addItems($event);
+            }
+        } catch (\Throwable $e) {
+            Yii::error($e);
         }
     }
 
@@ -85,9 +103,13 @@ class Events extends BaseObject
      */
     public static function onCalendarControlsInit($event)
     {
-        /* @var $controls CalendarControls */
-        $controls = $event->sender;
-        $controls->addWidget(ExportButton::class, ['container' => $controls->container],  ['sortOrder' => 50]);
+        try {
+            /* @var $controls CalendarControls */
+            $controls = $event->sender;
+            $controls->addWidget(ExportButton::class, ['container' => $controls->container],  ['sortOrder' => 50]);
+        } catch (\Throwable $e) {
+            Yii::error($e);
+        }
     }
 
     /**
@@ -97,14 +119,18 @@ class Events extends BaseObject
      */
     public static function onAdminMenuInit($event)
     {
-        $event->sender->addItem([
-            'label' => "external_calendar",
-            'url' => Url::to(['/external_calendar/admin']),
-            'group' => 'manage',
-            'icon' => '<i class="fa fa-certificate" style="color: #6fdbe8;"></i>',
-            'isActive' => (Yii::$app->controller->module && Yii::$app->controller->module->id == 'external_calendar' && Yii::$app->controller->id == 'admin'),
-            'sortOrder' => 99999,
-        ]);
+        try {
+            $event->sender->addItem([
+                'label' => "external_calendar",
+                'url' => Url::to(['/external_calendar/admin']),
+                'group' => 'manage',
+                'icon' => '<i class="fa fa-certificate" style="color: #6fdbe8;"></i>',
+                'isActive' => (Yii::$app->controller->module && Yii::$app->controller->module->id == 'external_calendar' && Yii::$app->controller->id == 'admin'),
+                'sortOrder' => 99999,
+            ]);
+        } catch (\Throwable $e) {
+            Yii::error($e);
+        }
     }
 
     /**
@@ -115,7 +141,11 @@ class Events extends BaseObject
      */
     public static function onCronHourlyRun($event)
     {
-        Yii::$app->queue->push(new SyncHourly());
+        try {
+            Yii::$app->queue->push(new SyncHourly());
+        } catch (\Throwable $e) {
+            Yii::error($e);
+        }
     }
 
     /**
@@ -126,7 +156,11 @@ class Events extends BaseObject
      */
     public static function onCronDailyRun($event)
     {
-        Yii::$app->queue->push( new SyncDaily());
+        try {
+            Yii::$app->queue->push( new SyncDaily());
+        } catch (\Throwable $e) {
+            Yii::error($e);
+        }
     }
 
 
@@ -139,37 +173,30 @@ class Events extends BaseObject
      */
     public static function onIntegrityCheck($event)
     {
-        $integrityController = $event->sender;
-        $integrityController->showTestHeadline("External Calendar Module - Entries (" . ExternalCalendarEntry::find()->count() . " entries)");
-        foreach (ExternalCalendarEntry::find()->joinWith('calendar')->all() as $entry) {
-            if ($entry->calendar === null) {
-                if ($integrityController->showFix("Deleting external calendar entry id " . $entry->id . " without existing calendar!")) {
-                    $entry->delete();
+        try {
+            $integrityController = $event->sender;
+            $integrityController->showTestHeadline("External Calendar Module - Entries (" . ExternalCalendarEntry::find()->count() . " entries)");
+            foreach (ExternalCalendarEntry::find()->joinWith('calendar')->all() as $entry) {
+                if ($entry->calendar === null) {
+                    if ($integrityController->showFix("Deleting external calendar entry id " . $entry->id . " without existing calendar!")) {
+                        $entry->delete();
+                    }
                 }
             }
+        } catch (\Throwable $e) {
+            Yii::error($e);
         }
-    }
-
-    /**
-     * On Init of Dashboard Sidebar, add the widget
-     *
-     * @param type $event
-     */
-    public static function onDashboardSidebarInit($event)
-    {
-        if (Yii::$app->user->isGuest) {
-            return;
-        }
-
-        $module = Yii::$app->getModule('external_calendar');
     }
 
     public static function onWallEntryLinks($event)
     {
-        if ($event->sender->object instanceof ExternalCalendarEntry) {
-            $event->sender->addWidget(DownloadIcsLink::class, ['calendarEntry' => $event->sender->object]);
+        try {
+            if ($event->sender->object instanceof ExternalCalendarEntry) {
+                $event->sender->addWidget(DownloadIcsLink::class, ['calendarEntry' => $event->sender->object]);
+            }
+        } catch (\Throwable $e) {
+            Yii::error($e);
         }
     }
-
 }
 

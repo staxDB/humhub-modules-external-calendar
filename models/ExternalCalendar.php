@@ -117,6 +117,7 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
      */
     public function init()
     {
+
         parent::init();
 
         if(!$this->color) {

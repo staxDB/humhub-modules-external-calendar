@@ -1,11 +1,10 @@
 <?php
 
-use humhub\widgets\MarkdownView;
+use humhub\modules\external_calendar\models\ExternalCalendar;
 use yii\helpers\Html;
 
-/* @var $calendar \humhub\modules\external_calendar\models\ExternalCalendar */
+/* @var $calendar ExternalCalendar */
 /* @var $stream boolean */
-/* @var $collapse boolean */
 
 $color = $calendar->color ? $calendar->color : $this->theme->variable('info');
 
@@ -18,7 +17,7 @@ if($description) {
 
 ?>
 <div class="media event">
-    <div class="y" style="padding-left:10px; border-left: 3px solid <?= $color ?>">
+    <div class="y" style="padding-left:10px; border-left: 3px solid <?= Html::encode($color) ?>">
         <div class="media-body clearfix">
             <a href="<?= $calendar->getUrl(); ?>" class="pull-left" style="margin-right: 10px">
                 <i class="fa fa-calendar colorDefault" style="font-size: 35px;"></i>
@@ -34,7 +33,7 @@ if($description) {
             </h5>
         </div>
         <?php if (!empty($description)) : ?>
-            <div <?= ($collapse) ? 'data-ui-show-more' : '' ?>
+            <div data-ui-show-more
                     data-read-more-text="<?= Yii::t('ExternalCalendarModule.widgets', "Read full description...") ?>"
                     style="overflow:hidden">
                 <?= $description ?>

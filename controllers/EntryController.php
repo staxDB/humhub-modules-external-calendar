@@ -52,10 +52,7 @@ class EntryController extends ContentContainerController
             return $this->renderModal($model, $cal);
         }
 
-        return $this->render('view', [
-            'model' => $model,
-            'stream' => true
-        ]);
+        return $this->render('view', ['model' => $model,]);
     }
 
     private function renderModal($model, $cal)
@@ -115,9 +112,9 @@ class EntryController extends ContentContainerController
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             if (empty($cal)) {
                 return ModalClose::widget(['saved' => true]);
-            } else {
-                return $this->renderModal($model, 1);
             }
+
+            return $this->renderModal($model, 1);
         }
 
         return $this->renderAjax('update', [
@@ -152,9 +149,9 @@ class EntryController extends ContentContainerController
      * @throws \yii\base\Exception
      * @throws \yii\web\RangeNotSatisfiableHttpException
      */
-    public function actionGenerateics()
+    public function actionGenerateics($id)
     {
-        $calendarEntry = $this->getCalendarEntry(Yii::$app->request->get('id'));
+        $calendarEntry = $this->getCalendarEntry($id);
         $ics = $calendarEntry->generateIcs();
         return Yii::$app->response->sendContentAsFile($ics, uniqid('calendar', true) . '.ics', ['mimeType' => 'text/calendar']);
     }

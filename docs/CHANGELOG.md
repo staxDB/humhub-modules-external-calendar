@@ -1,9 +1,12 @@
 Changelog
 =========
 
-v1.1.13 (Unreleased)
+v1.2.0 (November 04, 2020)
 ----------------------
 - Enh #17: Added export button tooltip
+- Chng: 1.7 WallEntry migration
+- Chng: Update min HumHub version to 1.7
+- Fix: PHP 7.4 compatibility
 
 v1.1.12 (September 15, 2020)
 ----------------------
