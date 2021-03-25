@@ -1,6 +1,10 @@
 Changelog
 =========
 
+v1.2.1 (Unreleased)
+----------------------
+- Fix #101: Display warning when cannot enable module
+
 v1.2.0 (November 04, 2020)
 ----------------------
 - Enh #17: Added export button tooltip
