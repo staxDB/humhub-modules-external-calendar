@@ -14,6 +14,4 @@ In order to use the import of external calendar, this module has to be installed
 Some calendars are not intended for permanent synchronization. These do not send a "last_modified" timestamp. 
 Please do not select the option `auto sync hourly` for these. It could slow down your system.
 
-This module was forked from:
-__Author:__ David Born ([staxDB](https://github.com/staxDB))
-__Module website:__ <https://github.com/staxDB/humhub-modules-external-calendar>  
+This module was forked from [David Born](https://github.com/staxDB/humhub-modules-external-calendar).
