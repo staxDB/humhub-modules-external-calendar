@@ -14,5 +14,14 @@
     "assets/screen1.jpg",
     "assets/screen2.jpg",
     "assets/screen3.jpg"
+  ],
+  "homepage": "https://github.com/humhub-contrib/external_calendar",
+  "authors": [
+    {
+      "name": "David Born"
+    },
+    {
+      "name": "Julian Harrer"
+    }
   ]
 }
