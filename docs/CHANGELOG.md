@@ -3,6 +3,7 @@ Changelog
 
 v1.2.1 (Unreleased)
 ----------------------
+- Fix #100: Remove unnecessary migration that removed module folder on first enabling
 - Fix #101: Display warning when cannot enable module
 
 v1.2.0 (November 04, 2020)
