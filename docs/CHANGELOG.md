@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.3.0 (Unreleased)
+---------------------
+- Enh: Use default timezone instead of deprecated server timezone
+
 v1.2.1 (Unreleased)
 ----------------------
 - Fix #100: Remove unnecessary migration that removed module folder on first enabling
