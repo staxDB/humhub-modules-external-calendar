@@ -1,6 +1,10 @@
 Changelog
 =========
 
+v1.3.0 (Unreleased)
+---------------------
+- Enh #5274: Deprecate CompatModuleManager
+
 v1.2.1 (Unreleased)
 ----------------------
 - Fix #100: Remove unnecessary migration that removed module folder on first enabling
