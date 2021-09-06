@@ -442,7 +442,7 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
     public function generateIcs()
     {
         $module = Yii::$app;
-        $timezone = $module->settings->get('timeZone');
+        $timezone = $module->settings->get('defaultTimeZone');
         $ics = new ICS($this->title, $this->description, $this->start_datetime, $this->end_datetime, $this->location, null, $timezone, $this->all_day);
         return $ics;
     }
