@@ -55,7 +55,7 @@ class Events extends BaseObject
         try {
             $contentContainer = $event->contentContainer;
 
-            if (!$contentContainer || $contentContainer->isModuleEnabled('external_calendar')) {
+            if (!$contentContainer || $contentContainer->moduleManager->isEnabled('external_calendar')) {
                 CalendarExtension::addItemTypes($event);
             }
         } catch (\Throwable $e) {
@@ -70,12 +70,13 @@ class Events extends BaseObject
     {
         try {
             /* @var $container ContentContainerActiveRecord */
-            if($event->sender->contentContainer && $event->sender->contentContainer->isModuleEnabled('external_calendar')) {
+            $container = $event->sender->contentContainer;
+            if($container && $container->moduleManager->isEnabled('external_calendar')) {
                 $event->sender->addItem([
                     'label' => Yii::t('ExternalCalendarModule.base', 'External Calendars'),
                     'id' => 'tab-calendar-external',
-                    'url' => $event->sender->contentContainer->createUrl('/external_calendar/calendar/index'),
-                    'visible' => $event->sender->contentContainer->can(ManageEntry::class),
+                    'url' => $container->createUrl('/external_calendar/calendar/index'),
+                    'visible' => $container->can(ManageEntry::class),
                     'isActive' => (Yii::$app->controller->module
                         && Yii::$app->controller->module->id === 'external_calendar'),
                 ]);
@@ -88,9 +89,10 @@ class Events extends BaseObject
     public static function onFindCalendarItems($event)
     {
         try {
+            /* @var ContentContainerActiveRecord $contentContainer */
             $contentContainer = $event->contentContainer;
 
-            if (!$contentContainer || $contentContainer->isModuleEnabled('external_calendar')) {
+            if (!$contentContainer || $contentContainer->moduleManager->isEnabled('external_calendar')) {
                 CalendarExtension::addItems($event);
             }
         } catch (\Throwable $e) {
