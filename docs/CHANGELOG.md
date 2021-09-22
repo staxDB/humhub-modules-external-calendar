@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.4.0 (Unreleased)
+---------------------
+- Enh #140: Use widget ContentVisibiltySelect
+
 1.3.0 (Unreleased)
 ---------------------
 - Enh: Use default timezone instead of deprecated server timezone
