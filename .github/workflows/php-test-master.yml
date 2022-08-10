@@ -11,3 +11,5 @@ jobs:
     with:
       module-id: external_calendar
       install-composer: true
+      additional-module-id: calendar
+      additional-module-composer: true
