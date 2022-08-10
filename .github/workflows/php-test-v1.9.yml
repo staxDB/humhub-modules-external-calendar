@@ -1,0 +1,13 @@
+name: PHP Codeception Tests - v1.9
+
+on:
+  push:
+  schedule:
+    - cron: "0 0 * * 0"
+
+jobs:
+  tests:
+    uses: humhub/actions/.github/workflows/module-tests-v1.9.yml@main
+    with:
+      module-id: external_calendar
+      install-composer: true
