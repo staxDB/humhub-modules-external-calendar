@@ -10,4 +10,5 @@ jobs:
     uses: humhub/actions/.github/workflows/module-tests-develop.yml@main
     with:
       module-id: external_calendar
+      additional-module-id: calendar
       install-composer: true
