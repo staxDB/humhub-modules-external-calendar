@@ -4,6 +4,7 @@ Changelog
 1.3.0 (Unreleased)
 ---------------------
 - Enh: Use default timezone instead of deprecated server timezone
+- Enh: Added French translations
 
 v1.2.1 (Unreleased)
 ----------------------
