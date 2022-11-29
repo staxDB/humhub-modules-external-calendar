@@ -4,6 +4,7 @@ Changelog
 1.3.0 (Unreleased)
 ---------------------
 - Enh: Use default timezone instead of deprecated server timezone
+- Enh: Remove deprecated checkbox "regular" style
 
 v1.2.1 (Unreleased)
 ----------------------
