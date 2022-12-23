@@ -1,13 +1,10 @@
 Changelog
 =========
 
-1.3.0 (Unreleased)
----------------------
+1.3.0 (December 23, 2022)
+-------------------------
 - Enh: Use default timezone instead of deprecated server timezone
 - Enh: Remove deprecated checkbox "regular" style
-
-v1.2.1 (Unreleased)
-----------------------
 - Fix #100: Remove unnecessary migration that removed module folder on first enabling
 - Fix #101: Display warning when cannot enable module
 - Enh #5274: Deprecate CompatModuleManager
