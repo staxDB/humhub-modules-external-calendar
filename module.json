@@ -8,7 +8,7 @@
   ],
   "version": "1.3.0",
   "humhub": {
-    "minVersion": "1.9"
+    "minVersion": "1.13"
   },
   "screenshots": [
     "assets/screen1.jpg",
