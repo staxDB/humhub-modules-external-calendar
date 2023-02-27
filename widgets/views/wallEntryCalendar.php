@@ -10,7 +10,7 @@ $color = $calendar->color ? $calendar->color : $this->theme->variable('info');
 
 $description = $calendar->description;
 
-if($description) {
+if ($description) {
     $config = \HTMLPurifier_Config::createDefault();
     $description = \yii\helpers\HtmlPurifier::process($calendar->description, $config);
 }
@@ -34,9 +34,9 @@ if($description) {
         </div>
         <?php if (!empty($description)) : ?>
             <div data-ui-show-more
-                    data-read-more-text="<?= Yii::t('ExternalCalendarModule.widgets', "Read full description...") ?>"
-                    style="overflow:hidden">
-                <?= $description ?>
+                 data-read-more-text="<?= Yii::t('ExternalCalendarModule.widgets', "Read full description...") ?>"
+                 style="overflow:hidden">
+                <?= nl2br($description) ?>
             </div>
         <?php endif; ?>
     </div>

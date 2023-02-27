@@ -1,6 +1,10 @@
 Changelog
 =========
 
+Unreleased
+-------------------------
+- Fix 43: Calendar entry description is missing line breaks
+
 1.3.0 (December 23, 2022)
 -------------------------
 - Enh: Use default timezone instead of deprecated server timezone
