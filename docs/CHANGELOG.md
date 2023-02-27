@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.4.0 (December 23, 2022)
+-------------------------
+- Fix: Hard delete calendar items on synchronization of imported calendar
+
 1.3.0 (December 23, 2022)
 -------------------------
 - Enh: Use default timezone instead of deprecated server timezone

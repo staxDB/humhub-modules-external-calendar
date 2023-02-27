@@ -181,7 +181,7 @@ class Events extends BaseObject
             foreach (ExternalCalendarEntry::find()->joinWith('calendar')->all() as $entry) {
                 if ($entry->calendar === null) {
                     if ($integrityController->showFix("Deleting external calendar entry id " . $entry->id . " without existing calendar!")) {
-                        $entry->delete();
+                        $entry->hardDelete();
                     }
                 }
             }
