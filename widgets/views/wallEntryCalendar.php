@@ -36,7 +36,7 @@ if ($description) {
             <div data-ui-show-more
                  data-read-more-text="<?= Yii::t('ExternalCalendarModule.widgets', "Read full description...") ?>"
                  style="overflow:hidden">
-                <?= nl2br($description) ?>
+                <?= nl2br(preg_replace('/https?:\/\/[\w\-\.!~#?%@$&=;+\*\'"(),\/]+/', '<a href="$0" target="_blank">$0</a>', $description)) ?>
             </div>
         <?php endif; ?>
     </div>
