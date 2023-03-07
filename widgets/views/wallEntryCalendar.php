@@ -1,5 +1,6 @@
 <?php
 
+use cebe\markdown\GithubMarkdown;
 use humhub\modules\external_calendar\models\ExternalCalendar;
 use yii\helpers\Html;
 
@@ -36,7 +37,7 @@ if ($description) {
             <div data-ui-show-more
                  data-read-more-text="<?= Yii::t('ExternalCalendarModule.widgets', "Read full description...") ?>"
                  style="overflow:hidden">
-                <?= nl2br((new \cebe\markdown\GithubMarkdown())->parse($description)) ?>
+                <?= nl2br((new GithubMarkdown())->parse($description)) ?>
             </div>
         <?php endif; ?>
     </div>
