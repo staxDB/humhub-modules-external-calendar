@@ -3,7 +3,8 @@ Changelog
 
 Unreleased
 -------------------------
-- Fix 43: Calendar entry description is missing line breaks
+- Fix #43: Calendar entry description is missing line breaks
+- Enh #40: Render URL's as clickable links in imported events
 
 1.3.0 (December 23, 2022)
 -------------------------
