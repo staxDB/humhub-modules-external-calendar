@@ -7,7 +7,7 @@ use yii\helpers\Html;
 /* @var $calendarEntry \humhub\modules\external_calendar\models\ExternalCalendarEntry */
 /* @var $stream boolean */
 
-$color = $calendarEntry->calendar->color ? $calendarEntry->calendar->color : $this->theme->variable('info');
+$color = $calendarEntry->calendar->color ?: $this->theme->variable('info');
 
 $description = $calendarEntry->description;
 
@@ -16,6 +16,8 @@ if ($description) {
     $description = \yii\helpers\HtmlPurifier::process($calendarEntry->description, $config);
 }
 
+$descriptionParser = new GithubMarkdown();
+$descriptionParser->enableNewlines = true;
 ?>
 <div class="media event">
     <div>
@@ -36,7 +38,7 @@ if ($description) {
                  data-read-more-text="<?= Yii::t('ExternalCalendarModule.widgets', "Read full description...") ?>"
                  style="overflow:hidden">
 
-                <p><?= nl2br((new GithubMarkdown())->parse($description)) ?></p>
+                <p><?= $descriptionParser->parse($description) ?></p>
 
             </div>
         <?php endif; ?>
