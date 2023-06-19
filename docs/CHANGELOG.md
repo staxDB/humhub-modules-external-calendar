@@ -1,8 +1,9 @@
 Changelog
 =========
 
-Unreleased
+1.4.0 (Unreleased)
 ---------------------
+- Enh #140: Use widget ContentVisibiltySelect
 - Enh: Use default timezone instead of deprecated server timezone
 - Enh: Added French translations
 - Fix #47: Error adding an iCalendar link (updated ics-parser library to version 3)
