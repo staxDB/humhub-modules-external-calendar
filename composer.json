@@ -4,7 +4,7 @@
   "type": "library",
   "require": {
     "php": ">=7.1",
-    "johngrogg/ics-parser": "^2",
+    "johngrogg/ics-parser": "^3",
     "nesbot/carbon": "^1.39.0",
     "simshaun/recurr": "^4",
     "symfony/translation": "v3.4.30",

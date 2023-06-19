@@ -1,20 +1,23 @@
 <?php
 
+use cebe\markdown\GithubMarkdown;
 use humhub\modules\ui\icon\widgets\Icon;
 use yii\helpers\Html;
 
 /* @var $calendarEntry \humhub\modules\external_calendar\models\ExternalCalendarEntry */
 /* @var $stream boolean */
 
-$color = $calendarEntry->calendar->color ? $calendarEntry->calendar->color : $this->theme->variable('info');
+$color = $calendarEntry->calendar->color ?: $this->theme->variable('info');
 
 $description = $calendarEntry->description;
 
-if($description) {
+if ($description) {
     $config = \HTMLPurifier_Config::createDefault();
     $description = \yii\helpers\HtmlPurifier::process($calendarEntry->description, $config);
 }
 
+$descriptionParser = new GithubMarkdown();
+$descriptionParser->enableNewlines = true;
 ?>
 <div class="media event">
     <div>
@@ -26,16 +29,16 @@ if($description) {
         <?php if (!empty($calendarEntry->location)) : ?>
             <p>
                 <?= Icon::get('map-marker ')->color($color)->size(Icon::SIZE_LG)->fixedWith(true)->style('margin-top:2px') ?>
-                <?= Html::encode( $calendarEntry->location) ?>
+                <?= Html::encode($calendarEntry->location) ?>
             </p>
         <?php endif; ?>
 
         <?php if (!empty($description) || !empty($calendarEntry->location)) : ?>
-            <div data-ui-show-more  data-read-more-text="<?= Yii::t('ExternalCalendarModule.widgets', "Read full description...") ?>"
-                    style="overflow:hidden">
+            <div data-ui-show-more
+                 data-read-more-text="<?= Yii::t('ExternalCalendarModule.widgets', "Read full description...") ?>"
+                 style="overflow:hidden">
 
-                <p><?= $description ?></p>
-
+                <p><?= $descriptionParser->parse($description) ?></p>
 
             </div>
         <?php endif; ?>
