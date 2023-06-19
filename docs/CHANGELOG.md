@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ---------------------
+- Enh: Use default timezone instead of deprecated server timezone
+- Enh: Added French translations
 - Fix #47: Error adding an iCalendar link (updated ics-parser library to version 3)
 
 1.3.3 (March 7, 2023)
