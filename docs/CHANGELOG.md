@@ -4,13 +4,19 @@ Changelog
 1.4.0 (Unreleased)
 ---------------------
 - Enh #140: Use widget ContentVisibiltySelect
-
-1.3.0 (Unreleased)
----------------------
 - Enh: Use default timezone instead of deprecated server timezone
+- Enh: Added French translations
+- Fix #47: Error adding an iCalendar link (updated ics-parser library to version 3)
 
-v1.2.1 (Unreleased)
-----------------------
+1.3.3 (March 7, 2023)
+---------------------
+- Fix #43: Calendar entry description is missing line breaks
+- Enh #40: Render URL's as clickable links in imported events
+
+1.3.0 (December 23, 2022)
+-------------------------
+- Enh: Use default timezone instead of deprecated server timezone
+- Enh: Remove deprecated checkbox "regular" style
 - Fix #100: Remove unnecessary migration that removed module folder on first enabling
 - Fix #101: Display warning when cannot enable module
 - Enh #5274: Deprecate CompatModuleManager
@@ -48,11 +54,10 @@ v1.1.8
 ----------------------
 - Fix #4: Unable to delete calendar exports
 
-
 v1.1.7
 ----------------------
 - Fix: All day events with given timezone are parsed with time
-- Fix: Removed DBDatevalidator 
+- Fix: Removed DBDatevalidator
 
 v1.1.6
 ----------------------
@@ -67,18 +72,15 @@ v1.1.4
 ---------------------------
 - Enh: Updated translations
 
-
 v1.1.2
 ----------------------
 - Fix: Different cases of dtstart and dtend handled incorrectly
 - Enh: Added vevent duration support
 
-
 v1.1.1
 ----------------------
 - Fix: Importing ICal events without Modification Date not working
 - Fix: Importing ICal events with start = end date not working
-
 
 v1.1
 ----------------------
@@ -118,11 +120,11 @@ v0.1.5
 
 v0.1.4
 ----------------------
-- Changed the way of integrating third-party code in `vendors` -folder 
+- Changed the way of integrating third-party code in `vendors` -folder
 
 v0.1.3
 ----------------------
-- Changed sync-method to async task using [asynchronous tasks](http://docs.humhub.org/admin-asynchronous-tasks.html) 
+- Changed sync-method to async task using [asynchronous tasks](http://docs.humhub.org/admin-asynchronous-tasks.html)
 
 v0.1.2
 ----------------------

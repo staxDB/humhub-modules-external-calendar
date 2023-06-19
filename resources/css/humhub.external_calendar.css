@@ -1,8 +1,4 @@
 /* OPTIONS */
-.regular-checkbox:not(:checked) + .regular-checkbox-box {
-    background-color: #fff;
-}
-
 .calendar-selectors {
     display:inline-block;
     float:left;

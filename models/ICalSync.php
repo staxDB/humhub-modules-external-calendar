@@ -148,7 +148,7 @@ class ICalSync extends Model
             $this->syncNonRecurringEvents();
             $this->syncRecurringEvents();
         } catch (\Exception $e) {
-            $this->error(Yii::t('ExternalCalendarModule.base', 'There was an error while synchronizing an ical calendar'), $e);
+            $this->error(Yii::t('ExternalCalendarModule.base', 'There was an error while synchronizing an ical calendar') . ': ' . $this->calendarModel->content->container->createUrl('/external_calendar/calendar/view', ['id' => $this->calendarModel->id]), $e);
         }
     }
 
