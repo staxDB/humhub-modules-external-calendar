@@ -1,15 +1,15 @@
 <?php
 return array (
-  '(No Title)' => '',
+  '(No Title)' => '(Pas de titre)',
   'All Day' => 'Toute la journée',
   'Calendar' => 'Calendrier',
-  'DT Stamp' => '',
+  'DT Stamp' => 'Timbre DT',
   'Description' => 'Description',
-  'End Datetime' => '',
+  'End Datetime' => 'Date et heure de fin',
   'ID' => 'ID',
-  'Last Modified' => '',
+  'Last Modified' => 'Dernière modification',
   'Location' => 'Lieu',
-  'Start Datetime' => '',
+  'Start Datetime' => 'Date et heure de début',
   'Title' => 'Titre',
-  'UID' => '',
+  'UID' => 'UID',
 );

@@ -12,7 +12,7 @@ use humhub\widgets\ModalDialog;
 
 <?php ModalDialog::begin(['size' => 'large', 'closable' => true]); ?>
     <div class="modal-body" style="padding-bottom:0px">
-        <?= $this->renderAjax('view', ['model' => $model, 'stream' => false]) ?>
+        <?= $this->renderAjax('view', ['model' => $model]) ?>
     </div>
     <div class="modal-footer">
         <?php if ($canManageEntries): ?>

@@ -3,14 +3,19 @@
   "description": "HumHub calendar module",
   "type": "library",
   "require": {
-    "php": ">=5.6",
-    "johngrogg/ics-parser": "^2",
+    "php": ">=7.1",
+    "johngrogg/ics-parser": "^3",
     "nesbot/carbon": "^1.39.0",
     "simshaun/recurr": "^4",
     "symfony/translation": "v3.4.30",
-    "doctrine/collections": "v1.4.0"
+    "doctrine/collections": "v1.6.8"
   },
   "require-dev": {
-    "phpunit/php-timer": "^1.0.9"
+    "phpunit/php-timer": "^5.0.3"
+  },
+  "config": {
+    "allow-plugins": {
+      "kylekatarnls/update-helper": true
+    }
   }
 }

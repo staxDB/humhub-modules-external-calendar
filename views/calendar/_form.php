@@ -1,5 +1,6 @@
 <?php
 
+use humhub\modules\ui\form\widgets\ContentVisibilitySelect;
 use humhub\modules\ui\form\widgets\ActiveForm;
 use humhub\modules\ui\form\widgets\ColorPicker;
 use humhub\widgets\Button;
@@ -41,7 +42,7 @@ if (!isset($model->color) && isset($contentContainer->color)) {
     <?= $form->field($model, 'url')->textarea(['rows' => 6, 'placeholder' => Yii::t('ExternalCalendarModule.model_calendar', 'e.g. https://calendar.google.com/calendar/ical/...')]) ?>
 
 
-    <?= $form->field($model, 'public')->checkbox() ?>
+    <?= $form->field($model, 'public')->widget(ContentVisibilitySelect::class) ?>
     <?= $form->field($model, 'sync_mode')->dropDownList($model->getSyncModeItems()) ?>
     <?= $form->field($model, 'event_mode')->dropDownList($model->getEventModeItems()) ?>
 
