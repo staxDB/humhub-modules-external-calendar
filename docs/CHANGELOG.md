@@ -1,9 +1,12 @@
 Changelog
 =========
 
-1.4.0 (19 June, 2023)
+1.4.0 (Unreleased)
 ---------------------
 - Fix: Hard delete calendar items on synchronization of imported calendar
+- Enh #140: Use widget ContentVisibiltySelect
+- Enh: Use default timezone instead of deprecated server timezone
+- Enh: Added French translations
 - Fix #47: Error adding an iCalendar link (updated ics-parser library to version 3)
 
 1.3.3 (March 7, 2023)
