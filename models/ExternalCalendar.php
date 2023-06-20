@@ -193,6 +193,11 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
      */
     public function validateURL($attribute, $params)
     {
+        if(!filter_var($this->url, FILTER_VALIDATE_URL)) {
+            $this->addError($attribute, Yii::t('ExternalCalendarModule.sync_result', "Bad URL"));
+            return false;
+        }
+
         try {
             new ICal($this->url, [
                 'defaultTimeZone' => Yii::$app->timeZone,
@@ -200,7 +205,9 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
         } catch (\Exception $e) {
             $this->addError($attribute, Yii::t('ExternalCalendarModule.sync_result', "Error while fetching ical"));
             Yii::error($e);
+            return false;
         }
+        return true;
     }
 
     /**

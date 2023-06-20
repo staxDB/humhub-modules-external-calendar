@@ -104,7 +104,7 @@ class CalendarController extends ContentContainerController
         $model = ($id) ? $this->findModel($id) : new ExternalCalendar($this->contentContainer);
 
         try {
-            if ($model->load(Yii::$app->request->post())) {
+            if ($model->load(Yii::$app->request->post()) && $model->validate()) {
                 (new ICalSync(['calendarModel' => $model, 'skipEvents' => true]))->syncICal();
                 if(!$model->hasErrors()) {
                     $this->view->success(Yii::t('ExternalCalendarModule.results', 'Calendar successfully created!'));
@@ -114,10 +114,6 @@ class CalendarController extends ContentContainerController
         } catch (\Exception $e) {
             Yii::warning($e);
             $this->view->error(Yii::t('ExternalCalendarModule.results', 'Error while creating iCal File. Please check, if Url is correct and Internet connection of server is enabled.'));
-            return $this->render('edit', [
-                'model' => $model,
-                'contentContainer' => $this->contentContainer
-            ]);
         }
 
         return $this->render('edit', [

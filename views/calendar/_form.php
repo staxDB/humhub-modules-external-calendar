@@ -10,17 +10,18 @@ use humhub\widgets\Button;
 /* @var $contentContainer \humhub\modules\content\models\ContentContainer */
 /* @var $form yii\widgets\ActiveForm */
 
-if ($model->color == null && isset($contentContainer->color)) {
+if (!isset($model->color) && isset($contentContainer->color)) {
     $model->color = $contentContainer->color;
-} elseif ($model->color == null) {
+} elseif (!isset($model->color)) {
     $model->color = '#d1d1d1';
 }
 
 \humhub\modules\external_calendar\assets\Assets::register($this);
 ?>
 <div class="calendar-extension-calendar-form">
+    <?php $form = ActiveForm::begin(['id'=>'add-new-calendar', 'method'=>'post', 'enableClientValidation' => true]); ?>
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?= $form->errorSummary($model) ?>
 
     <div id="event-color-field" class="form-group space-color-chooser-edit" style="margin-top: 5px;">
         <?= $form->field($model, 'color')->widget(ColorPicker::class, ['container' => 'event-color-field'])->label(Yii::t('ExternalCalendarModule.views_calendar', 'Title and Color')); ?>
