@@ -232,7 +232,7 @@ class ICalSync extends Model
         // finally delete items from db
         foreach ($eventModels as $model) {
             if (!$model->isRecurring()) {
-                $model->delete();
+                $model->hardDelete();
             }
         }
     }
@@ -273,7 +273,7 @@ class ICalSync extends Model
 
         // delete remaining models
         foreach ($existingModels as $model) {
-            $model->delete();
+            $model->hardDelete();
         }
     }
 
@@ -376,7 +376,7 @@ class ICalSync extends Model
 
             if (empty($alteredICalEvents)) {
                 foreach ($model->getAlteredRecurrences()->all() as $remainingAlteredModels) {
-                    $remainingAlteredModels->delete();
+                    $remainingAlteredModels->hardDelete();
                 }
                 return;
             }
@@ -398,7 +398,7 @@ class ICalSync extends Model
             // Delete remaining db models
             $remainingAlteredModels = $model->getAlteredRecurrences()->andWhere(['NOT IN', 'recurrence_id', $alteredRecurrenceIds])->all();
             foreach ($remainingAlteredModels as $remainingAlteredModel) {
-                $remainingAlteredModel->delete();
+                $remainingAlteredModel->hardDelete();
             }
         } catch (\Exception $e) {
             $this->error(Yii::t('ExternalCalendarModule.base', 'Could not sync altered events of recurrent ical event'), $e);

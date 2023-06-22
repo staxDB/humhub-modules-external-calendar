@@ -50,7 +50,7 @@ class Module extends ContentContainerModule
 //            $entry->delete();
 //        }
         foreach (ExternalCalendar::find()->all() as $entry) {
-            $entry->delete();
+            $entry->hardDelete();
         }
         parent::disable();
     }
@@ -99,7 +99,7 @@ class Module extends ContentContainerModule
         set_time_limit(180); // Set max execution time 3 minutes.
         parent::disableContentContainer($container);
         foreach (ExternalCalendar::find()->contentContainer($container)->all() as $item) {
-            $item->delete();
+            $item->hardDelete();
         }
     }
 

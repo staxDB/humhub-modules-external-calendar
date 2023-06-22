@@ -4,6 +4,7 @@ namespace humhub\modules\external_calendar\models;
 
 use Colors\RandomColor;
 use humhub\libs\Html;
+use humhub\modules\content\components\ActiveQueryContent;
 use humhub\modules\content\components\ContentContainerActiveRecord;
 use humhub\modules\external_calendar\jobs\UpdateCalendarVisibility;
 use humhub\modules\external_calendar\models\forms\ConfigForm;
@@ -352,10 +353,7 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
         }
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getEntries($includeRecurrences = true)
+    public function getEntries(bool $includeRecurrences = true): ActiveQueryContent
     {
         $query = $this->hasMany(ExternalCalendarEntry::class, ['calendar_id' => 'id']);
 
@@ -363,7 +361,7 @@ class ExternalCalendar extends ContentActiveRecord implements Searchable
             $query->andWhere('external_calendar_entry.parent_event_id IS NULL');
         }
 
-        return $query;
+        return $query->readable();
     }
 
     /**

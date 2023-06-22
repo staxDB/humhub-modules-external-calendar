@@ -407,7 +407,7 @@ class ExternalCalendarEntry extends ContentActiveRecord implements Searchable
         }
 
         foreach ($instances as $recurrence) {
-            $recurrence->delete();
+            $recurrence->hardDelete();
         }
     }
 

@@ -3,6 +3,7 @@ Changelog
 
 1.4.0 (Unreleased)
 ---------------------
+- Fix: Hard delete calendar items on synchronization of imported calendar
 - Enh #140: Use widget ContentVisibiltySelect
 - Enh: Use default timezone instead of deprecated server timezone
 - Enh: Added French translations
