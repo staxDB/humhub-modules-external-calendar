@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.4.0 (Unreleased)
+1.4.0 (June 22, 2023)
 ---------------------
 - Fix: Hard delete calendar items on synchronization of imported calendar
 - Enh #140: Use widget ContentVisibiltySelect
