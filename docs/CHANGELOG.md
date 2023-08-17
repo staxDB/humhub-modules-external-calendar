@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.4.1 (Unreleased)
+---------------------
+- Fix #54: Initialize module content class
+
 1.4.0 (June 22, 2023)
 ---------------------
 - Fix: Hard delete calendar items on synchronization of imported calendar
@@ -131,4 +135,3 @@ v0.1.3
 v0.1.2
 ----------------------
 - First stable release
-
