@@ -33,7 +33,7 @@ class ImportPerformanceTest extends ExternalCalendarTest
             DateTime::createFromFormat('!Ymd', '20190801', new \DateTimeZone('Europe/Berlin')),
             DateTime::createFromFormat('!Ymd', '20200801', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
-        print_r('Expand '.$timer->stop()->asString().' ('.count($events).")\n");
+        print_r('Expand '.$timer->stop().' ('.count($events).")\n");
     }
 
     public function testExpandRecurrence2OneYear()
@@ -45,7 +45,7 @@ class ImportPerformanceTest extends ExternalCalendarTest
             DateTime::createFromFormat('!Ymd', '20220801', new \DateTimeZone('Europe/Berlin')),
             DateTime::createFromFormat('!Ymd', '20230801', new \DateTimeZone('Europe/Berlin')),
             Space::findOne(1));
-        print_r('Expand '.$timer->stop()->asString().' ('.count($events).")\n");
+        print_r('Expand '.$timer->stop().' ('.count($events).")\n");
     }
 
 }

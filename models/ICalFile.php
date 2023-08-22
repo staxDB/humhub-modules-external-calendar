@@ -11,7 +11,14 @@ use Yii;
 
 class ICalFile extends ICal implements ICalIF
 {
+    /**
+     * @var ICalFileEvent[] $recurrenceRoots
+     */
     public $recurrenceRoots;
+
+    /**
+     * @var ICalFileEvent[] $alteredRecurrences
+     */
     public $alteredRecurrences;
 
     public function __construct($files = false, array $options = array())
@@ -72,8 +79,8 @@ class ICalFile extends ICal implements ICalIF
         }
 
         foreach ($events as $anEvent) {
-            $eventStart = $anEvent->dtstart_array[2];
-            $eventEnd = (isset($anEvent->dtend_array[2])) ? $anEvent->dtend_array[2] : null;
+            $eventStart = $anEvent->getDtstartValue(2);
+            $eventEnd = $anEvent->getDtendValue(2);
 
             if ($findRecurrences) {
                 $this->checkForRecurrence($anEvent);
@@ -175,8 +182,8 @@ class ICalFile extends ICal implements ICalIF
         $this->checkForRecurrences();
         $result = [];
         foreach ($this->recurrenceRoots as $recurrenceRoot) {
-            $recurrenceStart = $recurrenceRoot->dtstart_array[2];
-            $rrule = new Rule($recurrenceRoot->rrule);
+            $recurrenceStart = $recurrenceRoot->getDtstartValue(2);
+            $rrule = new Rule($recurrenceRoot->getRrule());
             $recurrenceEnd = $rrule->getUntil();
 
             if ($recurrenceEnd) {
@@ -243,7 +250,7 @@ class ICalFile extends ICal implements ICalIF
     {
        $this->checkForAlteredRecurrence($anEvent);
 
-        if (!empty($anEvent->rrule) && empty($anEvent->getRecurrenceId())) {
+        if (!empty($anEvent->getRrule()) && empty($anEvent->getRecurrenceId())) {
             $this->recurrenceRoots[] = $anEvent;
         }
     }
