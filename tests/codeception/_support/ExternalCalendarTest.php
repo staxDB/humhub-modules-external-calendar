@@ -24,6 +24,11 @@ class ExternalCalendarTest extends HumHubDbTestCase
         Events::registerAutoloader();
     }
 
+    public function getFileAlias($file): string
+    {
+        return 'file://' . str_replace('\\', '/', Yii::getAlias($file));
+    }
+
     protected function initCalendar($file = '@external_calendar/tests/codeception/data/test1.ics', $params = [], $asAdmin = true)
     {
         if($asAdmin) {
@@ -35,7 +40,7 @@ class ExternalCalendarTest extends HumHubDbTestCase
             'allowFiles' => true,
             'title' => 'test',
             'event_mode' => ExternalCalendar::EVENT_MODE_ALL,
-            'url' => Yii::getAlias($file)
+            'url' => $this->getFileAlias($file)
         ], $params);
 
         $externalCalendar = new ExternalCalendar(Space::findOne(1), $params);

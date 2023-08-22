@@ -502,7 +502,7 @@ class RecurrentImportTest extends ExternalCalendarTest
         $this->assertNotEmpty($events);
 
         // Sync with empty ical, this should remove all entries and recurrences
-        $externalCalendar->url = Yii::getAlias('@external_calendar/tests/codeception/data/empty.ics');
+        $externalCalendar->url = $this->getFileAlias('@external_calendar/tests/codeception/data/empty.ics');
         $externalCalendar->save();
         $externalCalendar->refresh();
 
