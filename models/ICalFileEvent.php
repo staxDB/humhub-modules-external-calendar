@@ -22,6 +22,11 @@ class ICalFileEvent extends Event implements ICalEventIF
     protected $endDateTime;
 
 
+    public function __get($name)
+    {
+        return $this->$name ?? parent::__get($name) ?? null;
+    }
+
     public function getUid()
     {
         return $this->uid;
@@ -46,7 +51,7 @@ class ICalFileEvent extends Event implements ICalEventIF
 
     public function getRrule()
     {
-        return isset($this->rrule) ? $this->rrule : null;
+        return $this->rrule;
     }
 
     public function getLocation()
@@ -56,11 +61,7 @@ class ICalFileEvent extends Event implements ICalEventIF
 
     public function getLastModified()
     {
-        if(isset($this->last_modified)) {
-            return $this->last_modified;
-        }
-
-        return null;
+        return $this->last_modified;
     }
 
     public function getTimeStamp()
@@ -96,11 +97,12 @@ class ICalFileEvent extends Event implements ICalEventIF
      */
     public function getRecurrenceId()
     {
-        if($this->getRrule() && !isset($this->recurrence_id)) {
+        $recurrence_id = $this->recurrence_id;
+        if ($this->getRrule() && !isset($recurrence_id)) {
             CalendarUtils::cleanRecurrentId($this->getStart());
         }
 
-        return isset($this->recurrence_id) ? CalendarUtils::cleanRecurrentId($this->recurrence_id) : null;
+        return isset($recurrence_id) ? CalendarUtils::cleanRecurrentId($recurrence_id) : null;
     }
 
     /**
@@ -108,7 +110,7 @@ class ICalFileEvent extends Event implements ICalEventIF
      */
     public function getExdate()
     {
-        return isset($this->exdate) ? $this->exdate : null;
+        return $this->exdate;
     }
 
     public function getExdateArray()
@@ -123,11 +125,7 @@ class ICalFileEvent extends Event implements ICalEventIF
      */
     public function getStartDateTime()
     {
-        if(!$this->startDateTime) {
-            $this->startDateTime = $this->getDateTimeFromDTArray($this->dtstart_array);
-        }
-
-        return $this->startDateTime;
+        return $this->startDateTime ?? $this->getDateTimeFromDTArray($this->getDtstartArray());
     }
 
     private function getDateTimeFromDTArray($dtArr)
@@ -151,19 +149,20 @@ class ICalFileEvent extends Event implements ICalEventIF
      */
     public function getEndDateTime()
     {
-        if($this->endDateTime) {
+        if ($this->endDateTime) {
             return $this->endDateTime;
         }
 
-        if(!empty($this->dtend_array)) {
-            return $this->endDateTime = $this->getDateTimeFromDTArray($this->dtend_array);
+        if (!empty($this->getDtendArray())) {
+            return $this->endDateTime = $this->getDateTimeFromDTArray($this->getDtendArray());
         }
 
         $this->endDateTime = clone $this->getStartDateTime();
 
-        if(!empty($this->duration_array)) {
-            $this->endDateTime->add($this->duration_array[2]);
-        } else if($this->isDateOnlyFormat($this->dtstart)) {
+        $duration_array = $this->duration_array;
+        if (!empty($duration_array)) {
+            $this->endDateTime->add($duration_array[2]);
+        } else if ($this->isDateOnlyFormat($this->dtstart)) {
             // https://tools.ietf.org/html/rfc5545#page-54
             $this->endDateTime->modify('+1 day');
         }
@@ -191,5 +190,25 @@ class ICalFileEvent extends Event implements ICalEventIF
     public function getCreated()
     {
         return $this->created;
+    }
+
+    public function getDtstartArray(): array
+    {
+        return $this->dtstart_array ?? [];
+    }
+
+    public function getDtstartValue($index)
+    {
+        return $this->getDtstartArray()[$index] ?? null;
+    }
+
+    public function getDtendArray(): array
+    {
+        return $this->dtend_array ?? [];
+    }
+
+    public function getDtendValue($index)
+    {
+        return $this->getDtendArray()[$index] ?? null;
     }
 }

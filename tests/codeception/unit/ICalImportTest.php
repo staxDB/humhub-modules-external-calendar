@@ -182,7 +182,7 @@ class ICalImportTest extends ExternalCalendarTest
             'allowFiles' => true,
             'title' => 'test',
             'public' => Content::VISIBILITY_PUBLIC,
-            'url' => Yii::getAlias('@external_calendar/tests/codeception/data/test1.ics')
+            'url' => $this->getFileAlias('@external_calendar/tests/codeception/data/test1.ics')
         ]);
 
         $externalCalendar->save();

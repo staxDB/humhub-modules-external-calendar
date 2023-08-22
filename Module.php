@@ -2,14 +2,15 @@
 
 namespace humhub\modules\external_calendar;
 
-use Yii;
-use yii\helpers\Url;
-use humhub\modules\external_calendar\permissions\ManageCalendar;
+use humhub\modules\content\components\ContentContainerActiveRecord;
+use humhub\modules\content\components\ContentContainerModule;
 use humhub\modules\external_calendar\models\ExternalCalendar;
+use humhub\modules\external_calendar\models\ExternalCalendarEntry;
+use humhub\modules\external_calendar\permissions\ManageCalendar;
 use humhub\modules\space\models\Space;
 use humhub\modules\user\models\User;
-use humhub\modules\content\components\ContentContainerModule;
-use humhub\modules\content\components\ContentContainerActiveRecord;
+use Yii;
+use yii\helpers\Url;
 
 class Module extends ContentContainerModule
 {
@@ -25,6 +26,17 @@ class Module extends ContentContainerModule
         return [
             Space::class,
             User::class,
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getContentClasses(): array
+    {
+        return [
+            ExternalCalendar::class,
+            ExternalCalendarEntry::class
         ];
     }
 
