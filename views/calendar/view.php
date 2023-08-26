@@ -1,13 +1,17 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\DetailView;
 use humhub\widgets\ModalButton;
 use humhub\modules\calendar\widgets\ContainerConfigMenu;
 use humhub\widgets\Button;
+use humhub\modules\external_calendar\assets\Assets;
 
 /* @var $this yii\web\View */
 /* @var $model \humhub\modules\external_calendar\models\ExternalCalendar */
+
+Assets::register($this);
 
 $this->title = $model->title;
 
@@ -33,19 +37,22 @@ $this->title = $model->title;
 
         <div class="btn-group-sm">
             <?= Button::primary(Yii::t('ExternalCalendarModule.base', 'Edit'))
-                ->link( $contentContainer->createUrl('edit', ['id' => $model->id]))->icon('fa-pencil-square-o'); ?>
-
-            <?= humhub\widgets\ModalConfirm::widget([
-                'uniqueID' => 'modal_delete_task_' . $model->id,
-                'linkOutput' => 'a',
-                'title' => Yii::t('ExternalCalendarModule.base', '<strong>Confirm</strong> deleting'),
-                'message' => Yii::t('ExternalCalendarModule.base', 'Are you sure you want to delete this item?'),
-                'buttonTrue' => Yii::t('ExternalCalendarModule.base', 'Delete'),
-                'buttonFalse' => Yii::t('ExternalCalendarModule.base', 'Cancel'),
-                'linkContent' => '<i class="fa fa-trash-o delete"></i>&nbsp;' . Yii::t('ExternalCalendarModule.base', 'Delete'),
-                'linkHref' => $contentContainer->createUrl('delete', ['id' => $model->id]),
-                'cssClass' => 'btn btn-danger'
-            ]); ?>
+                ->link($contentContainer->createUrl('edit', ['id' => $model->id]))->icon('fa-pencil-square-o'); ?>
+            <?= Html::a(
+                Html::tag('i', '', ['class' => ['fa', 'fa-trash-o', 'delete']]) . ' ' . Yii::t('ExternalCalendarModule.base', 'Delete'),
+                Url::to($contentContainer->createUrl('delete', ['id' => $model->id])), [
+                    'id' => 'modal_delete_task_' . $model->id,
+                    'class' => 'btn btn-danger',
+                    'title' => Yii::t('ExternalCalendarModule.base', 'Delete'),
+                    'data' => [
+                        'action-click' => 'external_calendar.removeCalendar',
+                        'action-confirm-header' => Yii::t('ExternalCalendarModule.base', '<strong>Confirm</strong> deleting'),
+                        'action-confirm' => Yii::t('ExternalCalendarModule.base', 'Are you sure you want to delete this item?'),
+                        'action-confirm-text' => Yii::t('ExternalCalendarModule.base', 'Delete'),
+                        'action-cancel-text' => Yii::t('ExternalCalendarModule.base', 'Cancel'),
+                    ],
+                ]
+            ); ?>
 
             <?= ModalButton::primary(Yii::t('ExternalCalendarModule.views_calendar', 'Sync Calendar'))->load($contentContainer->createUrl('sync', ['id' => $model->id]))->loader(true)->icon('fa-refresh')->right(); ?>
         </div>
